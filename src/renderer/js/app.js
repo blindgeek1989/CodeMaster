@@ -530,10 +530,89 @@ function showWelcome() {
   h1.focus();
 }
 
+// ===== Auto-updater UI =====
+function initUpdater() {
+  const banner = document.getElementById('update-banner');
+  const versionLabel = document.getElementById('update-version-label');
+  const notesBody = document.getElementById('update-notes');
+  const btnDownload = document.getElementById('btn-download-update');
+  const btnDismiss = document.getElementById('btn-dismiss-update');
+  const progressSection = document.getElementById('update-progress-section');
+  const progressBar = document.getElementById('update-progress-bar');
+  const progressLabel = document.getElementById('update-progress-label');
+  const restartSection = document.getElementById('update-restart-section');
+  const btnInstall = document.getElementById('btn-install-update');
+
+  if (!window.electronAPI) return;
+
+  // Show app version in header
+  window.electronAPI.getVersion().then(v => {
+    const versionEl = document.getElementById('app-version-display');
+    if (versionEl) versionEl.textContent = `v${v}`;
+  });
+
+  window.electronAPI.onUpdateAvailable((info) => {
+    versionLabel.textContent = `Version ${info.version}`;
+
+    // Release notes may be HTML or plain text from GitHub
+    if (info.releaseNotes) {
+      const stripped = info.releaseNotes
+        .replace(/<[^>]+>/g, '')  // strip HTML tags for screen reader safety
+        .trim();
+      notesBody.textContent = stripped || 'No release notes provided.';
+    } else {
+      notesBody.textContent = 'No release notes provided.';
+    }
+
+    banner.hidden = false;
+    announce(`Update available: Version ${info.version}. Use the update bar to download.`);
+    btnDownload.focus();
+  });
+
+  window.electronAPI.onDownloadProgress((progress) => {
+    progressSection.hidden = false;
+    btnDownload.disabled = true;
+    btnDownload.textContent = 'Downloading…';
+
+    progressBar.style.setProperty('--progress', `${progress.percent}%`);
+    progressBar.setAttribute('aria-valuenow', progress.percent);
+    progressLabel.textContent = `${progress.percent}%`;
+  });
+
+  window.electronAPI.onUpdateDownloaded((info) => {
+    progressSection.hidden = true;
+    restartSection.hidden = false;
+    announce(`Update downloaded. Version ${info.version} is ready. Press Restart and Install to apply.`);
+    btnInstall.focus();
+  });
+
+  window.electronAPI.onUpdateError((msg) => {
+    announce(`Update error: ${msg}`);
+    btnDownload.disabled = false;
+    btnDownload.textContent = 'Retry Download';
+    progressSection.hidden = true;
+  });
+
+  btnDownload.addEventListener('click', () => {
+    window.electronAPI.downloadUpdate();
+    announce('Downloading update. Please wait.');
+  });
+
+  btnDismiss.addEventListener('click', () => {
+    banner.hidden = true;
+    announce('Update notification dismissed. You can check for updates later.');
+  });
+
+  btnInstall.addEventListener('click', () => {
+    window.electronAPI.installUpdate();
+  });
+}
+
 // ===== Init =====
 function init() {
   buildSidebar();
   showWelcome();
+  initUpdater();
 }
 
 document.addEventListener('DOMContentLoaded', init);

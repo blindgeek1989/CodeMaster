@@ -4,6 +4,24 @@ All notable changes to CodeMaster are documented here.
 When you publish a GitHub Release, paste the relevant section into the release notes
 so users see "What's new" in the update notification.
 
+## [1.3.0] - 2026-07-31
+
+### Added
+- Python Fundamentals module — 10 lessons from zero assumed knowledge:
+  - Lesson 1: What Is Python? (history, uses, accessibility note)
+  - Lesson 2: Your First Python Program (print, sep=, end=)
+  - Lesson 3: Variables and Data Types (str, int, float, bool, type())
+  - Lesson 4: Working with Strings (f-strings, .upper/.strip/.replace, len, indexing)
+  - Lesson 5: Lists (create, index, append, for loop)
+  - Lesson 6: Making Decisions (if/elif/else, comparison and boolean operators)
+  - Lesson 7: Loops (for/range, enumerate, while, break, continue)
+  - Lesson 8: Functions (def, parameters, return, default params, docstrings)
+  - Lesson 9: Dictionaries (key-value, .get, .items, looping)
+  - Lesson 10: Error Handling (try/except/else/finally, raise, common exception types)
+- Stepped exercises: all exercises now show "Step X of Y" and require completing each step before advancing
+- Python exercises execute real code — output is shown in the editor and verified against expected output where applicable
+- Python code execution: main process spawns python via child_process; shows friendly error if Python is not installed
+
 ## [1.2.0] - 2026-07-31
 
 ### Added

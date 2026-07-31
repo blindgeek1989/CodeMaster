@@ -597,6 +597,40 @@ body {
 
 .exercise-output.show {
   display: block;
+  white-space: pre-wrap;
+}
+
+.exercise-output.success {
+  border-color: #16a34a;
+  color: #bbf7d0;
+}
+
+.exercise-output.error {
+  border-color: #dc2626;
+  color: #fca5a5;
+}
+
+.step-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.step-next-btn {
+  margin-top: 0.75rem;
+  display: block;
+}
+
+.step-next-btn[hidden] {
+  display: none;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* ===== Visually hidden utilities ===== */

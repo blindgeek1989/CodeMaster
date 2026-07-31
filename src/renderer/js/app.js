@@ -6,6 +6,7 @@ const MODULES = {
   css: window.cssModule,
   'css-sr': window.cssScreenReaderModule,
   javascript: window.jsModule,
+  python: window.pythonModule,
 };
 
 // ===== State =====
@@ -65,6 +66,7 @@ function buildSidebar() {
     { id: 'html',       icon: '📄', label: 'HTML' },
     { id: 'css',        icon: '🎨', label: 'CSS' },
     { id: 'javascript', icon: '⚡', label: 'JavaScript' },
+    { id: 'python',     icon: '🐍', label: 'Python' },
   ];
 
   moduleNav.innerHTML = '';
@@ -346,7 +348,7 @@ function showLesson(moduleId, lessonIndex) {
 
   // ── Exercise ──
   if (lesson.exercise) {
-    mainContent.appendChild(buildExercise(lesson.exercise, lesson.title));
+    mainContent.appendChild(buildExercise(lesson.exercise, lesson.title, moduleId));
   }
 
   // ── Navigation ──
@@ -472,7 +474,7 @@ function showModuleComplete(moduleId) {
 }
 
 function getNextModuleId(currentId) {
-  const order = ['html', 'css', 'javascript'];
+  const order = ['html', 'css', 'javascript', 'python'];
   const navId = currentId === 'css-sr' ? 'css' : currentId;
   const idx   = order.indexOf(navId);
   if (idx === -1 || idx === order.length - 1) return null;
@@ -577,7 +579,13 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
 }
 
 // ===== Exercise builder =====
-function buildExercise(exercise, lessonTitle) {
+function buildExercise(exercise, lessonTitle, moduleId) {
+  // Normalise: old format {prompt, starterCode, solution} → stepped format
+  const steps = exercise.steps || [
+    { instruction: exercise.prompt, starterCode: exercise.starterCode, solution: exercise.solution },
+  ];
+
+  const isPython = moduleId === 'python';
   const section = document.createElement('div');
   section.className = 'exercise-section';
 
@@ -586,24 +594,27 @@ function buildExercise(exercise, lessonTitle) {
   h2.textContent = 'Coding Exercise';
   section.appendChild(h2);
 
-  const prompt = document.createElement('p');
-  prompt.className = 'exercise-prompt';
-  prompt.textContent = exercise.prompt;
-  section.appendChild(prompt);
+  // Step counter header
+  const stepHeader = document.createElement('div');
+  stepHeader.className = 'step-header';
+  stepHeader.setAttribute('aria-live', 'polite');
+  section.appendChild(stepHeader);
+
+  // Instruction paragraph
+  const instructionEl = document.createElement('p');
+  instructionEl.className = 'exercise-prompt';
+  section.appendChild(instructionEl);
 
   const edId = `editor-${lessonTitle.replace(/\W+/g, '-')}`;
 
   const lbl = document.createElement('label');
   lbl.setAttribute('for', edId);
   lbl.className = 'sr-only-label';
-  lbl.textContent = `Code editor for: ${exercise.prompt}`;
   section.appendChild(lbl);
 
   const editor = document.createElement('textarea');
   editor.className = 'code-editor';
   editor.id = edId;
-  editor.value = exercise.starterCode;
-  editor.setAttribute('aria-label', `Code editor: ${exercise.prompt}`);
   editor.setAttribute('spellcheck', 'false');
   editor.setAttribute('autocorrect', 'off');
   editor.setAttribute('autocapitalize', 'off');
@@ -613,8 +624,8 @@ function buildExercise(exercise, lessonTitle) {
       e.preventDefault();
       const s = editor.selectionStart;
       const end = editor.selectionEnd;
-      editor.value = editor.value.substring(0, s) + '  ' + editor.value.substring(end);
-      editor.selectionStart = editor.selectionEnd = s + 2;
+      editor.value = editor.value.substring(0, s) + '    ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = s + 4;
     }
   });
 
@@ -623,16 +634,15 @@ function buildExercise(exercise, lessonTitle) {
   const actions = document.createElement('div');
   actions.className = 'exercise-actions';
 
-  const runBtn      = document.createElement('button');
-  runBtn.className  = 'btn-primary';
-  runBtn.textContent = 'Submit code';
+  const runBtn = document.createElement('button');
+  runBtn.className = 'btn-primary';
+  runBtn.textContent = isPython ? 'Run code' : 'Submit code';
 
-  const solBtn      = document.createElement('button');
-  solBtn.className  = 'btn-secondary';
+  const solBtn = document.createElement('button');
+  solBtn.className = 'btn-secondary';
   solBtn.textContent = 'Show solution';
-  let solShown = false;
 
-  const resetBtn    = document.createElement('button');
+  const resetBtn = document.createElement('button');
   resetBtn.className = 'btn-secondary';
   resetBtn.textContent = 'Reset';
 
@@ -648,38 +658,132 @@ function buildExercise(exercise, lessonTitle) {
   output.setAttribute('aria-live', 'polite');
   section.appendChild(output);
 
-  runBtn.addEventListener('click', () => {
-    output.textContent = 'Code submitted! Compare your work with the solution to check your understanding.';
+  // Next step / finish button — hidden until step is passed
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn-primary step-next-btn';
+  nextBtn.setAttribute('hidden', '');
+  section.appendChild(nextBtn);
+
+  let currentStep = 0;
+  let stepPassed = false;
+  let solShown = false;
+
+  function renderStep(idx) {
+    const step = steps[idx];
+    stepPassed = false;
+    solShown = false;
+    nextBtn.setAttribute('hidden', '');
+    output.textContent = '';
+    output.classList.remove('show', 'success', 'error');
+
+    stepHeader.textContent = `Step ${idx + 1} of ${steps.length}`;
+    instructionEl.textContent = step.instruction;
+    lbl.textContent = `Code editor for step ${idx + 1}: ${step.instruction}`;
+    editor.setAttribute('aria-label', `Code editor, step ${idx + 1}: ${step.instruction}`);
+    editor.value = step.starterCode;
+    solBtn.textContent = 'Show solution';
+
+    nextBtn.textContent = idx < steps.length - 1 ? 'Next step →' : 'Finish exercise ✓';
+    announce(`Step ${idx + 1} of ${steps.length}. ${step.instruction}`);
+  }
+
+  function markStepPassed(message, isSuccess) {
+    stepPassed = true;
+    output.textContent = message;
     output.classList.add('show');
-    announce('Code submitted.');
+    output.classList.toggle('success', isSuccess);
+    output.classList.toggle('error', !isSuccess);
+    if (isSuccess) nextBtn.removeAttribute('hidden');
+  }
+
+  runBtn.addEventListener('click', async () => {
+    const step = steps[currentStep];
+    const code = editor.value;
+
+    if (isPython && window.electronAPI) {
+      runBtn.disabled = true;
+      runBtn.textContent = 'Running…';
+      output.textContent = 'Running your code…';
+      output.classList.add('show');
+      output.classList.remove('success', 'error');
+
+      try {
+        const result = await window.electronAPI.runCode(code, 'python');
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run code';
+
+        if (result.success) {
+          let msg = result.output || '(No output)';
+          if (step.expectedOutput !== undefined) {
+            const passed = result.output.trim() === step.expectedOutput.trim();
+            msg = passed
+              ? `Output:\n${result.output}\n\n✓ Correct!`
+              : `Output:\n${result.output}\n\nExpected:\n${step.expectedOutput}\n\nNot quite — check your code and try again.`;
+            markStepPassed(msg, passed);
+          } else {
+            markStepPassed(`Output:\n${msg}\n\nLooks good! Check the output matches what you expected.`, true);
+          }
+        } else {
+          output.textContent = `Error:\n${result.output}`;
+          output.classList.add('show', 'error');
+          output.classList.remove('success');
+          announce('Your code has an error. Read the error message below the editor.');
+        }
+      } catch (err) {
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run code';
+        output.textContent = 'Could not run code. Make sure Python is installed.';
+        output.classList.add('show', 'error');
+      }
+    } else {
+      markStepPassed('Code submitted! Compare your work with the solution to check your understanding.', true);
+    }
   });
 
   solBtn.addEventListener('click', () => {
     solShown = !solShown;
+    const step = steps[currentStep];
     if (solShown) {
-      editor.value = exercise.solution;
+      editor.value = step.solution;
       solBtn.textContent = 'Hide solution';
       output.textContent = 'Solution loaded. Study it, then press Reset to try again.';
       output.classList.add('show');
+      output.classList.remove('success', 'error');
       announce('Solution loaded into the code editor.');
     } else {
-      editor.value = exercise.starterCode;
+      editor.value = step.starterCode;
       solBtn.textContent = 'Show solution';
       output.textContent = '';
-      output.classList.remove('show');
+      output.classList.remove('show', 'success', 'error');
       announce('Editor reset to starter code.');
     }
   });
 
   resetBtn.addEventListener('click', () => {
-    editor.value = exercise.starterCode;
+    editor.value = steps[currentStep].starterCode;
     solShown = false;
     solBtn.textContent = 'Show solution';
     output.textContent = '';
-    output.classList.remove('show');
+    output.classList.remove('show', 'success', 'error');
+    stepPassed = false;
+    nextBtn.setAttribute('hidden', '');
     announce('Editor reset to starter code.');
   });
 
+  nextBtn.addEventListener('click', () => {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      renderStep(currentStep);
+      editor.focus();
+    } else {
+      output.textContent = 'Exercise complete! Great work.';
+      output.classList.add('show', 'success');
+      nextBtn.setAttribute('hidden', '');
+      announce('Exercise complete!');
+    }
+  });
+
+  renderStep(0);
   return section;
 }
 
@@ -709,6 +813,7 @@ function showWelcome() {
     { id: 'html',       icon: '📄', label: 'HTML',       desc: '10 lessons — Start here' },
     { id: 'css',        icon: '🎨', label: 'CSS',        desc: '9 lessons' },
     { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '9 lessons' },
+    { id: 'python',     icon: '🐍', label: 'Python',     desc: '10 lessons' },
   ];
 
   defs.forEach(({ id, icon, label, desc }) => {

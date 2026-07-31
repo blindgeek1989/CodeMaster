@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow = null;
@@ -82,8 +83,40 @@ autoUpdater.on('error', (err) => {
 
 // ===== IPC handlers =====
 
-ipcMain.handle('run-code', async (_event, code) => {
-  return { success: true, output: 'Code executed in sandbox.' };
+ipcMain.handle('run-code', async (_event, { code, language }) => {
+  if (language !== 'python') {
+    return { success: true, output: '' };
+  }
+
+  return new Promise((resolve) => {
+    const proc = spawn('python', ['-c', code], { timeout: 10000 });
+    let stdout = '';
+    let stderr = '';
+
+    proc.stdout.on('data', (data) => { stdout += data.toString(); });
+    proc.stderr.on('data', (data) => { stderr += data.toString(); });
+
+    proc.on('close', (exitCode) => {
+      if (exitCode === 0) {
+        resolve({ success: true, output: stdout.trimEnd() });
+      } else {
+        // Strip internal file paths from tracebacks for cleaner display
+        const cleaned = stderr.replace(/File "<string>", /g, '').trimEnd();
+        resolve({ success: false, output: cleaned });
+      }
+    });
+
+    proc.on('error', (err) => {
+      if (err.code === 'ENOENT') {
+        resolve({
+          success: false,
+          output: 'Python not found. Please install Python from python.org and add it to your PATH, then restart CodeMaster.',
+        });
+      } else {
+        resolve({ success: false, output: err.message });
+      }
+    });
+  });
 });
 
 ipcMain.handle('download-update', () => {

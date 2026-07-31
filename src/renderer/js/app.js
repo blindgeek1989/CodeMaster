@@ -706,9 +706,9 @@ function showWelcome() {
   cards.setAttribute('role', 'list');
 
   const defs = [
-    { id: 'html',       icon: '📄', label: 'HTML',       desc: '6 lessons — Start here' },
-    { id: 'css',        icon: '🎨', label: 'CSS',        desc: '5 lessons' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '5 lessons' },
+    { id: 'html',       icon: '📄', label: 'HTML',       desc: '10 lessons — Start here' },
+    { id: 'css',        icon: '🎨', label: 'CSS',        desc: '9 lessons' },
+    { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '9 lessons' },
   ];
 
   defs.forEach(({ id, icon, label, desc }) => {

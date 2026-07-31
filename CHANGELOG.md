@@ -4,6 +4,29 @@ All notable changes to CodeMaster are documented here.
 When you publish a GitHub Release, paste the relevant section into the release notes
 so users see "What's new" in the update notification.
 
+## [1.2.0] - 2026-07-31
+
+### Added
+- HTML module expanded from 6 to 10 lessons:
+  - Lesson 7: Tables (th, scope, caption, thead/tbody/tfoot)
+  - Lesson 8: Audio and Video (controls, track element, captions, transcripts)
+  - Lesson 9: Introduction to ARIA (aria-label, aria-labelledby, aria-describedby, aria-hidden, aria-live, role)
+  - Lesson 10: Putting It All Together (complete accessible page + checklist)
+- CSS module expanded from 5 to 9 lessons:
+  - Lesson 6: CSS Grid (grid-template-columns, fr units, grid-column: 1/-1)
+  - Lesson 7: Responsive Design and Media Queries (mobile-first, min-width breakpoints, clamp())
+  - Lesson 8: CSS Custom Properties / Variables (:root, theming, dark mode)
+  - Lesson 9: Transitions and Animations (transition, transform, @keyframes, prefers-reduced-motion)
+- CSS for Screen Readers module expanded from 5 to 8 lessons:
+  - Lesson 6: Styling Accessible Form States (aria-invalid with CSS, required/error/disabled visuals)
+  - Lesson 7: Color and Contrast — The Numbers (WCAG 4.5:1 / 3:1 ratios, common mistakes)
+  - Lesson 8: CSS for Interactive Component States (aria-expanded, aria-selected, aria-pressed)
+- JavaScript module expanded from 5 to 9 lessons:
+  - Lesson 6: Working with Forms (preventDefault, validation, accessible error messages)
+  - Lesson 7: Fetch API (fetch(), async/await, try/catch, loading states)
+  - Lesson 8: Local Storage (setItem/getItem, JSON.stringify/parse, saving preferences)
+  - Lesson 9: Accessible JavaScript Patterns (focus management, focus trapping, aria-live announcements)
+
 ## [1.1.0] - 2026-07-31
 
 ### Changed

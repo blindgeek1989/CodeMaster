@@ -567,6 +567,487 @@ Always use a <button> for buttons — never a <div> or <span>. Only a real butto
 </html>`,
       },
     },
+    {
+      id: 'html-7',
+      title: 'Lesson 7: Tables — Organizing Data',
+      content: `Tables are for displaying information that has rows and columns — like a schedule, a price list, or a comparison chart. They are NOT for layout (arranging a page visually). Using tables for layout was a practice from the early 2000s that caused enormous accessibility problems. Always use CSS for layout.
+
+BASIC TABLE STRUCTURE
+A table is built from three main elements:
+- <table> — the wrapper for the entire table
+- <tr>    — table row (a horizontal row of cells)
+- <td>    — table data cell (a single cell of content)
+
+<table>
+  <tr>
+    <td>Name</td>
+    <td>Score</td>
+  </tr>
+  <tr>
+    <td>Alex</td>
+    <td>95</td>
+  </tr>
+</table>
+
+HEADER CELLS: <th>
+Use <th> instead of <td> for header cells — the cells that label a column or row.
+Screen readers announce "column header: Name" when the user moves to that column.
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Score</th>
+  </tr>
+  <tr>
+    <td>Alex</td>
+    <td>95</td>
+  </tr>
+</table>
+
+THE scope ATTRIBUTE
+The scope attribute tells screen readers whether a <th> is a column header or a row header:
+  scope="col"  — this header labels a column (most common)
+  scope="row"  — this header labels a row
+
+<th scope="col">Name</th>
+<th scope="col">Score</th>
+
+GROUPING WITH thead, tbody, tfoot
+These elements group rows logically — header rows, data rows, and summary rows:
+
+<table>
+  <thead>
+    <tr><th scope="col">Name</th><th scope="col">Score</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Alex</td><td>95</td></tr>
+    <tr><td>Sam</td><td>87</td></tr>
+  </tbody>
+  <tfoot>
+    <tr><td>Average</td><td>91</td></tr>
+  </tfoot>
+</table>
+
+THE caption ELEMENT
+Always give a table a caption — a visible title that describes what the table contains:
+
+<table>
+  <caption>Quiz scores for Module 1</caption>
+  ...
+</table>
+
+Screen readers announce the caption before reading the table, so users know what they are about to hear.`,
+      quiz: [
+        {
+          question: 'What element should you use for cells that label a column or row in a table?',
+          options: ['<td>', '<tr>', '<th>', '<caption>'],
+          answer: 2,
+        },
+        {
+          question: 'What does scope="col" on a <th> element tell screen readers?',
+          options: [
+            'This cell spans multiple columns',
+            'This header cell labels the column below it',
+            'This cell is in the footer of the table',
+            'This header applies to the whole table',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Build an accessible table showing three students and their grades. It should have: a caption describing the table, a thead with column headers (Name, Subject, Grade) using th and scope="col", and a tbody with three rows of student data.',
+        starterCode: `<table>
+  <!-- Add caption -->
+
+  <!-- Add thead with headers -->
+
+  <!-- Add tbody with 3 rows -->
+
+</table>`,
+        solution: `<table>
+  <caption>Student grades for Introduction to Web Development</caption>
+
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Subject</th>
+      <th scope="col">Grade</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>Alex</td>
+      <td>HTML</td>
+      <td>A</td>
+    </tr>
+    <tr>
+      <td>Sam</td>
+      <td>HTML</td>
+      <td>B+</td>
+    </tr>
+    <tr>
+      <td>Jordan</td>
+      <td>HTML</td>
+      <td>A-</td>
+    </tr>
+  </tbody>
+</table>`,
+      },
+    },
+    {
+      id: 'html-8',
+      title: 'Lesson 8: Audio and Video',
+      content: `HTML5 introduced native audio and video elements that work directly in the browser without plugins. Making media accessible requires more than just embedding a file — you need captions, transcripts, and audio descriptions.
+
+THE audio ELEMENT
+<audio controls src="podcast.mp3">
+  Your browser does not support audio.
+</audio>
+
+The controls attribute adds the play, pause, and volume controls. Without it, users cannot interact with the player.
+
+THE video ELEMENT
+<video controls width="640" height="360">
+  <source src="lesson.mp4" type="video/mp4" />
+  Your browser does not support video.
+</video>
+
+Using <source> elements lets you provide multiple file formats as fallbacks.
+
+CAPTIONS AND SUBTITLES: THE track ELEMENT
+Captions are text versions of spoken dialogue and important sounds, synchronized to the video. They are essential for deaf and hard-of-hearing users, and extremely useful for anyone watching in a noisy environment.
+
+<video controls>
+  <source src="lesson.mp4" type="video/mp4" />
+  <track
+    kind="captions"
+    src="lesson-captions.vtt"
+    srclang="en"
+    label="English captions"
+    default
+  />
+</video>
+
+The track attributes:
+- kind="captions"    — captions include dialogue and sounds
+- kind="subtitles"   — subtitles are usually just dialogue (for a different language)
+- src                — the path to a .vtt caption file
+- srclang="en"       — the language of the track
+- label              — what appears in the captions menu
+- default            — this track is on by default
+
+TRANSCRIPTS
+A transcript is a full text version of all spoken content in an audio or video file. Unlike captions, it is not synchronized — it is just a block of text. Transcripts are important for:
+- Users who are deaf-blind (using a braille display)
+- Users who prefer to read rather than listen
+- Search engines (audio and video content is not searchable without a transcript)
+
+Always provide a transcript for any audio or video content, linked directly below the player.
+
+AUDIO DESCRIPTIONS
+For videos that contain important visual information not described in the dialogue, an audio description track provides a spoken description of what is happening on screen. This is essential for blind users watching video content.`,
+      quiz: [
+        {
+          question: 'Which attribute must you add to <audio> and <video> elements so users can control playback?',
+          options: ['autoplay', 'controls', 'src', 'muted'],
+          answer: 1,
+        },
+        {
+          question: 'What is the difference between captions and a transcript?',
+          options: [
+            'Captions are for audio only; transcripts are for video only',
+            'Captions are synchronized to the media timeline; a transcript is a separate block of text covering all spoken content',
+            'Transcripts are for deaf users; captions are for hard-of-hearing users',
+            'They are different names for the same thing',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Write the HTML for an accessible video player. It should: use a <video> element with controls, provide an mp4 source, include an English captions track set as default, and below the video add a paragraph with a link to "transcript.html" that says "Read the full transcript".',
+        starterCode: `<!-- Accessible video player -->
+
+<!-- Transcript link below the player -->
+`,
+        solution: `<!-- Accessible video player -->
+<video controls width="640" height="360">
+  <source src="lesson.mp4" type="video/mp4" />
+  <track
+    kind="captions"
+    src="lesson-captions.vtt"
+    srclang="en"
+    label="English captions"
+    default
+  />
+</video>
+
+<!-- Transcript link below the player -->
+<p>
+  <a href="transcript.html">Read the full transcript for this video</a>
+</p>`,
+      },
+    },
+    {
+      id: 'html-9',
+      title: 'Lesson 9: Introduction to ARIA',
+      content: `ARIA stands for Accessible Rich Internet Applications. It is a set of HTML attributes that give assistive technologies extra information about what elements do and what state they are in.
+
+THE FIRST RULE OF ARIA
+Never use ARIA when native HTML can do the job. A real <button> element is always better than a <div> with role="button". Native HTML elements come with built-in keyboard support and accessibility semantics — ARIA adds them manually and requires much more work to do correctly.
+
+Use ARIA when:
+- You are building a custom interactive widget (a tab panel, a combobox, a slider)
+- Native HTML does not have an element for what you need
+- You need to provide extra context that HTML alone cannot express
+
+aria-label
+Provides a text label directly on an element, overriding its visible text (or providing one when there is none):
+
+<button aria-label="Close dialog">X</button>
+
+Without aria-label, a screen reader would say "X, button" — meaningless. With it, "Close dialog, button".
+
+aria-labelledby
+Points to another element that serves as the label:
+
+<h2 id="billing-heading">Billing address</h2>
+<section aria-labelledby="billing-heading">
+  ...
+</section>
+
+The section is now labeled by the heading text. Screen readers announce the heading when entering the section.
+
+aria-describedby
+Points to an element that provides additional description (not the label, but extra context):
+
+<input id="email" aria-describedby="email-hint" />
+<p id="email-hint">We will never share your email with anyone.</p>
+
+aria-hidden
+Hides an element from screen readers while keeping it visible on screen. Use for decorative content:
+
+<span aria-hidden="true">★★★★☆</span>
+<span class="sr-only">4 out of 5 stars</span>
+
+aria-live
+Marks a region that will update dynamically. Screen readers announce changes:
+
+<div aria-live="polite" id="status"></div>
+
+role
+Tells screen readers what an element IS when a native element is not used. Rarely needed:
+
+<div role="alert">Your session is about to expire.</div>
+
+role="alert" makes screen readers announce the content immediately as an alert.`,
+      quiz: [
+        {
+          question: 'What is the first rule of ARIA?',
+          options: [
+            'Always add aria-label to every element',
+            'Never use ARIA when a native HTML element can do the same job',
+            'ARIA must be used on all interactive elements',
+            'ARIA replaces the need for semantic HTML',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What does aria-hidden="true" do?',
+          options: [
+            'Hides the element visually on screen',
+            'Removes the element from the DOM completely',
+            'Hides the element from screen readers while keeping it visible on screen',
+            'Makes the element transparent',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Fix the four accessibility issues in the HTML below using ARIA attributes. (1) The icon button needs a meaningful label. (2) The search results section needs to be labeled by its heading. (3) The star rating needs to be hidden from screen readers (add a visible replacement). (4) The status div needs to announce updates politely.',
+        starterCode: `<!-- 1. Icon button with no label -->
+<button>🔍</button>
+
+<!-- 2. Section not linked to its heading -->
+<h2 id="results-heading">Search results</h2>
+<section>
+  <p>5 results found.</p>
+</section>
+
+<!-- 3. Star rating -->
+<span>★★★☆☆</span>
+
+<!-- 4. Status area that updates dynamically -->
+<div id="status"></div>`,
+        solution: `<!-- 1. Icon button with no label -->
+<button aria-label="Search">🔍</button>
+
+<!-- 2. Section not linked to its heading -->
+<h2 id="results-heading">Search results</h2>
+<section aria-labelledby="results-heading">
+  <p>5 results found.</p>
+</section>
+
+<!-- 3. Star rating -->
+<span aria-hidden="true">★★★☆☆</span>
+<span class="sr-only">3 out of 5 stars</span>
+
+<!-- 4. Status area that updates dynamically -->
+<div id="status" aria-live="polite" aria-atomic="true"></div>`,
+      },
+    },
+    {
+      id: 'html-10',
+      title: 'Lesson 10: Putting It All Together',
+      content: `You have covered all the core HTML concepts. This final lesson brings everything together into one complete, accessible page — and gives you a checklist to use on every page you build.
+
+WHAT A COMPLETE, ACCESSIBLE PAGE LOOKS LIKE
+Here is a full example using everything from this module:
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeMaster — HTML Module Complete</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header>
+      <a href="/"><img src="logo.png" alt="CodeMaster home" /></a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/html">HTML</a></li>
+          <li><a href="/css">CSS</a></li>
+          <li><a href="/js">JavaScript</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <h1>HTML Module Complete</h1>
+      <p>Congratulations on finishing the HTML module.</p>
+
+      <section aria-labelledby="what-next">
+        <h2 id="what-next">What to do next</h2>
+        <ol>
+          <li>Start the CSS module</li>
+          <li>Build a real page using only what you have learned</li>
+          <li>Share your work with someone</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 CodeMaster</p>
+    </footer>
+
+  </body>
+</html>
+
+YOUR ACCESSIBLE HTML CHECKLIST
+Use this every time you build a page:
+
+[ ] <!DOCTYPE html> on line 1
+[ ] <html lang="en"> with the correct language
+[ ] <meta charset="UTF-8"> in head
+[ ] <meta name="viewport"> in head
+[ ] Descriptive <title> — unique per page
+[ ] Skip link as the first focusable element
+[ ] One <h1> per page — the main topic
+[ ] Headings in logical order — never skip levels
+[ ] All images have alt text (or alt="" if decorative)
+[ ] All links have descriptive text — no "click here"
+[ ] All form inputs have associated <label> elements
+[ ] Landmark elements used: header, nav, main, footer
+[ ] Tables have caption and scope on headers
+[ ] Videos have captions track
+[ ] ARIA used only when native HTML cannot do the job`,
+      quiz: [
+        {
+          question: 'Why should a skip link be the very first focusable element on a page?',
+          options: [
+            'It improves search engine rankings',
+            'It lets keyboard and screen reader users jump past repeated navigation directly to the main content',
+            'It is required by the HTML5 specification',
+            'It makes the page load faster',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'You have a logo image that also serves as a link to the homepage. What should the alt text say?',
+          options: [
+            'alt="logo"',
+            'alt="" because it is decorative',
+            'alt="CodeMaster home" — describing the destination of the link',
+            'No alt attribute needed on linked images',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Build a complete, accessible HTML page for a personal blog post. It must include: DOCTYPE, html with lang, charset meta, viewport meta, a descriptive title, a skip link, a header with a site name and nav, a main section with an h1, at least two h2 sections with paragraphs, an unordered list, an image with good alt text, and a footer. Use the checklist from the lesson.',
+        starterCode: `<!DOCTYPE html>
+<!-- Build your complete accessible blog post page here -->
+`,
+        solution: `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My First Week Learning HTML — My Blog</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+      <a href="/">My Blog</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <h1>My First Week Learning HTML</h1>
+      <p>I started learning HTML this week and wanted to share what I discovered.</p>
+
+      <section aria-labelledby="what-i-learned">
+        <h2 id="what-i-learned">What I learned</h2>
+        <p>HTML is much more logical than I expected. Once you understand tags, everything clicks.</p>
+        <ul>
+          <li>Tags always come in pairs (mostly)</li>
+          <li>Semantic elements matter for screen readers</li>
+          <li>Alt text on images is non-negotiable</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="my-setup">
+        <h2 id="my-setup">My setup</h2>
+        <p>I used a simple text editor and a browser to get started.</p>
+        <img
+          src="desk-setup.jpg"
+          alt="A desk with a laptop, external keyboard, and braille display"
+        />
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 My Blog — <a href="/privacy">Privacy policy</a></p>
+    </footer>
+
+  </body>
+</html>`,
+      },
+    },
   ],
 };
 

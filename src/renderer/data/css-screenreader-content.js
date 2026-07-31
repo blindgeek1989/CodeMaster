@@ -503,6 +503,372 @@ WHEN VISUAL REORDERING IS ACCEPTABLE
 }`,
       },
     },
+    {
+      id: 'css-sr-6',
+      title: 'Lesson 6: Styling Accessible Form States',
+      content: `Forms are where accessibility often breaks down most severely. CSS controls how form states look — but it must work together with HTML and ARIA to communicate those states to screen readers. Color alone is never enough.
+
+THE PROBLEM WITH COLOR-ONLY FEEDBACK
+If the only way you communicate an error is by turning an input border red, a blind user gets no indication that something went wrong. CSS appearance must always be paired with a text change that screen readers can detect.
+
+REQUIRED FIELDS
+Visually mark required fields and add aria-required to communicate it to screen readers:
+
+<label for="email">
+  Email address <span aria-hidden="true">*</span>
+  <span class="sr-only">(required)</span>
+</label>
+<input type="email" id="email" aria-required="true" />
+
+The asterisk is hidden from screen readers (aria-hidden="true") and replaced with "(required)" in sr-only text. The aria-required attribute on the input also tells screen readers the field is required.
+
+ERROR STATES WITH aria-invalid
+When a field has an error, set aria-invalid="true" on the input and connect an error message with aria-describedby:
+
+<input
+  type="email"
+  id="email"
+  aria-invalid="true"
+  aria-describedby="email-error"
+/>
+<p id="email-error" class="field-error">
+  Please enter a valid email address.
+</p>
+
+In CSS, style the error state:
+input[aria-invalid="true"] {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+USING CSS ATTRIBUTE SELECTORS FOR STATES
+CSS can target ARIA attributes directly, keeping your styles in sync with the accessibility state:
+
+input[aria-invalid="true"] { border-color: red; }
+button[aria-expanded="true"] { background: #e0e7ff; }
+[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+DISABLED STATES
+Never rely only on the greyed-out appearance of a disabled element:
+- Add aria-disabled="true" for custom components
+- Use the disabled attribute on native inputs (automatically communicated to screen readers)
+- Style disabled elements to look visually distinct:
+
+input:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+SUCCESS STATES
+When a form submits successfully, show a success message in an aria-live region:
+
+<div id="form-status" aria-live="polite" aria-atomic="true"></div>
+
+Then with JavaScript, set textContent to announce the success. CSS can style the success state:
+
+.status-success {
+  color: #16a34a;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}`,
+      quiz: [
+        {
+          question: 'A form field turns red when invalid. Why is this insufficient for accessibility?',
+          options: [
+            'Red is not a valid CSS color',
+            'Color alone does not communicate the error to screen readers — you must also update text and use aria-invalid',
+            'The input border-color property does not work in all browsers',
+            'Screen readers read all CSS color changes automatically',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What does aria-invalid="true" tell a screen reader?',
+          options: [
+            'The input field should be hidden',
+            'The input has a wrong data type',
+            'The current value of the input does not meet the required criteria — announced as "invalid" when focused',
+            'The input is disabled',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Write CSS that styles three form states using ARIA attribute selectors. (1) An input with aria-invalid="true" should have a red (#ef4444) border and light red (#fef2f2) background. (2) A button with aria-expanded="true" should have an indigo (#e0e7ff) background. (3) Any element with aria-disabled="true" should have 0.5 opacity and a not-allowed cursor. Also write a .field-error class: red (#dc2626) text, 0.875rem font size.',
+        starterCode: `/* Invalid input state */
+
+/* Expanded button state */
+
+/* Disabled state */
+
+/* Error message text */
+.field-error {
+
+}`,
+        solution: `/* Invalid input state */
+input[aria-invalid="true"] {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* Expanded button state */
+button[aria-expanded="true"] {
+  background-color: #e0e7ff;
+}
+
+/* Disabled state */
+[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error message text */
+.field-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}`,
+      },
+    },
+    {
+      id: 'css-sr-7',
+      title: 'Lesson 7: Color and Contrast — The Numbers Behind Accessibility',
+      content: `Color contrast is the difference in brightness between text and its background. Low contrast is one of the most common accessibility failures on the web — and one of the easiest to fix once you understand the numbers.
+
+WHAT IS CONTRAST RATIO?
+Contrast ratio is a number from 1:1 (no contrast — identical colors) to 21:1 (maximum contrast — pure black on pure white). The formula is based on the relative luminance of the two colors.
+
+You do not need to calculate this by hand. Tools like the WebAIM Contrast Checker or browser developer tools calculate it for you.
+
+WCAG CONTRAST REQUIREMENTS
+WCAG 2.1 Level AA (the most widely required standard):
+
+Normal text (below 18pt or 14pt bold):
+  Minimum contrast ratio: 4.5:1
+
+Large text (18pt/24px or larger, or 14pt/18.67px bold):
+  Minimum contrast ratio: 3:1
+
+Non-text elements (icons, borders, UI components):
+  Minimum contrast ratio: 3:1
+
+WCAG 2.1 Level AAA (enhanced):
+  Normal text: 7:1
+  Large text: 4.5:1
+
+COMMON MISTAKES
+  Light grey text on white: #999999 on #ffffff = 2.85:1 — FAILS
+  Dark blue on black: #003366 on #000000 = 1.9:1 — FAILS
+  Yellow on white: #ffff00 on #ffffff = 1.07:1 — FAILS badly
+
+COMMON SAFE COMBINATIONS
+  #1e293b (dark navy) on #f8fafc (near white) = 14.2:1 — PASSES
+  #ffffff (white) on #6366f1 (indigo) = 4.55:1 — PASSES AA
+  #000000 (black) on #ffffff (white) = 21:1 — PASSES everything
+
+BEYOND CONTRAST: DO NOT RELY ON COLOR ALONE
+WCAG 1.4.1: Color must not be the only visual means of conveying information, indicating an action, or distinguishing an element.
+
+Bad:  "Required fields are shown in red."
+Good: "Required fields are marked with an asterisk (*) and the word 'required'."
+
+Bad:  "Green means success, red means error."
+Good: "Error fields show a red border, an error icon, and error text. Success fields show a checkmark and success text."
+
+Always add a second visual cue (icon, text, pattern, underline) alongside color.`,
+      quiz: [
+        {
+          question: 'What is the minimum contrast ratio for normal body text to pass WCAG 2.1 Level AA?',
+          options: ['2:1', '3:1', '4.5:1', '7:1'],
+          answer: 2,
+        },
+        {
+          question: 'A form highlights required fields in red. What else must be provided to meet WCAG 1.4.1?',
+          options: [
+            'Nothing — color is sufficient for form fields',
+            'A second visual indicator such as an asterisk, the word "required", or an icon — because color cannot be the only signal',
+            'An aria-required attribute (this satisfies the color rule)',
+            'A tooltip explaining the red color',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Look at these four color combinations and mark each as PASS or FAIL for WCAG AA normal text (4.5:1 minimum). Write your answers as CSS comments. Approximate ratios given: (1) #767676 on #ffffff ≈ 4.54:1, (2) #999999 on #ffffff ≈ 2.85:1, (3) #ffffff on #6366f1 ≈ 4.55:1, (4) #555555 on #eeeeee ≈ 5.74:1.',
+        starterCode: `/* Contrast ratio checks — WCAG AA normal text requires 4.5:1 minimum */
+
+/* 1. #767676 text on #ffffff background (ratio ≈ 4.54:1) */
+/* Result: */
+
+/* 2. #999999 text on #ffffff background (ratio ≈ 2.85:1) */
+/* Result: */
+
+/* 3. #ffffff text on #6366f1 background (ratio ≈ 4.55:1) */
+/* Result: */
+
+/* 4. #555555 text on #eeeeee background (ratio ≈ 5.74:1) */
+/* Result: */`,
+        solution: `/* Contrast ratio checks — WCAG AA normal text requires 4.5:1 minimum */
+
+/* 1. #767676 text on #ffffff background (ratio ≈ 4.54:1) */
+/* Result: PASS — just above the 4.5:1 threshold */
+
+/* 2. #999999 text on #ffffff background (ratio ≈ 2.85:1) */
+/* Result: FAIL — below 4.5:1. This is the classic "light grey on white" mistake. */
+
+/* 3. #ffffff text on #6366f1 background (ratio ≈ 4.55:1) */
+/* Result: PASS — white text on indigo just meets AA */
+
+/* 4. #555555 text on #eeeeee background (ratio ≈ 5.74:1) */
+/* Result: PASS — comfortably above 4.5:1 */`,
+      },
+    },
+    {
+      id: 'css-sr-8',
+      title: 'Lesson 8: CSS for Interactive States',
+      content: `CSS can and should reflect the ARIA state of interactive components. When a button controls a collapsible section, its visual appearance should change to match whether that section is open or closed — not just for sighted users, but to reinforce what the screen reader is already announcing.
+
+ARIA STATE ATTRIBUTES AND CSS
+ARIA state attributes like aria-expanded, aria-selected, aria-checked, and aria-pressed can be targeted directly in CSS using attribute selectors:
+
+[aria-expanded="true"]  { /* open state */ }
+[aria-expanded="false"] { /* closed state */ }
+
+DISCLOSURE BUTTONS (show/hide)
+A button that toggles a section uses aria-expanded:
+
+<button aria-expanded="false" aria-controls="details">
+  Show details
+</button>
+<div id="details" hidden>More content here.</div>
+
+CSS for the button's two states:
+
+button[aria-expanded="false"]::after {
+  content: " ▶";
+}
+
+button[aria-expanded="true"]::after {
+  content: " ▼";
+}
+
+button[aria-expanded="true"] {
+  background-color: #e0e7ff;
+  font-weight: 700;
+}
+
+TAB COMPONENTS (aria-selected)
+A selected tab uses aria-selected="true":
+
+[role="tab"][aria-selected="true"] {
+  border-bottom: 3px solid #6366f1;
+  color: #6366f1;
+  font-weight: 700;
+}
+
+[role="tab"][aria-selected="false"] {
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+}
+
+TOGGLE BUTTONS (aria-pressed)
+A toggle button (bold, mute, etc.) uses aria-pressed:
+
+button[aria-pressed="true"] {
+  background-color: #6366f1;
+  color: white;
+}
+
+button[aria-pressed="false"] {
+  background-color: transparent;
+  color: #6366f1;
+  border: 1px solid #6366f1;
+}
+
+THE BENEFIT OF THIS APPROACH
+By tying CSS to ARIA attributes, you get one source of truth: the ARIA state drives both what screen readers announce AND what sighted users see. If someone toggles the ARIA attribute with JavaScript, the visual style updates automatically.`,
+      quiz: [
+        {
+          question: 'A button has aria-expanded="true". Using CSS attribute selectors, how do you target it?',
+          options: [
+            '.expanded { }',
+            'button.open { }',
+            '[aria-expanded="true"] { }',
+            'button:state(expanded) { }',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'Why is it better to base visual styling on ARIA state attributes than on CSS classes like .is-open?',
+          options: [
+            'ARIA attributes load faster than CSS classes',
+            'ARIA attributes are the single source of truth — they drive both what screen readers announce and what sighted users see, eliminating the risk of them getting out of sync',
+            'CSS classes cannot be toggled with JavaScript',
+            'ARIA attributes have higher CSS specificity',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Write CSS for three interactive states: (1) A [role="tab"] with aria-selected="true" should have an indigo (#6366f1) bottom border of 3px, indigo text color, and bold weight. With aria-selected="false" it should have transparent border and grey (#64748b) text. (2) A button with aria-pressed="true" should have indigo background and white text. With aria-pressed="false" it should be transparent with indigo text and a 1px indigo border. (3) A button with aria-expanded="true" should have a ▼ character added after it using ::after; with "false" it should show ▶.',
+        starterCode: `/* Tab — selected */
+
+/* Tab — not selected */
+
+/* Toggle button — pressed */
+
+/* Toggle button — not pressed */
+
+/* Disclosure button — expanded */
+
+/* Disclosure button — collapsed */
+`,
+        solution: `/* Tab — selected */
+[role="tab"][aria-selected="true"] {
+  border-bottom: 3px solid #6366f1;
+  color: #6366f1;
+  font-weight: 700;
+}
+
+/* Tab — not selected */
+[role="tab"][aria-selected="false"] {
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+}
+
+/* Toggle button — pressed */
+button[aria-pressed="true"] {
+  background-color: #6366f1;
+  color: white;
+}
+
+/* Toggle button — not pressed */
+button[aria-pressed="false"] {
+  background-color: transparent;
+  color: #6366f1;
+  border: 1px solid #6366f1;
+}
+
+/* Disclosure button — expanded */
+button[aria-expanded="true"]::after {
+  content: " ▼";
+}
+
+/* Disclosure button — collapsed */
+button[aria-expanded="false"]::after {
+  content: " ▶";
+}`,
+      },
+    },
   ],
 };
 

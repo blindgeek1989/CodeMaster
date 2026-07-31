@@ -493,6 +493,535 @@ nav {
 }`,
       },
     },
+    {
+      id: 'css-6',
+      title: 'Lesson 6: CSS Grid — Two-Dimensional Layouts',
+      content: `Flexbox is great for one-dimensional layouts — a row of items or a column of items. CSS Grid is for two-dimensional layouts — rows AND columns at the same time. Think of it like a spreadsheet for your page layout.
+
+TURNING ON GRID
+Like Flexbox, you apply display: grid to the parent container:
+
+<div class="page-layout">
+  <header>Header</header>
+  <nav>Sidebar</nav>
+  <main>Main content</main>
+  <footer>Footer</footer>
+</div>
+
+.page-layout {
+  display: grid;
+}
+
+DEFINING COLUMNS: grid-template-columns
+This is where Grid gets powerful. You define how many columns the grid has and how wide each one is:
+
+grid-template-columns: 200px 1fr;
+  — Two columns: 200px fixed, then the rest of the space
+
+grid-template-columns: 1fr 1fr 1fr;
+  — Three equal columns
+
+grid-template-columns: repeat(3, 1fr);
+  — Same as above, but shorter to write
+
+THE fr UNIT
+fr means "fraction of the available space." It is unique to CSS Grid:
+  1fr 1fr     — two equal columns
+  1fr 2fr     — second column is twice as wide as the first
+  200px 1fr   — fixed sidebar, flexible main area
+
+DEFINING ROWS: grid-template-rows
+grid-template-rows: auto 1fr auto;
+  — Three rows: header (auto height), main (fills space), footer (auto height)
+
+GAP
+gap: 1rem;           — space between all rows and columns
+column-gap: 2rem;    — space between columns only
+row-gap: 1rem;       — space between rows only
+
+PLACING ITEMS: grid-column and grid-row
+You can tell an item to span multiple columns or rows:
+
+header {
+  grid-column: 1 / -1;   /* span from column 1 to the last column */
+}
+
+1 / -1 means "start at line 1, end at the last line" — spanning the full width.
+
+A COMPLETE PAGE LAYOUT EXAMPLE
+.page-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 0;
+  min-height: 100vh;
+}
+
+header  { grid-column: 1 / -1; }
+footer  { grid-column: 1 / -1; }`,
+      quiz: [
+        {
+          question: 'What does grid-template-columns: 1fr 2fr create?',
+          options: [
+            'One column that is 1px wide and one that is 2px wide',
+            'Two columns where the second is twice as wide as the first',
+            'Three columns of equal width',
+            'A grid with fractions as row heights',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What does grid-column: 1 / -1 do to an element?',
+          options: [
+            'Places it in the first column only',
+            'Removes it from the grid',
+            'Makes it span from the first column line to the last — the full width of the grid',
+            'Sets the column gap to 1 unit',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Write CSS for a classic page layout with a header, sidebar, main content area, and footer. The grid should have: two columns (sidebar: 240px, main: remaining space), three rows (header: auto, content: 1fr, footer: auto), 0 gap, min-height of 100vh. Make the header and footer span both columns.',
+        starterCode: `/* Page layout grid */
+.page-layout {
+
+}
+
+/* Header spans full width */
+.page-layout header {
+
+}
+
+/* Footer spans full width */
+.page-layout footer {
+
+}`,
+        solution: `/* Page layout grid */
+.page-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 0;
+  min-height: 100vh;
+}
+
+/* Header spans full width */
+.page-layout header {
+  grid-column: 1 / -1;
+}
+
+/* Footer spans full width */
+.page-layout footer {
+  grid-column: 1 / -1;
+}`,
+      },
+    },
+    {
+      id: 'css-7',
+      title: 'Lesson 7: Responsive Design and Media Queries',
+      content: `Responsive design means your page looks good and works well on any screen size — a large desktop monitor, a laptop, a tablet, or a phone. The primary tool for this is the CSS media query.
+
+THE VIEWPORT META TAG
+Before writing any responsive CSS, your HTML must have this in <head>:
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+Without it, mobile browsers zoom out to fit the desktop version of the page, ignoring all your responsive CSS.
+
+WHAT IS A MEDIA QUERY?
+A media query wraps CSS rules that only apply when certain conditions are true — most commonly, when the screen is narrower than a certain width:
+
+@media (max-width: 768px) {
+  /* These rules only apply when the screen is 768px wide or less */
+  .sidebar {
+    display: none;
+  }
+}
+
+MOBILE-FIRST APPROACH
+Write your base CSS for mobile (small screens) first. Then use media queries to add styles for larger screens:
+
+/* Base styles — mobile */
+.nav-links {
+  display: none;
+}
+
+/* When screen is 768px or wider, show the nav */
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+  }
+}
+
+Mobile-first is recommended because it forces you to think about the essential content first, and progressively enhance for larger screens.
+
+COMMON BREAKPOINTS (approximate screen widths)
+  Small phones:   max-width: 480px
+  Tablets:        max-width: 768px
+  Small laptops:  max-width: 1024px
+  Desktops:       min-width: 1280px
+
+FLEXIBLE IMAGES
+Images can overflow their container on small screens. Fix it globally:
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+This makes every image shrink to fit its container while preserving its aspect ratio.
+
+FLUID TYPOGRAPHY
+Instead of fixed pixel sizes, use clamp() to scale text smoothly:
+
+font-size: clamp(1rem, 2.5vw, 1.5rem);
+  — Minimum 1rem, scales with viewport, maximum 1.5rem`,
+      quiz: [
+        {
+          question: 'Why must you include the viewport meta tag for responsive design to work?',
+          options: [
+            'It speeds up page loading on mobile devices',
+            'Without it, mobile browsers zoom out to fit the desktop layout, ignoring your responsive CSS',
+            'It is required for CSS Grid to work',
+            'It sets the default font size for mobile screens',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What is the mobile-first approach?',
+          options: [
+            'Building a separate website just for mobile users',
+            'Writing base styles for mobile, then adding media queries for larger screens using min-width',
+            'Using max-width media queries to override desktop styles for mobile',
+            'Always starting with a 375px canvas in your design tool',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Write responsive CSS for a card grid. On mobile (base styles): cards stack in a single column, full width. At 600px and wider: cards display in a 2-column grid with 1.5rem gap. At 900px and wider: cards display in a 3-column grid. Also add the flexible image rule so images inside cards never overflow.',
+        starterCode: `/* Base styles — mobile: single column */
+.card-grid {
+
+}
+
+/* 600px and wider: 2 columns */
+
+/* 900px and wider: 3 columns */
+
+/* Flexible images */
+`,
+        solution: `/* Base styles — mobile: single column */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* 600px and wider: 2 columns */
+@media (min-width: 600px) {
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 900px and wider: 3 columns */
+@media (min-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Flexible images */
+img {
+  max-width: 100%;
+  height: auto;
+}`,
+      },
+    },
+    {
+      id: 'css-8',
+      title: 'Lesson 8: CSS Custom Properties (Variables)',
+      content: `CSS custom properties — often called CSS variables — let you store values in named containers and reuse them throughout your stylesheet. They make your code easier to maintain and update.
+
+DECLARING A VARIABLE
+Variables are declared with two dashes before the name:
+
+:root {
+  --color-primary: #6366f1;
+  --color-text: #1e293b;
+  --spacing-md: 1.5rem;
+  --radius: 8px;
+}
+
+:root is a special selector that refers to the root of the document (the html element). Variables declared here are available everywhere on the page.
+
+USING A VARIABLE
+Use the var() function to apply the variable's value:
+
+button {
+  background-color: var(--color-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+WHY VARIABLES ARE POWERFUL
+Without variables, if you use the same color in 50 different places and need to change it, you must update all 50 places. With a variable, you change one line:
+
+:root {
+  --color-primary: #6366f1;   /* Change this once */
+}
+
+Every element using var(--color-primary) updates automatically.
+
+DEFAULT VALUES
+var() accepts a fallback value if the variable is not defined:
+
+color: var(--color-brand, #333);
+
+If --color-brand is not defined, it uses #333.
+
+THEMING WITH VARIABLES
+Variables make dark mode simple:
+
+:root {
+  --bg: #ffffff;
+  --text: #1e293b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --text: #f8fafc;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+The variables update automatically based on the user's preference — you do not need to rewrite the body rule.
+
+NAMING CONVENTIONS
+Name variables by what they REPRESENT, not what they look like:
+  Good:  --color-primary, --spacing-sm, --font-heading
+  Bad:   --blue, --sixteen-pixels, --big-font`,
+      quiz: [
+        {
+          question: 'How do you use a CSS variable called --color-accent in a rule?',
+          options: [
+            'color: --color-accent;',
+            'color: $color-accent;',
+            'color: var(--color-accent);',
+            'color: css(--color-accent);',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'Why is naming a variable --blue considered bad practice?',
+          options: [
+            '--blue is not valid CSS syntax',
+            'Variable names cannot contain colors',
+            'If you change the color to purple, the name --blue is now misleading — name by purpose (--color-primary), not appearance',
+            'Blue is a reserved word in CSS',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Create a complete CSS variable system for a small design. In :root, declare variables for: primary color (#6366f1), text color (#1e293b), background (#f8fafc), border radius (8px), and two spacing values (small: 0.75rem, medium: 1.5rem). Then write styles for a .btn element and a .card element that use only var() references — no hardcoded values.',
+        starterCode: `/* Design tokens */
+:root {
+
+}
+
+/* Button using only variables */
+.btn {
+
+}
+
+/* Card using only variables */
+.card {
+
+}`,
+        solution: `/* Design tokens */
+:root {
+  --color-primary: #6366f1;
+  --color-text: #1e293b;
+  --color-bg: #f8fafc;
+  --radius: 8px;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1.5rem;
+}
+
+/* Button using only variables */
+.btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+}
+
+/* Card using only variables */
+.card {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid #e2e8f0;
+}`,
+      },
+    },
+    {
+      id: 'css-9',
+      title: 'Lesson 9: Transitions and Animations',
+      content: `CSS can animate elements smoothly — changing color, size, position, or opacity over time. Used thoughtfully, animation improves usability. Used carelessly, it can make pages inaccessible for users with motion sensitivity.
+
+TRANSITIONS
+A transition smoothly animates a change from one state to another (like hover or focus). You add it to the base element, not the hover state:
+
+button {
+  background-color: #6366f1;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #818cf8;
+}
+
+When the user hovers, the background smoothly changes over 0.2 seconds instead of jumping.
+
+THE transition PROPERTY
+transition: property duration timing-function delay;
+
+  property    — what to animate (background-color, transform, opacity, or all)
+  duration    — how long (0.2s, 500ms)
+  timing-function — the speed curve (ease, linear, ease-in, ease-out)
+  delay       — wait before starting (usually 0s)
+
+Common shorthand:
+  transition: all 0.2s ease;      — animate everything that changes
+  transition: transform 0.3s ease-out;
+
+TRANSFORMS
+transform changes an element's shape or position without affecting layout:
+
+  transform: translateY(-2px);     — move up 2px
+  transform: scale(1.05);          — grow to 105% size
+  transform: rotate(45deg);        — rotate 45 degrees
+
+button:hover {
+  transform: translateY(-2px);
+  transition: transform 0.15s ease;
+}
+
+KEYFRAME ANIMATIONS
+For more complex animations, use @keyframes:
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+ALWAYS RESPECT prefers-reduced-motion
+Some users get nausea or seizures from motion. ALWAYS include this at the top of any file with animations:
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+This is not optional — it is an accessibility requirement.`,
+      quiz: [
+        {
+          question: 'Where should the transition property be placed — on the base element or on the :hover state?',
+          options: [
+            'On the :hover state, so it only applies when hovering',
+            'On both the base element and the :hover state',
+            'On the base element, so it applies to both entering and leaving the hover state',
+            'In a separate @keyframes rule',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'Why must you always include a prefers-reduced-motion media query when using animations?',
+          options: [
+            'It is required by the CSS specification',
+            'Some users experience nausea, dizziness, or seizures from motion on screen — this query disables animations for them',
+            'It makes animations load faster',
+            'Without it, animations do not work in Firefox',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Write CSS for a button that: smoothly transitions its background color and transform over 0.2s ease on hover (lift up 2px with translateY). Also write a @keyframes animation called "slideIn" that animates from opacity 0 and translateY(16px) to opacity 1 and translateY(0). Apply it to .card elements with 0.3s duration. Finally, write the prefers-reduced-motion override.',
+        starterCode: `/* Button with hover transition */
+.btn {
+  background-color: #6366f1;
+
+}
+
+.btn:hover {
+
+}
+
+/* slideIn keyframe animation */
+
+/* Apply to .card */
+.card {
+
+}
+
+/* Reduced motion override — always include this */
+`,
+        solution: `/* Button with hover transition */
+.btn {
+  background-color: #6366f1;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #818cf8;
+  transform: translateY(-2px);
+}
+
+/* slideIn keyframe animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply to .card */
+.card {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Reduced motion override — always include this */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}`,
+      },
+    },
   ],
 };
 

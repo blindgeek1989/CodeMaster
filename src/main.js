@@ -3,6 +3,34 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 
+// sql.js — lazy-initialise on first SQL exercise
+let sqlPromise = null;
+function getSqlJs() {
+  if (!sqlPromise) {
+    const initSqlJs = require('sql.js');
+    sqlPromise = initSqlJs({
+      locateFile: (file) => path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', file),
+    });
+  }
+  return sqlPromise;
+}
+
+function formatSqlResults(results) {
+  if (!results || results.length === 0) return '(no rows returned)';
+  return results.map(({ columns, values }) => {
+    if (!columns || columns.length === 0) return '(no columns)';
+    const widths = columns.map((c, i) =>
+      Math.max(c.length, ...values.map(row => String(row[i] ?? 'NULL').length))
+    );
+    const sep = widths.map(w => '-'.repeat(w)).join('-+-');
+    const header = columns.map((c, i) => c.padEnd(widths[i])).join(' | ');
+    const rows = values.map(row =>
+      row.map((v, i) => String(v ?? 'NULL').padEnd(widths[i])).join(' | ')
+    );
+    return [header, sep, ...rows].join('\n');
+  }).join('\n\n');
+}
+
 let mainWindow = null;
 
 autoUpdater.autoDownload = false;
@@ -83,40 +111,83 @@ autoUpdater.on('error', (err) => {
 
 // ===== IPC handlers =====
 
-ipcMain.handle('run-code', async (_event, { code, language }) => {
-  if (language !== 'python') {
-    return { success: true, output: '' };
+ipcMain.handle('run-code', async (_event, { code, language, schema }) => {
+  if (language === 'python') {
+    return new Promise((resolve) => {
+      const proc = spawn('python', ['-c', code], { timeout: 10000 });
+      let stdout = '';
+      let stderr = '';
+
+      proc.stdout.on('data', (data) => { stdout += data.toString(); });
+      proc.stderr.on('data', (data) => { stderr += data.toString(); });
+
+      proc.on('close', (exitCode) => {
+        if (exitCode === 0) {
+          resolve({ success: true, output: stdout.trimEnd() });
+        } else {
+          const cleaned = stderr.replace(/File "<string>", /g, '').trimEnd();
+          resolve({ success: false, output: cleaned });
+        }
+      });
+
+      proc.on('error', (err) => {
+        if (err.code === 'ENOENT') {
+          resolve({
+            success: false,
+            output: 'Python not found. Please install Python from python.org and add it to your PATH, then restart CodeMaster.',
+          });
+        } else {
+          resolve({ success: false, output: err.message });
+        }
+      });
+    });
   }
 
-  return new Promise((resolve) => {
-    const proc = spawn('python', ['-c', code], { timeout: 10000 });
-    let stdout = '';
-    let stderr = '';
-
-    proc.stdout.on('data', (data) => { stdout += data.toString(); });
-    proc.stderr.on('data', (data) => { stderr += data.toString(); });
-
-    proc.on('close', (exitCode) => {
-      if (exitCode === 0) {
-        resolve({ success: true, output: stdout.trimEnd() });
-      } else {
-        // Strip internal file paths from tracebacks for cleaner display
-        const cleaned = stderr.replace(/File "<string>", /g, '').trimEnd();
-        resolve({ success: false, output: cleaned });
+  if (language === 'sql') {
+    try {
+      const SQL = await getSqlJs();
+      const db = new SQL.Database();
+      try {
+        if (schema) db.run(schema);
+        const results = db.exec(code);
+        return { success: true, output: formatSqlResults(results) };
+      } catch (err) {
+        return { success: false, output: err.message };
+      } finally {
+        db.close();
       }
-    });
+    } catch (err) {
+      return { success: false, output: `SQL engine error: ${err.message}` };
+    }
+  }
 
-    proc.on('error', (err) => {
-      if (err.code === 'ENOENT') {
-        resolve({
-          success: false,
-          output: 'Python not found. Please install Python from python.org and add it to your PATH, then restart CodeMaster.',
-        });
-      } else {
-        resolve({ success: false, output: err.message });
-      }
+  if (language === 'powershell') {
+    return new Promise((resolve) => {
+      const proc = spawn('powershell', [
+        '-NoProfile', '-NonInteractive', '-Command', code,
+      ], { timeout: 10000 });
+      let stdout = '';
+      let stderr = '';
+
+      proc.stdout.on('data', (data) => { stdout += data.toString(); });
+      proc.stderr.on('data', (data) => { stderr += data.toString(); });
+
+      proc.on('close', (exitCode) => {
+        const out = stdout.trimEnd();
+        if (exitCode === 0 || out) {
+          resolve({ success: true, output: out });
+        } else {
+          resolve({ success: false, output: stderr.trimEnd() || 'Command failed.' });
+        }
+      });
+
+      proc.on('error', (err) => {
+        resolve({ success: false, output: `PowerShell error: ${err.message}` });
+      });
     });
-  });
+  }
+
+  return { success: true, output: '' };
 });
 
 ipcMain.handle('download-update', () => {

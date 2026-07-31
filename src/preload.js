@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Code execution
-  runCode: (code, language) => ipcRenderer.invoke('run-code', { code, language }),
+  runCode: (code, language, schema) => ipcRenderer.invoke('run-code', { code, language, schema }),
 
   // App version
   getVersion: () => ipcRenderer.invoke('get-version'),

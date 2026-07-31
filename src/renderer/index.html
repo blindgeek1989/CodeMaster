@@ -12,6 +12,9 @@
   <script src="data/css-screenreader-content.js"></script>
   <script src="data/js-content.js"></script>
   <script src="data/python-content.js"></script>
+  <script src="data/sql-content.js"></script>
+  <script src="data/powershell-content.js"></script>
+  <script src="data/glossary-content.js"></script>
 </head>
 <body>
   <!-- Skip to main content -->
@@ -100,6 +103,19 @@
           When checked, the CSS module switches to a version focused on what screen reader users need to know about CSS.
         </p>
       </div>
+
+      <!-- Font size controls -->
+      <div class="font-size-controls" role="group" aria-label="Text size">
+        <span class="font-size-label" aria-hidden="true">Text size</span>
+        <button id="font-decrease" class="font-size-btn" aria-label="Decrease text size">A−</button>
+        <span id="font-size-display" class="font-size-display" aria-live="polite" aria-atomic="true"></span>
+        <button id="font-increase" class="font-size-btn" aria-label="Increase text size">A+</button>
+      </div>
+
+      <!-- Glossary button -->
+      <button id="glossary-btn" class="glossary-btn">
+        <span aria-hidden="true">📖</span> Glossary
+      </button>
     </nav>
 
     <!-- ===== Main ===== -->

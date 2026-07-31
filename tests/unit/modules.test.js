@@ -3,6 +3,9 @@ const cssModule = require('../../src/renderer/data/css-content');
 const cssScreenReaderModule = require('../../src/renderer/data/css-screenreader-content');
 const jsModule = require('../../src/renderer/data/js-content');
 const pythonModule = require('../../src/renderer/data/python-content');
+const sqlModule = require('../../src/renderer/data/sql-content');
+const powershellModule = require('../../src/renderer/data/powershell-content');
+const glossaryData = require('../../src/renderer/data/glossary-content');
 
 describe('HTML Module', () => {
   test('has required top-level fields', () => {
@@ -145,5 +148,76 @@ describe('Python Module', () => {
   test('accessibility mentioned in module content', () => {
     const allContent = pythonModule.lessons.map(l => l.content).join(' ').toLowerCase();
     expect(allContent).toMatch(/accessibility|screen reader|blind|keyboard/);
+  });
+});
+
+describe('SQL Module', () => {
+  test('has required top-level fields', () => {
+    expect(sqlModule).toHaveProperty('id', 'sql');
+    expect(sqlModule).toHaveProperty('title');
+    expect(Array.isArray(sqlModule.objectives)).toBe(true);
+    expect(Array.isArray(sqlModule.lessons)).toBe(true);
+  });
+
+  test('has at least 10 lessons', () => {
+    expect(sqlModule.lessons.length).toBeGreaterThanOrEqual(10);
+  });
+
+  test('every lesson has id, title, content, quiz, and exercise with steps', () => {
+    sqlModule.lessons.forEach(lesson => {
+      expect(lesson).toHaveProperty('id');
+      expect(lesson).toHaveProperty('content');
+      expect(Array.isArray(lesson.quiz)).toBe(true);
+      expect(Array.isArray(lesson.exercise.steps)).toBe(true);
+      expect(lesson.exercise.steps.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  test('every quiz answer index is within options bounds', () => {
+    sqlModule.lessons.forEach(lesson => {
+      lesson.quiz.forEach(q => {
+        expect(q.answer).toBeGreaterThanOrEqual(0);
+        expect(q.answer).toBeLessThan(q.options.length);
+      });
+    });
+  });
+});
+
+describe('PowerShell Module', () => {
+  test('has required top-level fields', () => {
+    expect(powershellModule).toHaveProperty('id', 'powershell');
+    expect(powershellModule).toHaveProperty('title');
+    expect(Array.isArray(powershellModule.lessons)).toBe(true);
+  });
+
+  test('has at least 8 lessons', () => {
+    expect(powershellModule.lessons.length).toBeGreaterThanOrEqual(8);
+  });
+
+  test('accessibility mentioned in module content', () => {
+    const allContent = powershellModule.lessons.map(l => l.content).join(' ').toLowerCase();
+    expect(allContent).toMatch(/accessibility|screen reader|keyboard/);
+  });
+});
+
+describe('Glossary', () => {
+  test('is an array with at least 50 terms', () => {
+    expect(Array.isArray(glossaryData)).toBe(true);
+    expect(glossaryData.length).toBeGreaterThanOrEqual(50);
+  });
+
+  test('every entry has term, definition, and module', () => {
+    glossaryData.forEach(entry => {
+      expect(typeof entry.term).toBe('string');
+      expect(entry.term.length).toBeGreaterThan(0);
+      expect(typeof entry.definition).toBe('string');
+      expect(entry.definition.length).toBeGreaterThan(0);
+      expect(typeof entry.module).toBe('string');
+    });
+  });
+
+  test('terms cover multiple modules', () => {
+    const modules = new Set(glossaryData.map(e => e.module));
+    expect(modules.size).toBeGreaterThanOrEqual(5);
   });
 });

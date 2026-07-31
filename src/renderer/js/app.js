@@ -2,12 +2,17 @@
 
 // ===== Module data =====
 const MODULES = {
-  html: window.htmlModule,
-  css: window.cssModule,
-  'css-sr': window.cssScreenReaderModule,
+  html:       window.htmlModule,
+  css:        window.cssModule,
+  'css-sr':   window.cssScreenReaderModule,
   javascript: window.jsModule,
-  python: window.pythonModule,
+  python:     window.pythonModule,
+  sql:        window.sqlModule,
+  powershell: window.powershellModule,
 };
+
+// ===== Languages that support real code execution =====
+const EXECUTABLE_LANGUAGES = new Set(['python', 'sql', 'powershell']);
 
 // ===== State =====
 let state = {
@@ -67,6 +72,8 @@ function buildSidebar() {
     { id: 'css',        icon: '🎨', label: 'CSS' },
     { id: 'javascript', icon: '⚡', label: 'JavaScript' },
     { id: 'python',     icon: '🐍', label: 'Python' },
+    { id: 'sql',        icon: '🗄️', label: 'SQL' },
+    { id: 'powershell', icon: '💻', label: 'PowerShell' },
   ];
 
   moduleNav.innerHTML = '';
@@ -333,6 +340,15 @@ function showLesson(moduleId, lessonIndex) {
   lessonHeader.appendChild(lessonTitle);
   mainContent.appendChild(lessonHeader);
 
+  // ── Skip to exercise link ──
+  if (lesson.exercise) {
+    const skipExercise = document.createElement('a');
+    skipExercise.className = 'skip-link skip-to-exercise';
+    skipExercise.href = '#exercise-section';
+    skipExercise.textContent = 'Skip to exercise';
+    mainContent.appendChild(skipExercise);
+  }
+
   // ── Lesson content ──
   const contentBox = document.createElement('div');
   contentBox.className = 'lesson-content';
@@ -411,6 +427,153 @@ function buildNavigation(moduleId, lessonIndex, total) {
 function markComplete(moduleId, lessonIndex) {
   if (!state.completedLessons[moduleId]) state.completedLessons[moduleId] = new Set();
   state.completedLessons[moduleId].add(lessonIndex);
+  saveProgress();
+}
+
+// ===== Progress persistence =====
+function saveProgress() {
+  const toSave = {};
+  for (const [id, set] of Object.entries(state.completedLessons)) {
+    toSave[id] = [...set];
+  }
+  try { localStorage.setItem('codemaster-progress', JSON.stringify(toSave)); } catch (_) {}
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem('codemaster-progress');
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    for (const [id, indices] of Object.entries(parsed)) {
+      if (Array.isArray(indices)) state.completedLessons[id] = new Set(indices);
+    }
+  } catch (_) {}
+}
+
+// ===== Font size =====
+const FONT_MIN = 14, FONT_MAX = 24, FONT_STEP = 2;
+let currentFontSize = 16;
+
+function applyFontSize(size) {
+  currentFontSize = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
+  document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+  const display = document.getElementById('font-size-display');
+  if (display) display.textContent = currentFontSize + 'px';
+  try { localStorage.setItem('codemaster-font-size', currentFontSize); } catch (_) {}
+}
+
+function initFontSize() {
+  const saved = parseInt(localStorage.getItem('codemaster-font-size') || '16');
+  applyFontSize(isNaN(saved) ? 16 : saved);
+
+  document.getElementById('font-increase').addEventListener('click', () => {
+    applyFontSize(currentFontSize + FONT_STEP);
+    announce(`Text size: ${currentFontSize}px`);
+  });
+  document.getElementById('font-decrease').addEventListener('click', () => {
+    applyFontSize(currentFontSize - FONT_STEP);
+    announce(`Text size: ${currentFontSize}px`);
+  });
+}
+
+// ===== Glossary =====
+function showGlossary() {
+  mainContent.innerHTML = '';
+  state.activeModuleId = null;
+  state.currentLessonIndex = -1;
+
+  const terms = window.glossaryData || [];
+
+  const section = document.createElement('section');
+  section.setAttribute('aria-labelledby', 'glossary-heading');
+
+  const h1 = document.createElement('h1');
+  h1.id = 'glossary-heading';
+  h1.textContent = 'Glossary';
+  section.appendChild(h1);
+
+  const intro = document.createElement('p');
+  intro.textContent = `${terms.length} terms across all modules. Use the search box to filter.`;
+  section.appendChild(intro);
+
+  const searchWrap = document.createElement('div');
+  searchWrap.className = 'glossary-search-wrap';
+
+  const searchLabel = document.createElement('label');
+  searchLabel.setAttribute('for', 'glossary-search');
+  searchLabel.textContent = 'Search terms:';
+  searchWrap.appendChild(searchLabel);
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'search';
+  searchInput.id = 'glossary-search';
+  searchInput.className = 'glossary-search';
+  searchInput.setAttribute('aria-controls', 'glossary-list');
+  searchInput.setAttribute('aria-label', 'Search glossary terms');
+  searchInput.placeholder = 'Type to filter…';
+  searchWrap.appendChild(searchInput);
+
+  const resultCount = document.createElement('p');
+  resultCount.id = 'glossary-result-count';
+  resultCount.className = 'glossary-result-count';
+  resultCount.setAttribute('aria-live', 'polite');
+  resultCount.setAttribute('aria-atomic', 'true');
+  searchWrap.appendChild(resultCount);
+
+  section.appendChild(searchWrap);
+
+  const list = document.createElement('dl');
+  list.id = 'glossary-list';
+  list.className = 'glossary-list';
+
+  function renderTerms(filter) {
+    list.innerHTML = '';
+    const q = filter.toLowerCase().trim();
+    const visible = terms.filter(t =>
+      !q || t.term.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q) || t.module.toLowerCase().includes(q)
+    );
+
+    resultCount.textContent = q
+      ? `${visible.length} result${visible.length !== 1 ? 's' : ''} for "${filter}"`
+      : `${visible.length} terms`;
+
+    visible.forEach(t => {
+      const dt = document.createElement('dt');
+      dt.className = 'glossary-term';
+
+      const termSpan = document.createElement('span');
+      termSpan.textContent = t.term;
+      dt.appendChild(termSpan);
+
+      const badge = document.createElement('span');
+      badge.className = 'glossary-module-badge';
+      badge.textContent = t.module;
+      dt.appendChild(badge);
+
+      const dd = document.createElement('dd');
+      dd.className = 'glossary-def';
+      dd.textContent = t.definition;
+
+      if (t.example) {
+        const pre = document.createElement('pre');
+        pre.className = 'glossary-example';
+        pre.textContent = t.example;
+        dd.appendChild(pre);
+      }
+
+      list.appendChild(dt);
+      list.appendChild(dd);
+    });
+  }
+
+  searchInput.addEventListener('input', () => renderTerms(searchInput.value));
+  renderTerms('');
+
+  section.appendChild(list);
+  mainContent.appendChild(section);
+  h1.setAttribute('tabindex', '-1');
+  h1.focus();
+  announce(`Glossary opened. ${terms.length} terms available. Use the search box to filter.`);
 }
 
 // ===== Module complete screen =====
@@ -474,7 +637,7 @@ function showModuleComplete(moduleId) {
 }
 
 function getNextModuleId(currentId) {
-  const order = ['html', 'css', 'javascript', 'python'];
+  const order = ['html', 'css', 'javascript', 'python', 'sql', 'powershell'];
   const navId = currentId === 'css-sr' ? 'css' : currentId;
   const idx   = order.indexOf(navId);
   if (idx === -1 || idx === order.length - 1) return null;
@@ -585,9 +748,12 @@ function buildExercise(exercise, lessonTitle, moduleId) {
     { instruction: exercise.prompt, starterCode: exercise.starterCode, solution: exercise.solution },
   ];
 
-  const isPython = moduleId === 'python';
+  const isExecutable = EXECUTABLE_LANGUAGES.has(moduleId);
+  const schema = exercise.schema || null;
+
   const section = document.createElement('div');
   section.className = 'exercise-section';
+  section.id = 'exercise-section';
 
   const h2 = document.createElement('h2');
   h2.className = 'exercise-title';
@@ -627,6 +793,10 @@ function buildExercise(exercise, lessonTitle, moduleId) {
       editor.value = editor.value.substring(0, s) + '    ' + editor.value.substring(end);
       editor.selectionStart = editor.selectionEnd = s + 4;
     }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runBtn.click();
+    }
   });
 
   section.appendChild(editor);
@@ -636,7 +806,7 @@ function buildExercise(exercise, lessonTitle, moduleId) {
 
   const runBtn = document.createElement('button');
   runBtn.className = 'btn-primary';
-  runBtn.textContent = isPython ? 'Run code' : 'Submit code';
+  runBtn.textContent = isExecutable ? 'Run code  Ctrl+Enter' : 'Submit code';
 
   const solBtn = document.createElement('button');
   solBtn.className = 'btn-secondary';
@@ -700,7 +870,7 @@ function buildExercise(exercise, lessonTitle, moduleId) {
     const step = steps[currentStep];
     const code = editor.value;
 
-    if (isPython && window.electronAPI) {
+    if (isExecutable && window.electronAPI) {
       runBtn.disabled = true;
       runBtn.textContent = 'Running…';
       output.textContent = 'Running your code…';
@@ -708,20 +878,20 @@ function buildExercise(exercise, lessonTitle, moduleId) {
       output.classList.remove('success', 'error');
 
       try {
-        const result = await window.electronAPI.runCode(code, 'python');
+        const result = await window.electronAPI.runCode(code, moduleId, schema);
         runBtn.disabled = false;
-        runBtn.textContent = 'Run code';
+        runBtn.textContent = 'Run code  Ctrl+Enter';
 
         if (result.success) {
-          let msg = result.output || '(No output)';
+          const out = result.output || '(No output)';
           if (step.expectedOutput !== undefined) {
             const passed = result.output.trim() === step.expectedOutput.trim();
-            msg = passed
+            const msg = passed
               ? `Output:\n${result.output}\n\n✓ Correct!`
               : `Output:\n${result.output}\n\nExpected:\n${step.expectedOutput}\n\nNot quite — check your code and try again.`;
             markStepPassed(msg, passed);
           } else {
-            markStepPassed(`Output:\n${msg}\n\nLooks good! Check the output matches what you expected.`, true);
+            markStepPassed(`Output:\n${out}\n\nLooks good! Check the output matches what you expected.`, true);
           }
         } else {
           output.textContent = `Error:\n${result.output}`;
@@ -731,8 +901,8 @@ function buildExercise(exercise, lessonTitle, moduleId) {
         }
       } catch (err) {
         runBtn.disabled = false;
-        runBtn.textContent = 'Run code';
-        output.textContent = 'Could not run code. Make sure Python is installed.';
+        runBtn.textContent = 'Run code  Ctrl+Enter';
+        output.textContent = 'Could not run code. Check that the required runtime is installed.';
         output.classList.add('show', 'error');
       }
     } else {
@@ -810,10 +980,12 @@ function showWelcome() {
   cards.setAttribute('role', 'list');
 
   const defs = [
-    { id: 'html',       icon: '📄', label: 'HTML',       desc: '10 lessons — Start here' },
-    { id: 'css',        icon: '🎨', label: 'CSS',        desc: '9 lessons' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '9 lessons' },
-    { id: 'python',     icon: '🐍', label: 'Python',     desc: '10 lessons' },
+    { id: 'html',       icon: '📄', label: 'HTML',        desc: '10 lessons — Start here' },
+    { id: 'css',        icon: '🎨', label: 'CSS',         desc: '9 lessons' },
+    { id: 'javascript', icon: '⚡', label: 'JavaScript',  desc: '9 lessons' },
+    { id: 'python',     icon: '🐍', label: 'Python',      desc: '10 lessons' },
+    { id: 'sql',        icon: '🗄️', label: 'SQL',         desc: '10 lessons' },
+    { id: 'powershell', icon: '💻', label: 'PowerShell',  desc: '8 lessons' },
   ];
 
   defs.forEach(({ id, icon, label, desc }) => {
@@ -925,9 +1097,18 @@ function initUpdater() {
 
 // ===== Init =====
 function init() {
+  loadProgress();
   buildSidebar();
+  initFontSize();
   showWelcome();
   initUpdater();
+
+  document.getElementById('glossary-btn').addEventListener('click', () => {
+    showGlossary();
+    // Deactivate sidebar module highlights
+    document.querySelectorAll('.module-nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.lesson-nav-btn').forEach(b => b.classList.remove('active'));
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

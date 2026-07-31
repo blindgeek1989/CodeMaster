@@ -29,10 +29,11 @@
   --radius-lg: 12px;
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
   --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
+  --base-font-size: 16px;
 }
 
 html {
-  font-size: 16px;
+  font-size: var(--base-font-size);
   scroll-behavior: smooth;
 }
 
@@ -1157,6 +1158,188 @@ body {
 }
 
 /* ===== Forced colors (Windows High Contrast) ===== */
+/* ===== Skip to exercise link ===== */
+.skip-to-exercise {
+  position: static;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  clip: auto;
+  padding: 0.35rem 0.9rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-secondary);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  text-decoration: none;
+  overflow: visible;
+  clip-path: none;
+  white-space: nowrap;
+}
+
+.skip-to-exercise:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ===== Font size controls ===== */
+.font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.font-size-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.font-size-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.font-size-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.font-size-btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.font-size-display {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+/* ===== Glossary button ===== */
+.glossary-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.5rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.glossary-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.glossary-btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ===== Glossary panel ===== */
+.glossary-search-wrap {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.glossary-search {
+  padding: 0.6rem 0.9rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 1rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.glossary-search:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+.glossary-result-count {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.glossary-list {
+  display: grid;
+  gap: 0;
+}
+
+.glossary-term {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.9rem 0 0.25rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.glossary-module-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--accent-light);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.1em 0.5em;
+  white-space: nowrap;
+}
+
+.glossary-def {
+  padding: 0.25rem 0 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.glossary-example {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 @media (forced-colors: active) {
   .module-nav-btn.active {
     border-left-color: Highlight;

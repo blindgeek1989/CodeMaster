@@ -4,6 +4,19 @@ All notable changes to CodeMaster are documented here.
 When you publish a GitHub Release, paste the relevant section into the release notes
 so users see "What's new" in the update notification.
 
+## [1.4.0] - 2026-07-31
+
+### Added
+- SQL Fundamentals module — 10 lessons with real in-memory SQLite execution (via sql.js):
+  What is SQL, SELECT, WHERE, Sorting/LIMIT, INSERT, UPDATE, DELETE, Aggregates/GROUP BY, JOINs, Putting It All Together
+- PowerShell module — 8 lessons with real execution:
+  What is the Command Line, Navigating, Files & Folders, Searching/Filtering, Variables/Pipelines, Conditionals/Loops, Functions/Scripts, Dev Tools
+- Glossary panel — 68 searchable terms across all modules, filterable by term/definition/module
+- Progress persistence — completed lessons now saved to localStorage and restored on next launch
+- Font size controls — A− / A+ buttons in sidebar, saves preference, range 14–24px
+- Ctrl+Enter keyboard shortcut to run code in any executable exercise editor
+- Skip to exercise link — appears above lesson content, jumps directly to the coding exercise
+
 ## [1.3.0] - 2026-07-31
 
 ### Added

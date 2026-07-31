@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeMaster — Accessible Coding Learning Platform</title>
+  <link rel="stylesheet" href="styles/main.css" />
+
+  <!-- Module data -->
+  <script src="data/html-content.js"></script>
+  <script src="data/css-content.js"></script>
+  <script src="data/css-screenreader-content.js"></script>
+  <script src="data/js-content.js"></script>
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Screen reader announcer (aria-live region) -->
+  <div
+    id="sr-announcer"
+    class="sr-announcer"
+    aria-live="assertive"
+    aria-atomic="true"
+    role="status"
+  ></div>
+
+  <div class="app-layout">
+
+    <!-- ===== Header ===== -->
+    <header class="app-header" role="banner">
+      <span class="app-logo" aria-label="CodeMaster">Code<span>Master</span></span>
+      <span class="app-tagline" aria-label="Accessible coding platform">Accessible Coding Platform</span>
+    </header>
+
+    <!-- ===== Sidebar ===== -->
+    <nav class="sidebar" aria-label="Course modules">
+      <p class="sidebar-section-title" aria-hidden="true">Modules</p>
+      <ul class="module-nav" id="module-nav" role="list"></ul>
+
+      <!-- SR Mode Toggle -->
+      <div class="sr-mode-toggle">
+        <label class="sr-mode-label">
+          <input
+            type="checkbox"
+            id="sr-mode-checkbox"
+            aria-describedby="sr-mode-desc"
+          />
+          Screen Reader CSS Mode
+        </label>
+        <p id="sr-mode-desc" class="sr-only-inline">
+          When checked, the CSS module switches to a version focused on what screen reader users need to know about CSS.
+        </p>
+      </div>
+    </nav>
+
+    <!-- ===== Main ===== -->
+    <main class="main-content" id="main-content" tabindex="-1">
+      <!-- Content is loaded dynamically by app.js -->
+    </main>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -707,6 +707,249 @@ body {
   color: var(--text-muted);
 }
 
+/* ===== Lesson top bar (breadcrumb + counter) ===== */
+.lesson-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.lesson-crumb {
+  display: flex;
+  align-items: center;
+}
+
+.crumb-btn {
+  background: none;
+  border: none;
+  color: var(--accent-hover);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.crumb-btn:hover {
+  color: var(--text-primary);
+}
+
+.lesson-counter {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== Lesson overview (module intro lesson list) ===== */
+.lesson-overview {
+  margin-bottom: 2rem;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.lesson-overview-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  counter-reset: lesson-counter;
+}
+
+.lesson-overview-list li {
+  counter-increment: lesson-counter;
+}
+
+.lesson-overview-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.lesson-overview-btn::before {
+  content: counter(lesson-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lesson-overview-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.lesson-overview-btn.completed::before {
+  content: '✓';
+  background: var(--success-bg);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ===== Start button ===== */
+.start-wrap {
+  margin-top: 2rem;
+}
+
+.btn-start {
+  padding: 0.75rem 2rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-start:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* ===== Lesson navigation (Prev / Next) ===== */
+.lesson-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.lesson-nav-prev,
+.lesson-nav-next {
+  display: flex;
+}
+
+.btn-lesson-nav {
+  padding: 0.65rem 1.5rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-prev,
+.btn-overview {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-prev:hover,
+.btn-overview:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.btn-next {
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.btn-next:hover {
+  background: var(--accent-hover);
+}
+
+.btn-finish {
+  background: var(--success);
+  color: #000;
+  border: 1px solid transparent;
+  font-weight: 700;
+}
+
+.btn-finish:hover {
+  opacity: 0.85;
+}
+
+/* ===== Module complete screen ===== */
+.complete-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.complete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  background: var(--success-bg);
+  border: 2px solid var(--success);
+  border-radius: 50%;
+  font-size: 2.5rem;
+  color: var(--success);
+  margin-bottom: 1.5rem;
+}
+
+.complete-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.complete-msg {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+/* ===== Sidebar lesson active state ===== */
+.lesson-nav-btn.active {
+  color: var(--accent-hover);
+  font-weight: 600;
+  background: var(--accent-light);
+}
+
 /* ===== Update Banner ===== */
 .update-banner {
   background: linear-gradient(135deg, #1c1b4b, #1e2a1f);

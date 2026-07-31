@@ -11,64 +11,67 @@ const MODULES = {
 // ===== State =====
 let state = {
   activeModuleId: null,
-  activeLessonId: null,
+  currentLessonIndex: -1,   // -1 = module intro screen
   srMode: false,
-  progress: {},
+  completedLessons: {},      // { moduleId: Set<number> }
 };
 
 // ===== DOM refs =====
-const moduleNav = document.getElementById('module-nav');
-const mainContent = document.getElementById('main-content');
+const moduleNav    = document.getElementById('module-nav');
+const mainContent  = document.getElementById('main-content');
 const srModeCheckbox = document.getElementById('sr-mode-checkbox');
-const announcer = document.getElementById('sr-announcer');
+const announcer    = document.getElementById('sr-announcer');
 
 // ===== Announce to screen reader =====
 function announce(message) {
   announcer.textContent = '';
-  requestAnimationFrame(() => {
-    announcer.textContent = message;
-  });
+  requestAnimationFrame(() => { announcer.textContent = message; });
+}
+
+function focusMainHeading() {
+  const h = mainContent.querySelector('h1, h2');
+  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: false }); }
 }
 
 // ===== SR mode toggle =====
 srModeCheckbox.addEventListener('change', () => {
   state.srMode = srModeCheckbox.checked;
-  const cssBtnEl = document.querySelector('[data-module="css"]');
-  if (cssBtnEl) {
-    cssBtnEl.textContent = '';
-    const icon = document.createElement('span');
-    icon.className = 'module-icon';
-    icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = '🎨';
-    cssBtnEl.appendChild(icon);
-    cssBtnEl.appendChild(document.createTextNode(state.srMode ? 'CSS (Screen Reader)' : 'CSS'));
+
+  // Re-label CSS button in sidebar
+  const cssBtn = document.querySelector('[data-module="css"]');
+  if (cssBtn) {
+    const icon = cssBtn.querySelector('.module-icon');
+    cssBtn.textContent = '';
+    if (icon) cssBtn.appendChild(icon);
+    cssBtn.appendChild(document.createTextNode(state.srMode ? 'CSS (Screen Reader)' : 'CSS'));
   }
 
   if (state.activeModuleId === 'css' || state.activeModuleId === 'css-sr') {
-    const targetId = state.srMode ? 'css-sr' : 'css';
-    loadModule(targetId);
+    const target = state.srMode ? 'css-sr' : 'css';
+    loadModule(target);
     announce(state.srMode
-      ? 'Screen Reader CSS mode enabled. Loading CSS for Screen Reader Users module.'
-      : 'Standard CSS mode enabled. Loading CSS Fundamentals module.');
+      ? 'Screen Reader CSS mode enabled. Loading CSS for Screen Reader Users.'
+      : 'Standard CSS mode enabled. Loading CSS Fundamentals.');
   } else {
     announce(state.srMode
-      ? 'Screen Reader CSS mode enabled. Select CSS from the sidebar to load the screen reader module.'
-      : 'Standard CSS mode disabled.');
+      ? 'Screen Reader CSS mode enabled. Open the CSS module to use it.'
+      : 'Standard CSS mode enabled.');
   }
 });
 
 // ===== Build sidebar =====
 function buildSidebar() {
-  const modules = [
-    { id: 'html', icon: '📄', label: 'HTML' },
-    { id: 'css', icon: '🎨', label: 'CSS' },
+  const defs = [
+    { id: 'html',       icon: '📄', label: 'HTML' },
+    { id: 'css',        icon: '🎨', label: 'CSS' },
     { id: 'javascript', icon: '⚡', label: 'JavaScript' },
   ];
 
   moduleNav.innerHTML = '';
-  modules.forEach(({ id, icon, label }) => {
+  defs.forEach(({ id, icon, label }) => {
     const li = document.createElement('li');
     li.className = 'module-nav-item';
+    li.id = `nav-item-${id}`;
 
     const btn = document.createElement('button');
     btn.className = 'module-nav-btn';
@@ -79,132 +82,171 @@ function buildSidebar() {
     iconSpan.className = 'module-icon';
     iconSpan.setAttribute('aria-hidden', 'true');
     iconSpan.textContent = icon;
-
     btn.appendChild(iconSpan);
     btn.appendChild(document.createTextNode(label));
 
     btn.addEventListener('click', () => {
       const targetId = (id === 'css' && state.srMode) ? 'css-sr' : id;
       loadModule(targetId);
-      toggleLessonList(li, btn);
+      openLessonList(li, btn, targetId);
     });
 
-    const lessonUl = document.createElement('ul');
-    lessonUl.className = 'module-lessons';
-    lessonUl.id = `lessons-${id}`;
-
-    const mod = MODULES[(id === 'css' && state.srMode) ? 'css-sr' : id];
-    if (mod && mod.lessons) {
-      mod.lessons.forEach((lesson, i) => {
-        const lessonLi = document.createElement('li');
-        const lessonBtn = document.createElement('button');
-        lessonBtn.className = 'lesson-nav-btn';
-        lessonBtn.textContent = lesson.title;
-        lessonBtn.dataset.lesson = lesson.id;
-        lessonBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          scrollToLesson(lesson.id);
-        });
-        lessonLi.appendChild(lessonBtn);
-        lessonUl.appendChild(lessonLi);
-      });
-    }
-
+    const lessonUl = buildLessonList(id);
     li.appendChild(btn);
     li.appendChild(lessonUl);
     moduleNav.appendChild(li);
   });
 }
 
-function toggleLessonList(li, btn) {
-  const ul = li.querySelector('.module-lessons');
-  const isOpen = ul.classList.contains('open');
-  document.querySelectorAll('.module-lessons.open').forEach(el => el.classList.remove('open'));
-  document.querySelectorAll('.module-nav-btn[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
-  if (!isOpen) {
-    ul.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true');
-  }
+function buildLessonList(moduleNavId) {
+  const ul = document.createElement('ul');
+  ul.className = 'module-lessons';
+  ul.id = `lessons-${moduleNavId}`;
+
+  const modId = (moduleNavId === 'css' && state.srMode) ? 'css-sr' : moduleNavId;
+  const mod   = MODULES[modId];
+  if (!mod) return ul;
+
+  mod.lessons.forEach((lesson, i) => {
+    const li  = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'lesson-nav-btn';
+    btn.textContent = lesson.title;
+    btn.dataset.lessonIndex = i;
+    btn.dataset.moduleId    = moduleNavId;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tid = (moduleNavId === 'css' && state.srMode) ? 'css-sr' : moduleNavId;
+      showLesson(tid, i);
+    });
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+
+  return ul;
 }
 
-// ===== Load module =====
+function openLessonList(li, btn, moduleId) {
+  document.querySelectorAll('.module-lessons.open').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.module-nav-btn[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+  const ul = li.querySelector('.module-lessons');
+  if (ul) { ul.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+}
+
+function updateSidebarActive(moduleId, lessonIndex) {
+  const navId = moduleId === 'css-sr' ? 'css' : moduleId;
+
+  document.querySelectorAll('.module-nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.module === navId);
+  });
+
+  document.querySelectorAll('.lesson-nav-btn').forEach(btn => {
+    const match = btn.dataset.moduleId === navId &&
+                  parseInt(btn.dataset.lessonIndex) === lessonIndex;
+    btn.classList.toggle('active', match);
+  });
+}
+
+// ===== Load module → show intro =====
 function loadModule(moduleId) {
-  state.activeModuleId = moduleId;
+  state.activeModuleId    = moduleId;
+  state.currentLessonIndex = -1;
+  if (!state.completedLessons[moduleId]) state.completedLessons[moduleId] = new Set();
+
   const mod = MODULES[moduleId];
   if (!mod) return;
 
+  const navId = moduleId === 'css-sr' ? 'css' : moduleId;
   document.querySelectorAll('.module-nav-btn').forEach(btn => {
-    const isActive = btn.dataset.module === (moduleId === 'css-sr' ? 'css' : moduleId);
-    btn.classList.toggle('active', isActive);
+    btn.classList.toggle('active', btn.dataset.module === navId);
   });
+  document.querySelectorAll('.lesson-nav-btn').forEach(btn => btn.classList.remove('active'));
 
   mainContent.innerHTML = '';
 
-  // Progress bar
-  const progressWrap = document.createElement('div');
-  progressWrap.className = 'progress-bar-wrap';
-  const progressFill = document.createElement('div');
-  progressFill.className = 'progress-bar-fill';
-  progressFill.setAttribute('role', 'progressbar');
-  progressFill.setAttribute('aria-label', `${mod.title} progress`);
-  progressFill.setAttribute('aria-valuemin', '0');
-  progressFill.setAttribute('aria-valuemax', '100');
-  progressFill.setAttribute('aria-valuenow', '0');
-  progressWrap.appendChild(progressFill);
-  mainContent.appendChild(progressWrap);
-
-  // Module header
-  const header = document.createElement('header');
-  header.className = 'module-header';
-
+  // Badge
   const badge = document.createElement('span');
   badge.className = 'module-badge';
   badge.textContent = moduleId === 'css-sr' ? 'CSS — Screen Reader Edition' : mod.title;
 
-  const title = document.createElement('h1');
-  title.className = 'module-title';
-  title.id = 'module-title';
-  title.textContent = mod.title;
+  // Title
+  const h1 = document.createElement('h1');
+  h1.className = 'module-title';
+  h1.id = 'module-title';
+  h1.textContent = mod.title;
 
+  // Description
   const desc = document.createElement('p');
   desc.className = 'module-description';
   desc.textContent = mod.description;
 
+  const header = document.createElement('header');
+  header.className = 'module-header';
   header.appendChild(badge);
-  header.appendChild(title);
+  header.appendChild(h1);
   header.appendChild(desc);
   mainContent.appendChild(header);
 
   // Objectives & Goals
   const og = document.createElement('div');
   og.className = 'objectives-goals';
-  og.appendChild(buildList('Learning Objectives', mod.objectives));
-  og.appendChild(buildList('Goals', mod.goals));
+  og.appendChild(buildInfoCard('Learning Objectives', mod.objectives, 'objectives'));
+  og.appendChild(buildInfoCard('Goals', mod.goals, 'goals'));
   mainContent.appendChild(og);
 
-  // Lessons
-  const lessonsSection = document.createElement('section');
-  lessonsSection.setAttribute('aria-label', 'Module lessons');
+  // Lesson list overview
+  const overviewSection = document.createElement('section');
+  overviewSection.setAttribute('aria-label', 'Lessons in this module');
+  overviewSection.className = 'lesson-overview';
+
+  const overviewTitle = document.createElement('h2');
+  overviewTitle.className = 'section-label';
+  overviewTitle.textContent = `${mod.lessons.length} Lessons`;
+  overviewSection.appendChild(overviewTitle);
+
+  const lessonList = document.createElement('ol');
+  lessonList.className = 'lesson-overview-list';
 
   mod.lessons.forEach((lesson, i) => {
-    lessonsSection.appendChild(buildLesson(lesson, i + 1, progressFill, mod.lessons.length));
+    const li   = document.createElement('li');
+    const btn  = document.createElement('button');
+    btn.className = 'lesson-overview-btn';
+    btn.textContent = lesson.title;
+    const done = state.completedLessons[moduleId] && state.completedLessons[moduleId].has(i);
+    if (done) {
+      btn.classList.add('completed');
+      btn.setAttribute('aria-label', `${lesson.title} — completed`);
+    }
+    btn.addEventListener('click', () => showLesson(moduleId, i));
+    li.appendChild(btn);
+    lessonList.appendChild(li);
   });
 
-  mainContent.appendChild(lessonsSection);
+  overviewSection.appendChild(lessonList);
+  mainContent.appendChild(overviewSection);
 
-  announce(`Loaded ${mod.title}. ${mod.lessons.length} lessons available.`);
+  // Start button
+  const startWrap = document.createElement('div');
+  startWrap.className = 'start-wrap';
+  const startBtn = document.createElement('button');
+  startBtn.className = 'btn-start';
+  startBtn.textContent = 'Start Learning';
+  startBtn.addEventListener('click', () => showLesson(moduleId, 0));
+  startWrap.appendChild(startBtn);
+  mainContent.appendChild(startWrap);
 
-  mainContent.querySelector('h1').focus();
+  announce(`${mod.title} — ${mod.lessons.length} lessons. Press Start Learning to begin.`);
+  focusMainHeading();
 }
 
-function buildList(label, items) {
+function buildInfoCard(label, items, id) {
   const card = document.createElement('section');
   card.className = 'card';
-  card.setAttribute('aria-labelledby', label.toLowerCase().replace(' ', '-') + '-heading');
+  card.setAttribute('aria-labelledby', `${id}-heading`);
 
   const h2 = document.createElement('h2');
   h2.className = 'card-title';
-  h2.id = label.toLowerCase().replace(' ', '-') + '-heading';
+  h2.id = `${id}-heading`;
   h2.textContent = label;
 
   const ul = document.createElement('ul');
@@ -219,100 +261,273 @@ function buildList(label, items) {
   return card;
 }
 
-function buildLesson(lesson, number, progressBar, totalLessons) {
-  const section = document.createElement('section');
-  section.className = 'lesson-section';
-  section.id = lesson.id;
-  section.setAttribute('aria-labelledby', `${lesson.id}-title`);
+// ===== Show a single lesson =====
+function showLesson(moduleId, lessonIndex) {
+  state.activeModuleId     = moduleId;
+  state.currentLessonIndex = lessonIndex;
 
-  // Header
-  const header = document.createElement('div');
-  header.className = 'lesson-header';
+  const mod   = MODULES[moduleId];
+  const lesson = mod.lessons[lessonIndex];
+  const total  = mod.lessons.length;
+  if (!mod || !lesson) return;
 
-  const num = document.createElement('span');
-  num.className = 'lesson-number';
-  num.setAttribute('aria-hidden', 'true');
-  num.textContent = number;
+  if (!state.completedLessons[moduleId]) state.completedLessons[moduleId] = new Set();
 
-  const title = document.createElement('h2');
-  title.className = 'lesson-title';
-  title.id = `${lesson.id}-title`;
-  title.textContent = lesson.title;
+  updateSidebarActive(moduleId, lessonIndex);
+  mainContent.innerHTML = '';
 
-  header.appendChild(num);
-  header.appendChild(title);
-  section.appendChild(header);
+  // ── Top bar: module + lesson counter ──
+  const topBar = document.createElement('div');
+  topBar.className = 'lesson-top-bar';
 
-  // Content
-  const content = document.createElement('div');
-  content.className = 'lesson-content';
-  content.setAttribute('tabindex', '0');
-  content.setAttribute('aria-label', `${lesson.title} — lesson content`);
-  content.textContent = lesson.content;
-  section.appendChild(content);
+  const moduleCrumb = document.createElement('span');
+  moduleCrumb.className = 'lesson-crumb';
+  const crumbBtn = document.createElement('button');
+  crumbBtn.className = 'crumb-btn';
+  crumbBtn.textContent = mod.title;
+  crumbBtn.setAttribute('aria-label', `Back to ${mod.title} overview`);
+  crumbBtn.addEventListener('click', () => loadModule(moduleId));
+  moduleCrumb.appendChild(crumbBtn);
 
-  // Quiz
+  const lessonCounter = document.createElement('span');
+  lessonCounter.className = 'lesson-counter';
+  lessonCounter.setAttribute('aria-label', `Lesson ${lessonIndex + 1} of ${total}`);
+  lessonCounter.textContent = `Lesson ${lessonIndex + 1} of ${total}`;
+
+  topBar.appendChild(moduleCrumb);
+  topBar.appendChild(lessonCounter);
+  mainContent.appendChild(topBar);
+
+  // ── Progress bar ──
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'progress-bar-wrap';
+  const progressFill = document.createElement('div');
+  progressFill.className = 'progress-bar-fill';
+  progressFill.setAttribute('role', 'progressbar');
+  progressFill.setAttribute('aria-label', `${mod.title} progress`);
+  progressFill.setAttribute('aria-valuemin', '0');
+  progressFill.setAttribute('aria-valuemax', '100');
+  const pct = Math.round((state.completedLessons[moduleId].size / total) * 100);
+  progressFill.setAttribute('aria-valuenow', pct);
+  progressFill.style.width = `${pct}%`;
+  progressWrap.appendChild(progressFill);
+  mainContent.appendChild(progressWrap);
+
+  // ── Lesson header ──
+  const lessonHeader = document.createElement('div');
+  lessonHeader.className = 'lesson-header';
+
+  const numBadge = document.createElement('span');
+  numBadge.className = 'lesson-number';
+  numBadge.setAttribute('aria-hidden', 'true');
+  numBadge.textContent = lessonIndex + 1;
+
+  const lessonTitle = document.createElement('h1');
+  lessonTitle.className = 'lesson-title';
+  lessonTitle.id = 'lesson-title';
+  lessonTitle.textContent = lesson.title;
+
+  lessonHeader.appendChild(numBadge);
+  lessonHeader.appendChild(lessonTitle);
+  mainContent.appendChild(lessonHeader);
+
+  // ── Lesson content ──
+  const contentBox = document.createElement('div');
+  contentBox.className = 'lesson-content';
+  contentBox.setAttribute('tabindex', '0');
+  contentBox.setAttribute('aria-label', `${lesson.title} — lesson content`);
+  contentBox.textContent = lesson.content;
+  mainContent.appendChild(contentBox);
+
+  // ── Quiz ──
   if (lesson.quiz && lesson.quiz.length) {
-    section.appendChild(buildQuiz(lesson, progressBar, totalLessons, number));
+    mainContent.appendChild(buildQuiz(lesson, progressFill, total, moduleId, lessonIndex));
   }
 
-  // Exercise
+  // ── Exercise ──
   if (lesson.exercise) {
-    section.appendChild(buildExercise(lesson.exercise, lesson.title));
+    mainContent.appendChild(buildExercise(lesson.exercise, lesson.title));
   }
 
-  return section;
+  // ── Navigation ──
+  mainContent.appendChild(buildNavigation(moduleId, lessonIndex, total));
+
+  announce(`Lesson ${lessonIndex + 1} of ${total}: ${lesson.title}`);
+  focusMainHeading();
 }
 
-function buildQuiz(lesson, progressBar, totalLessons, lessonNum) {
-  const quizSection = document.createElement('div');
-  quizSection.className = 'quiz-section';
-  quizSection.setAttribute('role', 'group');
-  quizSection.setAttribute('aria-label', `Quiz for ${lesson.title}`);
+function buildNavigation(moduleId, lessonIndex, total) {
+  const nav = document.createElement('nav');
+  nav.className = 'lesson-nav';
+  nav.setAttribute('aria-label', 'Lesson navigation');
 
-  const quizTitle = document.createElement('h3');
-  quizTitle.className = 'quiz-title';
-  quizTitle.textContent = 'Knowledge Check';
-  quizSection.appendChild(quizTitle);
+  const prevWrap = document.createElement('div');
+  prevWrap.className = 'lesson-nav-prev';
+
+  const nextWrap = document.createElement('div');
+  nextWrap.className = 'lesson-nav-next';
+
+  if (lessonIndex > 0) {
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'btn-lesson-nav btn-prev';
+    prevBtn.textContent = '← Previous Lesson';
+    prevBtn.addEventListener('click', () => showLesson(moduleId, lessonIndex - 1));
+    prevWrap.appendChild(prevBtn);
+  } else {
+    const overviewBtn = document.createElement('button');
+    overviewBtn.className = 'btn-lesson-nav btn-overview';
+    overviewBtn.textContent = '← Module Overview';
+    overviewBtn.addEventListener('click', () => loadModule(moduleId));
+    prevWrap.appendChild(overviewBtn);
+  }
+
+  if (lessonIndex < total - 1) {
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-lesson-nav btn-next';
+    nextBtn.textContent = 'Next Lesson →';
+    nextBtn.addEventListener('click', () => {
+      markComplete(moduleId, lessonIndex);
+      showLesson(moduleId, lessonIndex + 1);
+    });
+    nextWrap.appendChild(nextBtn);
+  } else {
+    const finishBtn = document.createElement('button');
+    finishBtn.className = 'btn-lesson-nav btn-finish';
+    finishBtn.textContent = 'Complete Module ✓';
+    finishBtn.addEventListener('click', () => {
+      markComplete(moduleId, lessonIndex);
+      showModuleComplete(moduleId);
+    });
+    nextWrap.appendChild(finishBtn);
+  }
+
+  nav.appendChild(prevWrap);
+  nav.appendChild(nextWrap);
+  return nav;
+}
+
+function markComplete(moduleId, lessonIndex) {
+  if (!state.completedLessons[moduleId]) state.completedLessons[moduleId] = new Set();
+  state.completedLessons[moduleId].add(lessonIndex);
+}
+
+// ===== Module complete screen =====
+function showModuleComplete(moduleId) {
+  const mod   = MODULES[moduleId];
+  const total = mod.lessons.length;
+
+  mainContent.innerHTML = '';
+
+  const screen = document.createElement('section');
+  screen.className = 'complete-screen';
+  screen.setAttribute('aria-labelledby', 'complete-heading');
+
+  const icon = document.createElement('span');
+  icon.className = 'complete-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = '✓';
+
+  const h1 = document.createElement('h1');
+  h1.id = 'complete-heading';
+  h1.className = 'complete-title';
+  h1.textContent = 'Module Complete!';
+
+  const msg = document.createElement('p');
+  msg.className = 'complete-msg';
+  msg.textContent = `You finished all ${total} lessons in ${mod.title}. Great work.`;
+
+  const actions = document.createElement('div');
+  actions.className = 'complete-actions';
+
+  const reviewBtn = document.createElement('button');
+  reviewBtn.className = 'btn-primary';
+  reviewBtn.textContent = 'Review this module';
+  reviewBtn.addEventListener('click', () => loadModule(moduleId));
+
+  const nextModuleId = getNextModuleId(moduleId);
+  if (nextModuleId) {
+    const nextMod = MODULES[nextModuleId];
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-start';
+    nextBtn.textContent = `Start ${nextMod.title} →`;
+    nextBtn.addEventListener('click', () => {
+      const navId = nextModuleId === 'css-sr' ? 'css' : nextModuleId;
+      const li = document.getElementById(`nav-item-${navId}`);
+      const btn = li && li.querySelector('.module-nav-btn');
+      if (li && btn) openLessonList(li, btn, nextModuleId);
+      loadModule(nextModuleId);
+    });
+    actions.appendChild(nextBtn);
+  }
+
+  actions.appendChild(reviewBtn);
+  screen.appendChild(icon);
+  screen.appendChild(h1);
+  screen.appendChild(msg);
+  screen.appendChild(actions);
+  mainContent.appendChild(screen);
+
+  announce(`Module complete! You finished all ${total} lessons in ${mod.title}.`);
+  focusMainHeading();
+}
+
+function getNextModuleId(currentId) {
+  const order = ['html', 'css', 'javascript'];
+  const navId = currentId === 'css-sr' ? 'css' : currentId;
+  const idx   = order.indexOf(navId);
+  if (idx === -1 || idx === order.length - 1) return null;
+  const next  = order[idx + 1];
+  return (next === 'css' && state.srMode) ? 'css-sr' : next;
+}
+
+// ===== Quiz builder =====
+function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
+  const section = document.createElement('div');
+  section.className = 'quiz-section';
+  section.setAttribute('role', 'group');
+  section.setAttribute('aria-label', `Knowledge check for ${lesson.title}`);
+
+  const h2 = document.createElement('h2');
+  h2.className = 'quiz-title';
+  h2.textContent = 'Knowledge Check';
+  section.appendChild(h2);
 
   lesson.quiz.forEach((q, qi) => {
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'quiz-question';
+    const qDiv    = document.createElement('div');
+    qDiv.className = 'quiz-question';
 
     const fieldset = document.createElement('fieldset');
-    fieldset.style.border = 'none';
-    fieldset.style.padding = '0';
+    fieldset.style.cssText = 'border:none;padding:0;margin:0';
 
     const legend = document.createElement('legend');
     legend.className = 'question-text';
     legend.textContent = `${qi + 1}. ${q.question}`;
     fieldset.appendChild(legend);
 
-    const optionsList = document.createElement('ul');
-    optionsList.className = 'options-list';
-    optionsList.setAttribute('role', 'list');
+    const optList = document.createElement('ul');
+    optList.className = 'options-list';
+    optList.setAttribute('role', 'list');
 
     const name = `q-${lesson.id}-${qi}`;
 
     q.options.forEach((opt, oi) => {
-      const li = document.createElement('li');
-      const label = document.createElement('label');
-      label.className = 'option-label';
+      const li    = document.createElement('li');
+      const lbl   = document.createElement('label');
+      lbl.className = 'option-label';
 
       const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = name;
+      radio.type  = 'radio';
+      radio.name  = name;
       radio.value = oi;
-      radio.id = `${name}-opt-${oi}`;
-
-      label.setAttribute('for', radio.id);
-      label.appendChild(radio);
-      label.appendChild(document.createTextNode(opt));
-      li.appendChild(label);
-      optionsList.appendChild(li);
+      radio.id    = `${name}-opt-${oi}`;
+      lbl.setAttribute('for', radio.id);
+      lbl.appendChild(radio);
+      lbl.appendChild(document.createTextNode(opt));
+      li.appendChild(lbl);
+      optList.appendChild(li);
     });
 
-    fieldset.appendChild(optionsList);
+    fieldset.appendChild(optList);
 
     const checkBtn = document.createElement('button');
     checkBtn.className = 'check-btn';
@@ -337,65 +552,69 @@ function buildQuiz(lesson, progressBar, totalLessons, lessonNum) {
         if (i === q.answer) lbl.classList.add('correct');
         else if (i === parseInt(selected.value) && !isCorrect) lbl.classList.add('incorrect');
       });
-
       if (isCorrect) {
         feedback.textContent = 'Correct! Well done.';
         feedback.className = 'quiz-feedback show correct';
         announce('Correct! Well done.');
-        updateProgress(progressBar, totalLessons, lessonNum);
+        markComplete(moduleId, lessonIndex);
+        const pct = Math.round((state.completedLessons[moduleId].size / total) * 100);
+        progressFill.style.width = `${pct}%`;
+        progressFill.setAttribute('aria-valuenow', pct);
       } else {
-        feedback.textContent = `Incorrect. The correct answer is: ${q.options[q.answer]}`;
+        feedback.textContent = `Not quite. The correct answer is: ${q.options[q.answer]}`;
         feedback.className = 'quiz-feedback show incorrect';
-        announce(`Incorrect. The correct answer is: ${q.options[q.answer]}`);
+        announce(`Not quite. The correct answer is: ${q.options[q.answer]}`);
       }
     });
 
     fieldset.appendChild(checkBtn);
     fieldset.appendChild(feedback);
-    questionDiv.appendChild(fieldset);
-    quizSection.appendChild(questionDiv);
+    qDiv.appendChild(fieldset);
+    section.appendChild(qDiv);
   });
 
-  return quizSection;
+  return section;
 }
 
+// ===== Exercise builder =====
 function buildExercise(exercise, lessonTitle) {
   const section = document.createElement('div');
   section.className = 'exercise-section';
 
-  const title = document.createElement('h3');
-  title.className = 'exercise-title';
-  title.textContent = 'Coding Exercise';
-  section.appendChild(title);
+  const h2 = document.createElement('h2');
+  h2.className = 'exercise-title';
+  h2.textContent = 'Coding Exercise';
+  section.appendChild(h2);
 
   const prompt = document.createElement('p');
   prompt.className = 'exercise-prompt';
   prompt.textContent = exercise.prompt;
   section.appendChild(prompt);
 
-  const editorLabel = document.createElement('label');
-  editorLabel.setAttribute('for', `editor-${lessonTitle.replace(/\s+/g, '-')}`);
-  editorLabel.className = 'sr-only-label';
-  editorLabel.textContent = `Code editor for: ${exercise.prompt}`;
-  section.appendChild(editorLabel);
+  const edId = `editor-${lessonTitle.replace(/\W+/g, '-')}`;
+
+  const lbl = document.createElement('label');
+  lbl.setAttribute('for', edId);
+  lbl.className = 'sr-only-label';
+  lbl.textContent = `Code editor for: ${exercise.prompt}`;
+  section.appendChild(lbl);
 
   const editor = document.createElement('textarea');
   editor.className = 'code-editor';
-  editor.id = `editor-${lessonTitle.replace(/\s+/g, '-')}`;
+  editor.id = edId;
   editor.value = exercise.starterCode;
   editor.setAttribute('aria-label', `Code editor: ${exercise.prompt}`);
   editor.setAttribute('spellcheck', 'false');
   editor.setAttribute('autocorrect', 'off');
   editor.setAttribute('autocapitalize', 'off');
 
-  // Tab key inserts spaces in editor instead of leaving it
   editor.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const start = editor.selectionStart;
+      const s = editor.selectionStart;
       const end = editor.selectionEnd;
-      editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
-      editor.selectionStart = editor.selectionEnd = start + 2;
+      editor.value = editor.value.substring(0, s) + '  ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = s + 2;
     }
   });
 
@@ -404,75 +623,64 @@ function buildExercise(exercise, lessonTitle) {
   const actions = document.createElement('div');
   actions.className = 'exercise-actions';
 
-  const runBtn = document.createElement('button');
-  runBtn.className = 'btn-primary';
-  runBtn.textContent = 'Run code';
-  runBtn.setAttribute('aria-describedby', 'exercise-output-desc');
+  const runBtn      = document.createElement('button');
+  runBtn.className  = 'btn-primary';
+  runBtn.textContent = 'Submit code';
 
-  const showSolutionBtn = document.createElement('button');
-  showSolutionBtn.className = 'btn-secondary';
-  showSolutionBtn.textContent = 'Show solution';
+  const solBtn      = document.createElement('button');
+  solBtn.className  = 'btn-secondary';
+  solBtn.textContent = 'Show solution';
+  let solShown = false;
 
-  const resetBtn = document.createElement('button');
+  const resetBtn    = document.createElement('button');
   resetBtn.className = 'btn-secondary';
   resetBtn.textContent = 'Reset';
 
   actions.appendChild(runBtn);
-  actions.appendChild(showSolutionBtn);
+  actions.appendChild(solBtn);
   actions.appendChild(resetBtn);
   section.appendChild(actions);
 
   const output = document.createElement('div');
   output.className = 'exercise-output';
-  output.id = 'exercise-output-desc';
   output.setAttribute('role', 'region');
   output.setAttribute('aria-label', 'Exercise output');
   output.setAttribute('aria-live', 'polite');
   section.appendChild(output);
 
   runBtn.addEventListener('click', () => {
-    output.textContent = 'Code submitted. In a full environment, your code would run here.';
-    output.className = 'exercise-output show';
+    output.textContent = 'Code submitted! Compare your work with the solution to check your understanding.';
+    output.classList.add('show');
     announce('Code submitted.');
   });
 
-  showSolutionBtn.addEventListener('click', () => {
-    editor.value = exercise.solution;
-    output.textContent = 'Solution loaded into editor.';
-    output.className = 'exercise-output show';
-    announce('Solution loaded into the code editor.');
-    showSolutionBtn.textContent = 'Hide solution';
-    showSolutionBtn.addEventListener('click', () => {
+  solBtn.addEventListener('click', () => {
+    solShown = !solShown;
+    if (solShown) {
+      editor.value = exercise.solution;
+      solBtn.textContent = 'Hide solution';
+      output.textContent = 'Solution loaded. Study it, then press Reset to try again.';
+      output.classList.add('show');
+      announce('Solution loaded into the code editor.');
+    } else {
       editor.value = exercise.starterCode;
-      output.textContent = 'Editor reset to starter code.';
+      solBtn.textContent = 'Show solution';
+      output.textContent = '';
+      output.classList.remove('show');
       announce('Editor reset to starter code.');
-    }, { once: true });
-  }, { once: true });
+    }
+  });
 
   resetBtn.addEventListener('click', () => {
     editor.value = exercise.starterCode;
-    output.className = 'exercise-output';
+    solShown = false;
+    solBtn.textContent = 'Show solution';
     output.textContent = '';
+    output.classList.remove('show');
     announce('Editor reset to starter code.');
   });
 
   return section;
-}
-
-function updateProgress(progressBar, totalLessons, lessonNum) {
-  const pct = Math.min(100, Math.round((lessonNum / totalLessons) * 100));
-  progressBar.style.width = `${pct}%`;
-  progressBar.setAttribute('aria-valuenow', pct);
-}
-
-function scrollToLesson(lessonId) {
-  const el = document.getElementById(lessonId);
-  if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const focusTarget = el.querySelector('h2') || el;
-  focusTarget.setAttribute('tabindex', '-1');
-  focusTarget.focus({ preventScroll: true });
-  announce(`Jumped to ${focusTarget.textContent}`);
 }
 
 // ===== Welcome screen =====
@@ -488,37 +696,47 @@ function showWelcome() {
   h1.textContent = 'CodeMaster';
 
   const p1 = document.createElement('p');
-  p1.textContent = 'A fully accessible coding learning platform built for keyboard and screen reader users. Learn HTML, CSS, and JavaScript at your own pace.';
+  p1.textContent = 'A fully accessible coding learning platform built for keyboard and screen reader users. No experience needed — start from the very beginning.';
 
   const p2 = document.createElement('p');
-  p2.textContent = 'Choose a module from the sidebar or select one below to get started.';
+  p2.textContent = 'Choose a module below or from the sidebar to get started.';
 
   const cards = document.createElement('div');
   cards.className = 'module-cards';
   cards.setAttribute('role', 'list');
 
-  const moduleList = [
-    { id: 'html', icon: '📄', label: 'HTML', desc: '3 lessons' },
-    { id: 'css', icon: '🎨', label: 'CSS', desc: '3 lessons' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '3 lessons' },
+  const defs = [
+    { id: 'html',       icon: '📄', label: 'HTML',       desc: '6 lessons — Start here' },
+    { id: 'css',        icon: '🎨', label: 'CSS',        desc: '5 lessons' },
+    { id: 'javascript', icon: '⚡', label: 'JavaScript', desc: '5 lessons' },
   ];
 
-  moduleList.forEach(({ id, icon, label, desc }) => {
+  defs.forEach(({ id, icon, label, desc }) => {
     const card = document.createElement('button');
     card.className = 'module-start-card';
     card.setAttribute('role', 'listitem');
+
     const iconSpan = document.createElement('span');
     iconSpan.className = 'icon';
     iconSpan.setAttribute('aria-hidden', 'true');
     iconSpan.textContent = icon;
-    const h3 = document.createElement('h3');
+
+    const h3  = document.createElement('h3');
     h3.textContent = label;
+
     const pDesc = document.createElement('p');
     pDesc.textContent = desc;
+
     card.appendChild(iconSpan);
     card.appendChild(h3);
     card.appendChild(pDesc);
-    card.addEventListener('click', () => loadModule(id));
+    card.addEventListener('click', () => {
+      const navId = id;
+      const li  = document.getElementById(`nav-item-${navId}`);
+      const btn = li && li.querySelector('.module-nav-btn');
+      if (li && btn) openLessonList(li, btn, navId);
+      loadModule(id);
+    });
     cards.appendChild(card);
   });
 
@@ -527,43 +745,36 @@ function showWelcome() {
   welcome.appendChild(p2);
   welcome.appendChild(cards);
   mainContent.appendChild(welcome);
+  h1.setAttribute('tabindex', '-1');
   h1.focus();
 }
 
 // ===== Auto-updater UI =====
 function initUpdater() {
-  const banner = document.getElementById('update-banner');
-  const versionLabel = document.getElementById('update-version-label');
-  const notesBody = document.getElementById('update-notes');
-  const btnDownload = document.getElementById('btn-download-update');
-  const btnDismiss = document.getElementById('btn-dismiss-update');
+  const banner          = document.getElementById('update-banner');
+  const versionLabel    = document.getElementById('update-version-label');
+  const notesBody       = document.getElementById('update-notes');
+  const btnDownload     = document.getElementById('btn-download-update');
+  const btnDismiss      = document.getElementById('btn-dismiss-update');
   const progressSection = document.getElementById('update-progress-section');
-  const progressBar = document.getElementById('update-progress-bar');
-  const progressLabel = document.getElementById('update-progress-label');
-  const restartSection = document.getElementById('update-restart-section');
-  const btnInstall = document.getElementById('btn-install-update');
+  const progressBar     = document.getElementById('update-progress-bar');
+  const progressLabel   = document.getElementById('update-progress-label');
+  const restartSection  = document.getElementById('update-restart-section');
+  const btnInstall      = document.getElementById('btn-install-update');
 
   if (!window.electronAPI) return;
 
-  // Show app version in header
   window.electronAPI.getVersion().then(v => {
-    const versionEl = document.getElementById('app-version-display');
-    if (versionEl) versionEl.textContent = `v${v}`;
+    const el = document.getElementById('app-version-display');
+    if (el) el.textContent = `v${v}`;
   });
 
   window.electronAPI.onUpdateAvailable((info) => {
     versionLabel.textContent = `Version ${info.version}`;
-
-    // Release notes may be HTML or plain text from GitHub
-    if (info.releaseNotes) {
-      const stripped = info.releaseNotes
-        .replace(/<[^>]+>/g, '')  // strip HTML tags for screen reader safety
-        .trim();
-      notesBody.textContent = stripped || 'No release notes provided.';
-    } else {
-      notesBody.textContent = 'No release notes provided.';
-    }
-
+    const notes = info.releaseNotes
+      ? info.releaseNotes.replace(/<[^>]+>/g, '').trim()
+      : 'No release notes provided.';
+    notesBody.textContent = notes;
     banner.hidden = false;
     announce(`Update available: Version ${info.version}. Use the update bar to download.`);
     btnDownload.focus();
@@ -572,8 +783,7 @@ function initUpdater() {
   window.electronAPI.onDownloadProgress((progress) => {
     progressSection.hidden = false;
     btnDownload.disabled = true;
-    btnDownload.textContent = 'Downloading…';
-
+    btnDownload.textContent = 'Downloading...';
     progressBar.style.setProperty('--progress', `${progress.percent}%`);
     progressBar.setAttribute('aria-valuenow', progress.percent);
     progressLabel.textContent = `${progress.percent}%`;
@@ -600,7 +810,7 @@ function initUpdater() {
 
   btnDismiss.addEventListener('click', () => {
     banner.hidden = true;
-    announce('Update notification dismissed. You can check for updates later.');
+    announce('Update notification dismissed.');
   });
 
   btnInstall.addEventListener('click', () => {

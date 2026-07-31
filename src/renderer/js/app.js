@@ -975,9 +975,8 @@ function showWelcome() {
   const p2 = document.createElement('p');
   p2.textContent = 'Choose a module below or from the sidebar to get started.';
 
-  const cards = document.createElement('div');
+  const cards = document.createElement('ul');
   cards.className = 'module-cards';
-  cards.setAttribute('role', 'list');
 
   const defs = [
     { id: 'html',       icon: '📄', label: 'HTML',        desc: '10 lessons — Start here' },
@@ -989,32 +988,38 @@ function showWelcome() {
   ];
 
   defs.forEach(({ id, icon, label, desc }) => {
+    const li = document.createElement('li');
+
     const card = document.createElement('button');
     card.className = 'module-start-card';
-    card.setAttribute('role', 'listitem');
+    card.setAttribute('aria-label', `${label} — ${desc}`);
 
     const iconSpan = document.createElement('span');
-    iconSpan.className = 'icon';
+    iconSpan.className = 'card-icon';
     iconSpan.setAttribute('aria-hidden', 'true');
     iconSpan.textContent = icon;
 
-    const h3  = document.createElement('h3');
-    h3.textContent = label;
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'card-label';
+    labelSpan.setAttribute('aria-hidden', 'true');
+    labelSpan.textContent = label;
 
-    const pDesc = document.createElement('p');
-    pDesc.textContent = desc;
+    const descSpan = document.createElement('span');
+    descSpan.className = 'card-desc';
+    descSpan.setAttribute('aria-hidden', 'true');
+    descSpan.textContent = desc;
 
     card.appendChild(iconSpan);
-    card.appendChild(h3);
-    card.appendChild(pDesc);
+    card.appendChild(labelSpan);
+    card.appendChild(descSpan);
     card.addEventListener('click', () => {
-      const navId = id;
-      const li  = document.getElementById(`nav-item-${navId}`);
-      const btn = li && li.querySelector('.module-nav-btn');
-      if (li && btn) openLessonList(li, btn, navId);
+      const navLi = document.getElementById(`nav-item-${id}`);
+      const navBtn = navLi && navLi.querySelector('.module-nav-btn');
+      if (navLi && navBtn) openLessonList(navLi, navBtn, id);
       loadModule(id);
     });
-    cards.appendChild(card);
+    li.appendChild(card);
+    cards.appendChild(li);
   });
 
   welcome.appendChild(h1);
@@ -1030,7 +1035,8 @@ function showWelcome() {
 function initUpdater() {
   const banner          = document.getElementById('update-banner');
   const versionLabel    = document.getElementById('update-version-label');
-  const notesBody       = document.getElementById('update-notes');
+  const btnWhatsNew     = document.getElementById('btn-whats-new');
+  const errorMsg        = document.getElementById('update-error-msg');
   const btnDownload     = document.getElementById('btn-download-update');
   const btnDismiss      = document.getElementById('btn-dismiss-update');
   const progressSection = document.getElementById('update-progress-section');
@@ -1038,9 +1044,52 @@ function initUpdater() {
   const progressLabel   = document.getElementById('update-progress-label');
   const restartSection  = document.getElementById('update-restart-section');
   const btnInstall      = document.getElementById('btn-install-update');
+  const modal           = document.getElementById('whats-new-modal');
+  const modalNotes      = document.getElementById('modal-release-notes');
+  const btnCloseModal   = document.getElementById('btn-close-whats-new');
 
   if (!window.electronAPI) return;
 
+  // ---- Modal open/close with focus trap ----
+  let _trapFocus = null;
+
+  function openWhatsNewModal() {
+    modal.hidden = false;
+    btnCloseModal.focus();
+
+    _trapFocus = (e) => {
+      if (e.key === 'Escape') { closeWhatsNewModal(); return; }
+      if (e.key !== 'Tab') return;
+      const focusable = [...modal.querySelectorAll('button, [href], [tabindex="0"]')];
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    modal.addEventListener('keydown', _trapFocus);
+  }
+
+  function closeWhatsNewModal() {
+    modal.hidden = true;
+    if (_trapFocus) modal.removeEventListener('keydown', _trapFocus);
+    _trapFocus = null;
+    btnWhatsNew.focus();
+  }
+
+  btnWhatsNew.addEventListener('click', openWhatsNewModal);
+  btnCloseModal.addEventListener('click', closeWhatsNewModal);
+
+  // Close when clicking the overlay backdrop (outside the dialog)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeWhatsNewModal();
+  });
+
+  // ---- Updater events ----
   window.electronAPI.getVersion().then(v => {
     const el = document.getElementById('app-version-display');
     if (el) el.textContent = `v${v}`;
@@ -1051,7 +1100,9 @@ function initUpdater() {
     const notes = info.releaseNotes
       ? info.releaseNotes.replace(/<[^>]+>/g, '').trim()
       : 'No release notes provided.';
-    notesBody.textContent = notes;
+    modalNotes.textContent = notes;
+    btnWhatsNew.hidden = false;
+    errorMsg.hidden = true;
     banner.hidden = false;
     announce(`Update available: Version ${info.version}. Use the update bar to download.`);
     btnDownload.focus();
@@ -1073,14 +1124,19 @@ function initUpdater() {
     btnInstall.focus();
   });
 
-  window.electronAPI.onUpdateError((msg) => {
-    announce(`Update error: ${msg}`);
+  window.electronAPI.onUpdateError(() => {
+    const friendly = 'Unable to check for updates. Please check your internet connection, or visit github.com/blindgeek1989/CodeMaster to download the latest version.';
+    errorMsg.textContent = friendly;
+    errorMsg.hidden = false;
+    banner.hidden = false;
+    announce(friendly);
     btnDownload.disabled = false;
-    btnDownload.textContent = 'Retry Download';
+    btnDownload.textContent = 'Retry';
     progressSection.hidden = true;
   });
 
   btnDownload.addEventListener('click', () => {
+    errorMsg.hidden = true;
     window.electronAPI.downloadUpdate();
     announce('Downloading update. Please wait.');
   });

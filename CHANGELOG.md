@@ -4,6 +4,13 @@ All notable changes to CodeMaster are documented here.
 When you publish a GitHub Release, paste the relevant section into the release notes
 so users see "What's new" in the update notification.
 
+## [1.5.0] - 2026-07-31
+
+### Fixed
+- Welcome screen module cards now use a proper `<ul>/<li>/<button>` structure — NVDA (and other screen readers) now announce them as buttons with their name and lesson count instead of "clickable"
+- "What's new" link in the update banner now opens a proper modal dialog with focus trapped inside, Escape to close, and focus returned to the trigger button on close
+- Update error message is now user-friendly ("Unable to check for updates. Please check your internet connection…") instead of exposing the raw internal error text; the message is also shown visually in the banner
+
 ## [1.4.0] - 2026-07-31
 
 ### Added

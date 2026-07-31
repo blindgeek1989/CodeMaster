@@ -1,6 +1,6 @@
 {
   "name": "codemaster",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Accessible coding learning platform for screen reader and keyboard users",
   "main": "src/main.js",
   "scripts": {

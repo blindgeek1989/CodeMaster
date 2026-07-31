@@ -706,6 +706,12 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
   margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+.module-cards li {
+  display: contents;
 }
 
 .module-start-card {
@@ -717,6 +723,9 @@ body {
   text-align: left;
   color: var(--text-primary);
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .module-start-card:hover {
@@ -725,19 +734,22 @@ body {
   transform: translateY(-2px);
 }
 
-.module-start-card .icon {
+.module-start-card .card-icon {
   font-size: 2rem;
   margin-bottom: 0.75rem;
   display: block;
+  line-height: 1;
 }
 
-.module-start-card h3 {
+.module-start-card .card-label {
+  display: block;
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
 
-.module-start-card p {
+.module-start-card .card-desc {
+  display: block;
   font-size: 0.8rem;
   color: var(--text-muted);
 }
@@ -1014,34 +1026,82 @@ body {
   margin-bottom: 0.25rem;
 }
 
-.update-notes-details {
+.btn-whats-new {
   margin-top: 0.4rem;
-}
-
-.update-notes-details summary {
+  background: none;
+  border: none;
+  padding: 0;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--accent);
   cursor: pointer;
-  user-select: none;
-  display: inline;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: inherit;
 }
 
-.update-notes-details summary:hover {
-  color: var(--text-secondary);
+.btn-whats-new:hover {
+  color: var(--accent-hover);
 }
 
-.update-notes-body {
+.btn-whats-new:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.update-error-msg {
   margin-top: 0.5rem;
   font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  max-height: 140px;
-  overflow-y: auto;
-  padding: 0.5rem;
-  background: rgba(0,0,0,0.25);
-  border-radius: var(--radius);
+  color: var(--error, #f87171);
+  line-height: 1.5;
+}
+
+/* ===== What's new modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal-dialog {
+  background: var(--bg-card);
   border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 560px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.modal-dialog h2 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.modal-release-notes {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
   white-space: pre-wrap;
+  margin-bottom: 1.5rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay {
+    transition: none;
+  }
 }
 
 .update-actions {

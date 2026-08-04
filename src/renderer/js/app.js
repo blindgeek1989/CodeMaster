@@ -9,6 +9,7 @@ const MODULES = {
   python:     window.pythonModule,
   sql:        window.sqlModule,
   powershell: window.powershellModule,
+  aria:       window.ariaModule,
 };
 
 // ===== Languages that support real code execution =====
@@ -74,6 +75,7 @@ function buildSidebar() {
     { id: 'python',     icon: '🐍', label: 'Python' },
     { id: 'sql',        icon: '🗄️', label: 'SQL' },
     { id: 'powershell', icon: '💻', label: 'PowerShell' },
+    { id: 'aria',       icon: '♿', label: 'ARIA' },
   ];
 
   moduleNav.innerHTML = '';

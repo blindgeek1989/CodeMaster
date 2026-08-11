@@ -2,6 +2,7 @@
 
 // ===== Module data =====
 const MODULES = {
+  think:      window.thinkProgrammerModule,
   html:       window.htmlModule,
   css:        window.cssModule,
   'css-sr':   window.cssScreenReaderModule,
@@ -32,7 +33,7 @@ const announcer    = document.getElementById('sr-announcer');
 // ===== Announce to screen reader =====
 function announce(message) {
   announcer.textContent = '';
-  requestAnimationFrame(() => { announcer.textContent = message; });
+  setTimeout(() => { announcer.textContent = message; }, 150);
 }
 
 function focusMainHeading() {
@@ -69,6 +70,7 @@ srModeCheckbox.addEventListener('change', () => {
 // ===== Build sidebar =====
 function buildSidebar() {
   const defs = [
+    { id: 'think',      icon: '🧠', label: 'Think Like a Programmer' },
     { id: 'html',       icon: '📄', label: 'HTML' },
     { id: 'css',        icon: '🎨', label: 'CSS' },
     { id: 'javascript', icon: '⚡', label: 'JavaScript' },
@@ -639,7 +641,7 @@ function showModuleComplete(moduleId) {
 }
 
 function getNextModuleId(currentId) {
-  const order = ['html', 'css', 'javascript', 'python', 'sql', 'powershell'];
+  const order = ['think', 'html', 'css', 'javascript', 'python', 'sql', 'powershell'];
   const navId = currentId === 'css-sr' ? 'css' : currentId;
   const idx   = order.indexOf(navId);
   if (idx === -1 || idx === order.length - 1) return null;
@@ -702,8 +704,7 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
 
     const feedback = document.createElement('div');
     feedback.className = 'quiz-feedback';
-    feedback.setAttribute('role', 'status');
-    feedback.setAttribute('aria-live', 'polite');
+    feedback.setAttribute('aria-hidden', 'true');
 
     checkBtn.addEventListener('click', () => {
       const selected = fieldset.querySelector(`input[name="${name}"]:checked`);
@@ -981,12 +982,13 @@ function showWelcome() {
   cards.className = 'module-cards';
 
   const defs = [
-    { id: 'html',       icon: '📄', label: 'HTML',        desc: '10 lessons — Start here' },
-    { id: 'css',        icon: '🎨', label: 'CSS',         desc: '9 lessons' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript',  desc: '9 lessons' },
-    { id: 'python',     icon: '🐍', label: 'Python',      desc: '10 lessons' },
-    { id: 'sql',        icon: '🗄️', label: 'SQL',         desc: '10 lessons' },
-    { id: 'powershell', icon: '💻', label: 'PowerShell',  desc: '8 lessons' },
+    { id: 'think',      icon: '🧠', label: 'Think Like a Programmer', desc: '9 lessons — Start here' },
+    { id: 'html',       icon: '📄', label: 'HTML',                    desc: '10 lessons' },
+    { id: 'css',        icon: '🎨', label: 'CSS',                     desc: '9 lessons' },
+    { id: 'javascript', icon: '⚡', label: 'JavaScript',              desc: '9 lessons' },
+    { id: 'python',     icon: '🐍', label: 'Python',                  desc: '10 lessons' },
+    { id: 'sql',        icon: '🗄️', label: 'SQL',                     desc: '10 lessons' },
+    { id: 'powershell', icon: '💻', label: 'PowerShell',              desc: '8 lessons' },
   ];
 
   defs.forEach(({ id, icon, label, desc }) => {

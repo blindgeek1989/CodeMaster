@@ -1,3 +1,4 @@
+const thinkModule = require('../../src/renderer/data/think-programmer-content');
 const htmlModule = require('../../src/renderer/data/html-content');
 const cssModule = require('../../src/renderer/data/css-content');
 const cssScreenReaderModule = require('../../src/renderer/data/css-screenreader-content');
@@ -6,6 +7,46 @@ const pythonModule = require('../../src/renderer/data/python-content');
 const sqlModule = require('../../src/renderer/data/sql-content');
 const powershellModule = require('../../src/renderer/data/powershell-content');
 const glossaryData = require('../../src/renderer/data/glossary-content');
+
+describe('Think Like a Programmer Module', () => {
+  test('has required top-level fields', () => {
+    expect(thinkModule).toHaveProperty('id', 'think');
+    expect(thinkModule).toHaveProperty('title');
+    expect(thinkModule).toHaveProperty('description');
+    expect(Array.isArray(thinkModule.objectives)).toBe(true);
+    expect(Array.isArray(thinkModule.goals)).toBe(true);
+    expect(Array.isArray(thinkModule.lessons)).toBe(true);
+  });
+
+  test('has at least 9 lessons', () => {
+    expect(thinkModule.lessons.length).toBeGreaterThanOrEqual(9);
+  });
+
+  test('every lesson has id, title, content, and quiz', () => {
+    thinkModule.lessons.forEach(lesson => {
+      expect(lesson).toHaveProperty('id');
+      expect(lesson).toHaveProperty('title');
+      expect(lesson).toHaveProperty('content');
+      expect(Array.isArray(lesson.quiz)).toBe(true);
+      expect(lesson.quiz.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  test('every quiz answer index is within options bounds', () => {
+    thinkModule.lessons.forEach(lesson => {
+      lesson.quiz.forEach(q => {
+        expect(q.answer).toBeGreaterThanOrEqual(0);
+        expect(q.answer).toBeLessThan(q.options.length);
+      });
+    });
+  });
+
+  test('all lessons have exercise: null (conceptual module — no code editor)', () => {
+    thinkModule.lessons.forEach(lesson => {
+      expect(lesson.exercise).toBeNull();
+    });
+  });
+});
 
 describe('HTML Module', () => {
   test('has required top-level fields', () => {
@@ -44,8 +85,9 @@ describe('HTML Module', () => {
     });
   });
 
-  test('every exercise has prompt, starterCode, and solution', () => {
+  test('every non-null exercise has prompt, starterCode, and solution', () => {
     htmlModule.lessons.forEach(lesson => {
+      if (lesson.exercise === null) return;
       expect(lesson.exercise).toHaveProperty('prompt');
       expect(lesson.exercise).toHaveProperty('starterCode');
       expect(lesson.exercise).toHaveProperty('solution');

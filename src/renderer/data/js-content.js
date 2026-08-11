@@ -84,27 +84,7 @@ These four concepts — variables, functions, conditions, and loops — are the 
           answer: 2,
         },
       ],
-      exercise: {
-        prompt: 'No code yet. In the text area below, write out in plain English the instructions for a simple program that: (1) Asks the user for their name. (2) Asks for their age. (3) If they are 18 or older, displays a welcome message with their name. (4) If they are younger than 18, displays a message saying the site is for adults only.',
-        starterCode: `// Write your plain-English program description:
-
-// Step 1:
-
-// Step 2:
-
-// Step 3:
-
-// Step 4:`,
-        solution: `// Write your plain-English program description:
-
-// Step 1: Store the user's name in a variable called "name"
-
-// Step 2: Store the user's age in a variable called "age"
-
-// Step 3: If age is 18 or greater, display "Welcome, [name]! You have access."
-
-// Step 4: If age is less than 18, display "Sorry, this site is for adults only."`,
-      },
+      exercise: null,
     },
     {
       id: 'js-2',

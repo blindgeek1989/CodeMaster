@@ -67,19 +67,7 @@ Screen readers read the HTML, not the visual appearance. This is why writing goo
           answer: 2,
         },
       ],
-      exercise: {
-        prompt: 'No coding yet — but let\'s think it through. In the text area below, list the three web languages and write one sentence explaining what each one does. Use plain English, no copying.',
-        starterCode: `HTML:
-
-CSS:
-
-JavaScript:`,
-        solution: `HTML: Defines the content and structure of a web page — the words, headings, images, links, and forms.
-
-CSS: Controls the appearance — colors, fonts, spacing, and layout.
-
-JavaScript: Adds interactivity — things like buttons that respond to clicks and menus that open and close.`,
-      },
+      exercise: null,
     },
     {
       id: 'html-2',

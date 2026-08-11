@@ -95,31 +95,7 @@ You are not writing code for a visual layout engine. You are writing code for tw
           answer: 1,
         },
       ],
-      exercise: {
-        prompt: `The accessibility tree concept connects directly to your daily experience as a screen reader user. In the text area below, answer these three questions in your own words:
-
-1. What is the accessibility tree and why does the browser build it?
-2. What are the four properties every node in the tree has? Give a real-world example of each.
-3. When a developer sets display:none on a button, what happens to it in the accessibility tree — and why does that matter?`,
-        starterCode: `1. The accessibility tree is:
-
-2. The four properties are:
-   - Role: for example...
-   - Name: for example...
-   - State: for example...
-   - Properties: for example...
-
-3. When display:none is applied:`,
-        solution: `1. The accessibility tree is a parallel data structure the browser builds from HTML that represents the page's meaning and structure. The browser builds it so assistive technologies like screen readers, braille displays, and voice control software have a structured, semantic representation of the page to work with — separate from the visual layout.
-
-2. The four properties are:
-   - Role: what kind of thing it is. Example: a <button> element has role "button".
-   - Name: what the element is called. Example: a button labeled "Submit" has the name "Submit".
-   - State: its current condition. Example: a checkbox that is checked has state "checked".
-   - Properties: additional descriptors. Example: a required field has property "required".
-
-3. When display:none is applied, the element is completely removed from the accessibility tree. It does not exist for screen readers at all — they cannot find it, navigate to it, or read it. This matters because if a button is only hidden visually (with opacity:0 or off-screen positioning), a screen reader can still reach it, which can create confusion. display:none removes it from everyone.`,
-      },
+      exercise: null,
     },
     {
       id: 'aria-2',

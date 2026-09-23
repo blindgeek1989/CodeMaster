@@ -918,10 +918,10 @@ POST REQUEST WITH JSON BODY
       role  = "developer"
   }
 
-  $response = Invoke-RestMethod `
-      -Uri    "https://api.example.com/users" `
-      -Method POST `
-      -ContentType "application/json" `
+  $response = Invoke-RestMethod \`
+      -Uri    "https://api.example.com/users" \`
+      -Method POST \`
+      -ContentType "application/json" \`
       -Body   ($newUser | ConvertTo-Json)
 
   Write-Output "Created user with ID: $($response.id)"
@@ -934,8 +934,8 @@ AUTHENTICATION — API KEY IN HEADERS
       "Accept"        = "application/json"
   }
 
-  $response = Invoke-RestMethod `
-      -Uri     "https://api.example.com/protected" `
+  $response = Invoke-RestMethod \`
+      -Uri     "https://api.example.com/protected" \`
       -Headers $headers
 
 ─────────────────────────────
@@ -958,8 +958,8 @@ Many APIs return paginated results. Here is a pattern to collect all pages:
 ERROR HANDLING WITH API CALLS
 ─────────────────────────────
   try {
-      $user = Invoke-RestMethod `
-          -Uri    "https://api.example.com/users/999" `
+      $user = Invoke-RestMethod \`
+          -Uri    "https://api.example.com/users/999" \`
           -ErrorAction Stop
       return $user
   }

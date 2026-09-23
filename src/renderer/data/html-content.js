@@ -1133,7 +1133,7 @@ Web Components with Shadow DOM require careful ARIA implementation — ARIA attr
             'It adds animation to the dialog opening',
             'It saves the dialog state to localStorage',
           ],
-          answer: 'It moves focus into the dialog, makes the background inert, and allows Escape to close',
+          answer: 1,
         },
         {
           question: 'What does the "popover" attribute on an element do?',
@@ -1143,7 +1143,7 @@ Web Components with Shadow DOM require careful ARIA implementation — ARIA attr
             'It requires the element to be absolutely positioned',
             'It adds a CSS animation when the element appears',
           ],
-          answer: 'It makes the element appear above the page in the browser\'s top layer with built-in dismiss behaviour',
+          answer: 0,
         },
         {
           question: 'Why do Web Components using Shadow DOM require extra care for accessibility?',
@@ -1153,7 +1153,7 @@ Web Components with Shadow DOM require careful ARIA implementation — ARIA attr
             'Web Components do not support keyboard events',
             'The browser strips all ARIA from Shadow DOM for security',
           ],
-          answer: 'ARIA attributes do not automatically cross shadow boundaries — screen readers may not see them',
+          answer: 1,
         },
       ],
       exercise: {

@@ -335,7 +335,7 @@ MULTIPLE PROPS
     return (
       <article>
         <h2>{title}</h2>
-        <p>Price: ${price}</p>
+        <p>Price: \${price}</p>
         <p>{inStock ? 'In stock' : 'Out of stock'}</p>
       </article>
     );

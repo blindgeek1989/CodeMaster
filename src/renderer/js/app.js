@@ -7,6 +7,10 @@ const MODULES = {
   typescript:           window.typescriptModule,
   'async-js':           window.asyncJsModule,
   react:                window.reactModule,
+  nextjs:               window.nextjsModule,
+  nodejs:               window.nodejsModule,
+  jest:                 window.jestModule,
+  regex:                window.regexModule,
   'prompt-engineering': window.promptEngineeringModule,
   think:                window.thinkProgrammerModule,
   html:                 window.htmlModule,
@@ -22,26 +26,30 @@ const MODULES = {
   'scrum-exam':         window.scrumExamPrepModule,
 };
 
-// ===== Module metadata (icon, label, lesson count source) =====
+// ===== Module metadata (icon, label, optional prereqs) =====
 const MODULE_DEFS = [
   { id: 'think',                icon: '🧠', label: 'Think Like a Programmer', note: 'Start here' },
   { id: 'html',                 icon: '📄', label: 'HTML' },
-  { id: 'css',                  icon: '🎨', label: 'CSS' },
-  { id: 'javascript',           icon: '⚡', label: 'JavaScript' },
+  { id: 'css',                  icon: '🎨', label: 'CSS',                    prereqs: ['html'] },
+  { id: 'javascript',           icon: '⚡', label: 'JavaScript',             prereqs: ['html', 'css'] },
   { id: 'python',               icon: '🐍', label: 'Python' },
   { id: 'sql',                  icon: '🗄️', label: 'SQL' },
   { id: 'powershell',           icon: '💻', label: 'PowerShell' },
-  { id: 'aria',                 icon: '♿', label: 'ARIA' },
+  { id: 'aria',                 icon: '♿', label: 'ARIA',                   prereqs: ['html'] },
   { id: 'git',                  icon: '🌿', label: 'Git & Version Control' },
-  { id: 'github',               icon: '🐙', label: 'GitHub' },
-  { id: 'typescript',           icon: '🔷', label: 'TypeScript' },
-  { id: 'async-js',             icon: '⏳', label: 'Async JavaScript' },
-  { id: 'react',                icon: '⚛️', label: 'React' },
+  { id: 'github',               icon: '🐙', label: 'GitHub',                prereqs: ['git'] },
+  { id: 'typescript',           icon: '🔷', label: 'TypeScript',            prereqs: ['javascript'] },
+  { id: 'async-js',             icon: '⏳', label: 'Async JavaScript',      prereqs: ['javascript'] },
+  { id: 'react',                icon: '⚛️', label: 'React',                prereqs: ['javascript', 'async-js'] },
+  { id: 'nextjs',               icon: '▲',  label: 'Next.js',               prereqs: ['react'] },
+  { id: 'nodejs',               icon: '🟢', label: 'Node.js & Express',     prereqs: ['javascript'] },
+  { id: 'jest',                 icon: '🧪', label: 'Testing with Jest',     prereqs: ['javascript'] },
+  { id: 'regex',                icon: '🔍', label: 'Regular Expressions',   prereqs: ['javascript'] },
   { id: 'prompt-engineering',   icon: '✨', label: 'Prompt Engineering' },
   { id: 'scrum-intro',          icon: '🔄', label: 'Intro to Scrum' },
-  { id: 'scrum-master',         icon: '🏉', label: 'Scrum Master' },
-  { id: 'scrum-ai',             icon: '🤖', label: 'Scrum Master with AI' },
-  { id: 'scrum-exam',           icon: '📝', label: 'Scrum Exam Prep' },
+  { id: 'scrum-master',         icon: '🏉', label: 'Scrum Master',          prereqs: ['scrum-intro'] },
+  { id: 'scrum-ai',             icon: '🤖', label: 'Scrum Master with AI',  prereqs: ['scrum-master'] },
+  { id: 'scrum-exam',           icon: '📝', label: 'Scrum Exam Prep',       prereqs: ['scrum-master'] },
 ];
 
 // ===== Languages that support real code execution =====
@@ -694,6 +702,28 @@ function loadModule(moduleId) {
   header.appendChild(desc);
   mainContent.appendChild(header);
 
+  // Prerequisites notice
+  const def = MODULE_DEFS.find(d => d.id === moduleId);
+  if (def && def.prereqs && def.prereqs.length > 0) {
+    const prereqDiv = document.createElement('div');
+    prereqDiv.className = 'prereq-notice';
+    prereqDiv.setAttribute('role', 'note');
+    const label = document.createElement('span');
+    label.textContent = 'Recommended first: ';
+    prereqDiv.appendChild(label);
+    def.prereqs.forEach((prereqId, i) => {
+      const prereqDef = MODULE_DEFS.find(d => d.id === prereqId);
+      if (!prereqDef) return;
+      if (i > 0) prereqDiv.appendChild(document.createTextNode(' and '));
+      const btn = document.createElement('button');
+      btn.className = 'prereq-link';
+      btn.textContent = prereqDef.label;
+      btn.addEventListener('click', () => loadModule(prereqId));
+      prereqDiv.appendChild(btn);
+    });
+    mainContent.appendChild(prereqDiv);
+  }
+
   // Objectives & Goals
   const og = document.createElement('div');
   og.className = 'objectives-goals';
@@ -708,7 +738,10 @@ function loadModule(moduleId) {
 
   const overviewTitle = document.createElement('h2');
   overviewTitle.className = 'section-label';
-  overviewTitle.textContent = `${mod.lessons.length} Lessons`;
+  const completedCount = state.completedLessons[moduleId] ? state.completedLessons[moduleId].size : 0;
+  overviewTitle.textContent = completedCount > 0
+    ? `${mod.lessons.length} Lessons — ${completedCount} of ${mod.lessons.length} complete`
+    : `${mod.lessons.length} Lessons`;
   overviewSection.appendChild(overviewTitle);
 
   const lessonList = document.createElement('ol');
@@ -872,6 +905,7 @@ function showLesson(moduleId, lessonIndex) {
 
   state.activeModuleId     = moduleId;
   state.currentLessonIndex = lessonIndex;
+  saveLastPosition(moduleId, lessonIndex);
 
   const mod   = MODULES[moduleId];
   const lesson = mod.lessons[lessonIndex];
@@ -917,8 +951,24 @@ function showLesson(moduleId, lessonIndex) {
     announce(nowBookmarked ? `Bookmarked: ${lesson.title}` : `Bookmark removed: ${lesson.title}`);
   });
 
+  // ── Copy lesson text button ──
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'lesson-copy-btn';
+  copyBtn.textContent = 'Copy lesson';
+  copyBtn.setAttribute('aria-label', 'Copy lesson content to clipboard');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(lesson.content || '').then(() => {
+      copyBtn.textContent = 'Copied!';
+      announce('Lesson content copied to clipboard.');
+      setTimeout(() => { copyBtn.textContent = 'Copy lesson'; }, 2000);
+    }).catch(() => {
+      announce('Copy failed. Please select and copy the text manually.');
+    });
+  });
+
   topBar.appendChild(moduleCrumb);
   topBar.appendChild(lessonCounter);
+  topBar.appendChild(copyBtn);
   topBar.appendChild(bookmarkBtn);
   mainContent.appendChild(topBar);
 
@@ -1064,6 +1114,94 @@ function loadProgress() {
     for (const [id, indices] of Object.entries(parsed)) {
       if (Array.isArray(indices)) state.completedLessons[id] = new Set(indices);
     }
+  } catch (_) {}
+}
+
+// ===== Last position — resume dialog =====
+function saveLastPosition(moduleId, lessonIndex) {
+  try {
+    const mod = MODULES[moduleId];
+    if (!mod) return;
+    localStorage.setItem('codemaster-last-position', JSON.stringify({
+      moduleId,
+      lessonIndex,
+      moduleTitle: mod.title,
+      lessonTitle: mod.lessons[lessonIndex] ? mod.lessons[lessonIndex].title : '',
+    }));
+  } catch (_) {}
+}
+
+function showResumeDialog(moduleId, lessonIndex, moduleTitle, lessonTitle) {
+  const overlay = document.createElement('div');
+  overlay.className = 'dialog-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'resume-dialog-title');
+
+  const box = document.createElement('div');
+  box.className = 'dialog-box';
+
+  const h2 = document.createElement('h2');
+  h2.id = 'resume-dialog-title';
+  h2.textContent = 'Welcome back!';
+
+  const p = document.createElement('p');
+  p.textContent = `You were last on "${lessonTitle}" in ${moduleTitle}. Would you like to resume?`;
+
+  const actions = document.createElement('div');
+  actions.className = 'dialog-actions';
+
+  const resumeBtn = document.createElement('button');
+  resumeBtn.className = 'btn-primary';
+  resumeBtn.textContent = 'Resume';
+
+  const freshBtn = document.createElement('button');
+  freshBtn.className = 'btn-secondary';
+  freshBtn.textContent = 'Start Fresh';
+
+  const dismiss = () => { document.body.removeChild(overlay); };
+
+  resumeBtn.addEventListener('click', () => { dismiss(); showLesson(moduleId, lessonIndex); });
+  freshBtn.addEventListener('click', () => {
+    dismiss();
+    try { localStorage.removeItem('codemaster-last-position'); } catch (_) {}
+    announce('Home screen.');
+  });
+
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { dismiss(); announce('Resume cancelled.'); return; }
+    if (e.key === 'Tab') {
+      const focusable = Array.from(box.querySelectorAll('button'));
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+  });
+
+  actions.appendChild(resumeBtn);
+  actions.appendChild(freshBtn);
+  box.appendChild(h2);
+  box.appendChild(p);
+  box.appendChild(actions);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  resumeBtn.focus();
+  announce(`Welcome back! You were on "${lessonTitle}" in ${moduleTitle}. Press Resume to continue or Start Fresh for the home screen.`);
+}
+
+function checkAndShowResumeDialog() {
+  showWelcome();
+  try {
+    const raw = localStorage.getItem('codemaster-last-position');
+    if (!raw) return;
+    const { moduleId, lessonIndex, moduleTitle, lessonTitle } = JSON.parse(raw);
+    const mod = MODULES[moduleId];
+    if (!mod || !mod.lessons[lessonIndex]) return;
+    showResumeDialog(moduleId, lessonIndex, moduleTitle || mod.title, lessonTitle || mod.lessons[lessonIndex].title);
   } catch (_) {}
 }
 
@@ -1617,7 +1755,9 @@ function showWelcome() {
     const mod = MODULES[id];
     if (!mod) return;
     const count = mod.lessons.length;
-    const desc = note ? `${count} lessons — ${note}` : `${count} lessons`;
+    const done  = state.completedLessons[id] ? state.completedLessons[id].size : 0;
+    const progressText = done > 0 ? ` — ${done}/${count} complete` : '';
+    const desc = note ? `${count} lessons — ${note}${progressText}` : `${count} lessons${progressText}`;
 
     const li = document.createElement('li');
 
@@ -1784,7 +1924,7 @@ function init() {
   loadProgress();
   renderBookmarksSidebar();
   initFontSize();
-  showWelcome();
+  checkAndShowResumeDialog();
   initUpdater();
 
   homeBtn.addEventListener('click', () => {

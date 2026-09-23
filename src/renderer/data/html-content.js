@@ -1197,6 +1197,332 @@ Web Components with Shadow DOM require careful ARIA implementation — ARIA attr
 </script>`,
       },
     },
+
+    // ─────────────────────────────────────────────────────────────────
+    // LESSON 12 — ADVANCED FORMS
+    // ─────────────────────────────────────────────────────────────────
+    {
+      id: 'html-12',
+      title: 'Lesson 12: Advanced Forms — Grouping, Validation, and Accessibility',
+      content: `HTML forms are the primary way users interact with your application — signing up, searching, checking out, submitting feedback. A well-built form is fast to fill out, easy to correct, and fully operable by keyboard and screen reader. This lesson covers the tools HTML provides to achieve all three.
+
+GROUPING RELATED FIELDS WITH FIELDSET AND LEGEND
+When a form contains related inputs — a billing address, a set of radio buttons, a card number section — wrap them in a <fieldset> and give the group a name with <legend>.
+
+  <fieldset>
+    <legend>Shipping address</legend>
+    <label for="street">Street</label>
+    <input id="street" name="street" type="text" />
+    <label for="city">City</label>
+    <input id="city" name="city" type="text" />
+  </fieldset>
+
+Screen readers announce the legend text before each field inside the group, so users always know which section they are in: "Shipping address — Street — edit text".
+
+Rules:
+  - Every fieldset should have a legend as its first child
+  - Nest fieldsets when you have sub-groups (billing vs. shipping)
+  - Radio and checkbox groups must always use fieldset/legend — the legend IS the group label
+
+LABEL ASSOCIATIONS
+Every input needs a label. The two reliable methods are:
+
+1. htmlFor / id pairing (preferred — most compatible):
+   <label for="email">Email address</label>
+   <input id="email" name="email" type="email" />
+
+2. Wrapping (implicit association):
+   <label>
+     Email address
+     <input name="email" type="email" />
+   </label>
+
+Never use placeholder text as a substitute for a label. Placeholders disappear when the user starts typing, leaving them with no reminder of what the field is for.
+
+For inputs with no visible label (icon buttons, search boxes), use aria-label:
+  <input type="search" aria-label="Search lessons" />
+
+SPECIALIST INPUT TYPES
+HTML has many input types beyond text and password. Use the right one — the browser provides free validation, a matching keyboard on mobile, and semantic meaning for assistive technology.
+
+  type="email"    — validates email format, shows email keyboard on mobile
+  type="tel"      — shows numeric keyboard on mobile (no built-in format validation)
+  type="url"      — validates URL format
+  type="number"   — numeric spinner, use min/max/step attributes
+  type="range"    — slider, use min/max/step and always show the current value visibly
+  type="date"     — native date picker (format varies by OS)
+  type="color"    — color picker
+  type="search"   — search field (adds a clear button in some browsers)
+  type="password" — masks input
+
+Example of a range input with a visible value:
+  <label for="volume">Volume: <span id="vol-display">50</span></label>
+  <input id="volume" type="range" min="0" max="100" value="50"
+         oninput="document.getElementById('vol-display').textContent = this.value" />
+
+Always display the current value next to a range slider — screen readers announce the value when focus is on the input, but sighted users need it too.
+
+DATALIST FOR AUTOCOMPLETE SUGGESTIONS
+The <datalist> element provides a list of predefined suggestions for a text input without locking the user to those choices:
+
+  <label for="browser">Preferred browser</label>
+  <input id="browser" name="browser" list="browser-options" />
+  <datalist id="browser-options">
+    <option value="Chrome" />
+    <option value="Firefox" />
+    <option value="Safari" />
+    <option value="Edge" />
+  </datalist>
+
+The user can type freely or pick from the suggestions. The list attribute on the input must match the id on the datalist.
+
+THE CONSTRAINT VALIDATION API
+HTML provides built-in validation through attributes and a JavaScript API. The browser validates on submit by default — no JavaScript required for basic cases.
+
+VALIDATION ATTRIBUTES
+  required            — field must not be empty
+  minlength / maxlength — character count limits for text inputs
+  min / max           — numeric or date range
+  pattern             — a regular expression the value must match
+  type="email"        — email format check (built-in)
+
+  <input type="text" id="username" name="username"
+         required minlength="3" maxlength="20"
+         pattern="[a-zA-Z0-9_]+"
+         aria-describedby="username-hint" />
+  <p id="username-hint">3–20 characters, letters, numbers, and underscores only.</p>
+
+SETCUSTOMVALIDITY
+For custom validation logic, use setCustomValidity() to set or clear an error message:
+
+  const pass  = document.getElementById('password');
+  const conf  = document.getElementById('confirm');
+
+  conf.addEventListener('input', () => {
+    if (conf.value !== pass.value) {
+      conf.setCustomValidity('Passwords do not match.');
+    } else {
+      conf.setCustomValidity('');  // empty string = valid
+    }
+  });
+
+Always call setCustomValidity('') to clear a previous error when the condition is resolved.
+
+CSS :INVALID AND :VALID PSEUDO-CLASSES
+Style inputs based on their validation state:
+
+  input:valid   { border-color: green; }
+  input:invalid { border-color: red; }
+
+Caution: these apply as soon as the page loads, before the user touches anything — empty required fields immediately show red. Use the :user-invalid pseudo-class (or a touched class added via JavaScript) to only show errors after the user has interacted with a field:
+
+  input:user-invalid { border-color: red; }   /* modern browsers */
+
+ACCESSIBLE ERROR MESSAGES
+Browser default validation popups are not reliably accessible. For full control, suppress the default UI with novalidate on the form and show your own error messages:
+
+  <form id="signup" novalidate>
+    <div>
+      <label for="email">Email (required)</label>
+      <input id="email" type="email" required
+             aria-describedby="email-error" aria-invalid="false" />
+      <p id="email-error" class="error" role="alert" hidden></p>
+    </div>
+    <button type="submit">Sign up</button>
+  </form>
+
+  <script>
+    const form  = document.getElementById('signup');
+    const input = document.getElementById('email');
+    const error = document.getElementById('email-error');
+
+    form.addEventListener('submit', e => {
+      if (!input.validity.valid) {
+        e.preventDefault();
+        error.textContent = input.validity.valueMissing
+          ? 'Email is required.'
+          : 'Please enter a valid email address.';
+        error.hidden = false;
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+      }
+    });
+
+    input.addEventListener('input', () => {
+      if (input.validity.valid) {
+        error.hidden = true;
+        input.setAttribute('aria-invalid', 'false');
+      }
+    });
+  </script>
+
+Key points:
+  - aria-invalid="true" tells screen readers the field has an error
+  - aria-describedby links the input to its error message — announced when the field receives focus
+  - role="alert" on the error paragraph causes it to be announced immediately when it appears
+  - Move focus to the first invalid field so keyboard users are not left stranded
+  - Always link hints (not just errors) to their input with aria-describedby
+
+FORM SUBMISSION ACCESSIBILITY CHECKLIST
+  [ ] Every input has a visible label (not just a placeholder)
+  [ ] Related inputs are grouped with fieldset and legend
+  [ ] Required fields are marked required AND indicated in the label text
+  [ ] Error messages use aria-describedby to link to their input
+  [ ] aria-invalid is set to "true" on invalid fields
+  [ ] Focus moves to the first invalid field on failed submission
+  [ ] Success states are announced via aria-live or focus`,
+
+      quiz: [
+        {
+          question: 'What is the purpose of <fieldset> and <legend> in a form?',
+          options: [
+            'They apply CSS styles to a group of inputs',
+            'They group related inputs and give the group an accessible name that screen readers announce before each field',
+            'They prevent the browser from submitting empty fields',
+            'They replace the need for individual <label> elements',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'A range input has no visible label showing its current value. Why is this a problem?',
+          options: [
+            'The browser cannot render a range input without a visible value',
+            'Sighted users cannot tell what value is selected, and screen readers only announce the value when the input is focused',
+            'Range inputs require JavaScript to function — they do not work with plain HTML',
+            'It is not a problem — the tooltip shows the current value on hover',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'Why should you add novalidate to a form that uses custom accessible error messages?',
+          options: [
+            'novalidate disables all HTML validation so your form always submits',
+            'It prevents the browser\'s default validation popup, which is not reliably accessible, so you can show your own linked error messages instead',
+            'It makes the form submit faster by skipping server-side checks',
+            'It is required for aria-describedby to work on inputs',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'Which two attributes work together to link an input to its error message so screen readers announce it?',
+          options: [
+            'aria-label and aria-role',
+            'aria-invalid and role="alert"',
+            'aria-describedby on the input and a matching id on the error element',
+            'name and for',
+          ],
+          answer: 2,
+        },
+      ],
+
+      exercise: {
+        prompt: 'Build an accessible registration form with three fields: Full name (required, min 2 chars), Email (required, type email), and Password (required, minlength 8). Use fieldset/legend, proper labels, novalidate, and show linked error messages with aria-invalid and aria-describedby when the form is submitted with invalid data.',
+        starterCode: `<!-- Accessible registration form -->
+<form id="register" novalidate>
+  <fieldset>
+    <legend>Create your account</legend>
+
+    <!-- Full name field -->
+    <!-- Add: label, input (required, minlength=2), error paragraph -->
+
+    <!-- Email field -->
+    <!-- Add: label, input (type=email, required), error paragraph -->
+
+    <!-- Password field -->
+    <!-- Add: label, input (type=password, required, minlength=8), error paragraph -->
+
+    <button type="submit">Register</button>
+  </fieldset>
+</form>
+
+<script>
+  // On submit:
+  // 1. Prevent default
+  // 2. For each invalid field, show its error and set aria-invalid="true"
+  // 3. Focus the first invalid field
+  // On input: clear error and set aria-invalid="false" if valid
+</script>`,
+        solution: `<form id="register" novalidate>
+  <fieldset>
+    <legend>Create your account</legend>
+
+    <div>
+      <label for="fullname">Full name (required)</label>
+      <input id="fullname" name="fullname" type="text"
+             required minlength="2"
+             aria-describedby="fullname-error" aria-invalid="false" />
+      <p id="fullname-error" role="alert" hidden></p>
+    </div>
+
+    <div>
+      <label for="email">Email address (required)</label>
+      <input id="email" name="email" type="email"
+             required
+             aria-describedby="email-error" aria-invalid="false" />
+      <p id="email-error" role="alert" hidden></p>
+    </div>
+
+    <div>
+      <label for="password">Password (required, 8+ characters)</label>
+      <input id="password" name="password" type="password"
+             required minlength="8"
+             aria-describedby="password-error" aria-invalid="false" />
+      <p id="password-error" role="alert" hidden></p>
+    </div>
+
+    <button type="submit">Register</button>
+  </fieldset>
+</form>
+
+<script>
+  const fields = [
+    { id: 'fullname', msgs: { valueMissing: 'Full name is required.', tooShort: 'Name must be at least 2 characters.' } },
+    { id: 'email',    msgs: { valueMissing: 'Email is required.', typeMismatch: 'Please enter a valid email address.' } },
+    { id: 'password', msgs: { valueMissing: 'Password is required.', tooShort: 'Password must be at least 8 characters.' } },
+  ];
+
+  function showError(field, input, error) {
+    const v = input.validity;
+    const msg = v.valueMissing ? field.msgs.valueMissing
+              : v.tooShort    ? field.msgs.tooShort
+              : v.typeMismatch ? field.msgs.typeMismatch
+              : input.validationMessage;
+    error.textContent = msg;
+    error.hidden = false;
+    input.setAttribute('aria-invalid', 'true');
+  }
+
+  function clearError(input, error) {
+    error.hidden = true;
+    input.setAttribute('aria-invalid', 'false');
+  }
+
+  document.getElementById('register').addEventListener('submit', e => {
+    e.preventDefault();
+    let firstInvalid = null;
+    fields.forEach(f => {
+      const input = document.getElementById(f.id);
+      const error = document.getElementById(f.id + '-error');
+      if (!input.validity.valid) {
+        showError(f, input, error);
+        if (!firstInvalid) firstInvalid = input;
+      } else {
+        clearError(input, error);
+      }
+    });
+    if (firstInvalid) firstInvalid.focus();
+  });
+
+  fields.forEach(f => {
+    const input = document.getElementById(f.id);
+    const error = document.getElementById(f.id + '-error');
+    input.addEventListener('input', () => {
+      if (input.validity.valid) clearError(input, error);
+    });
+  });
+</script>`,
+      },
+    },
   ],
 };
 

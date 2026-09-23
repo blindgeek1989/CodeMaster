@@ -1610,6 +1610,110 @@ body {
   color: var(--warning);
 }
 
+/* ===== Copy lesson button ===== */
+.lesson-copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lesson-copy-btn:hover,
+.lesson-copy-btn:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lesson-copy-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ===== Prerequisite notice ===== */
+.prereq-notice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.prereq-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prereq-link:hover { color: var(--accent-hover); }
+
+.prereq-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ===== Resume dialog ===== */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  padding: 2rem;
+  max-width: 440px;
+  width: calc(100% - 2rem);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.dialog-box h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.dialog-box p {
+  margin: 0 0 1.5rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (forced-colors: active) {
+  .dialog-overlay { background: Canvas; }
+  .dialog-box     { border: 2px solid ButtonText; }
+  .prereq-notice  { border-left-color: Highlight; }
+}
+
 /* ===== Quiz History ===== */
 .quiz-history-section {
   margin-top: 1rem;

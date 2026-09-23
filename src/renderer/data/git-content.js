@@ -1120,6 +1120,242 @@ git pull
 git branch -d feature/your-feature-name`,
       },
     },
+    // ─────────────────────────────────────────────────────────────────
+    // LESSON 10 — BRANCHING STRATEGIES AND PULL REQUEST WORKFLOWS
+    // ─────────────────────────────────────────────────────────────────
+    {
+      id: 'git-10',
+      title: 'Lesson 10: Branching Strategies and Pull Request Workflows',
+      content: `A branching strategy is the agreed-upon pattern a team uses to create, name, and merge branches. Having a consistent strategy keeps the repository readable and deployments predictable.
+
+WHY BRANCHES MATTER
+Every developer works on their own branch so their in-progress code does not break teammates. When the work is ready, a Pull Request (PR) — called a Merge Request in GitLab — is opened so the team can review the code before it reaches the main branch.
+
+─────────────────────────────
+BRANCH NAMING CONVENTIONS
+─────────────────────────────
+Prefix branches with a category so anyone can tell at a glance what kind of work it is:
+
+  feature/add-dark-mode        — new functionality
+  fix/skip-link-focus          — bug fix
+  chore/update-dependencies    — maintenance (no user-facing change)
+  docs/api-readme              — documentation only
+  refactor/extract-modal-logic — code restructure with no behaviour change
+
+Use lowercase, hyphens instead of spaces, and keep names short but descriptive.
+
+─────────────────────────────
+TWO COMMON STRATEGIES
+─────────────────────────────
+TRUNK-BASED DEVELOPMENT
+Everyone works on short-lived branches that merge back to main (or "trunk") within a day or two. The main branch is always deployable.
+
+  Advantages: simple, fast feedback, fewer merge conflicts
+  Works best for: teams with good test coverage and CI/CD pipelines
+
+GIT FLOW
+Two long-lived branches: main (production) and develop (integration). Features branch off develop; releases get their own branch; hotfixes branch off main.
+
+  Advantages: structured releases, clear separation between stable and in-progress
+  Works best for: teams with scheduled release cycles
+
+For most modern projects, trunk-based development is preferred. Git Flow adds overhead that is only justified by complex release requirements.
+
+─────────────────────────────
+CREATING AND SWITCHING BRANCHES
+─────────────────────────────
+Create a new branch and switch to it:
+  git switch -c feature/add-search
+
+Switch to an existing branch:
+  git switch main
+
+List all local branches (* marks the current one):
+  git branch
+
+List remote branches too:
+  git branch -a
+
+Delete a branch after it merges:
+  git branch -d feature/add-search    — safe delete (fails if unmerged)
+  git branch -D feature/add-search    — force delete
+
+─────────────────────────────
+MERGING VS REBASING
+─────────────────────────────
+MERGE creates a "merge commit" that joins two branch histories:
+
+  git switch main
+  git merge feature/add-search
+
+  Result: preserves the full history of both branches; the feature branch is visible in the log.
+  Use when: you want a clear record that a feature was developed separately.
+
+REBASE replays your commits on top of the target branch as if you had started from its latest state:
+
+  git switch feature/add-search
+  git rebase main
+
+  Result: linear history — looks like the feature was always built on top of main.
+  Use when: you want a clean, readable commit history.
+
+GOLDEN RULE OF REBASING: never rebase a branch that other people are also working on. Rebase rewrites commit hashes, which will conflict with their copies.
+
+─────────────────────────────
+SQUASH COMMITS BEFORE MERGING
+─────────────────────────────
+Squashing collapses multiple commits into one clean commit before merging. Most GitHub PRs offer a "Squash and merge" button for this.
+
+  Before: "WIP", "fix typo", "actually fix it", "final fix"
+  After:  "Add accessible search component"
+
+Squashing keeps main's history readable. Reserve it for small features; large features are clearer with individual commits preserved.
+
+─────────────────────────────
+OPENING A PULL REQUEST
+─────────────────────────────
+  1. Push your branch:
+     git push -u origin feature/add-search
+
+  2. Go to GitHub — it shows a "Compare & pull request" banner.
+
+  3. Fill in the PR template:
+     TITLE: short, imperative, under 70 characters
+       Good: "Add keyboard-accessible search component"
+       Bad:  "search stuff"
+
+     BODY should include:
+       - What changed and why (not just what the code does)
+       - How to test it manually
+       - Screenshots or screen reader test results if UI changed
+       - Link to the related issue: "Closes #42"
+
+─────────────────────────────
+CODE REVIEW ETIQUETTE
+─────────────────────────────
+As the AUTHOR:
+  - Keep PRs small (under 400 lines changed) — large PRs get shallow reviews
+  - Respond to all comments, even if just "fixed" or "agreed, but out of scope"
+  - Do not take feedback personally — reviewers are improving the code, not criticising you
+
+As the REVIEWER:
+  - Approve what is good; only block on real problems
+  - Ask questions rather than issuing commands: "Could this be extracted into a helper?" not "Extract this."
+  - Label nits clearly: "nit: extra blank line" so the author knows it is optional
+
+─────────────────────────────
+RESOLVING MERGE CONFLICTS
+─────────────────────────────
+A conflict happens when two branches changed the same lines differently. Git marks the conflict:
+
+  <<<<<<< HEAD
+  color: blue;
+  =======
+  color: green;
+  >>>>>>> feature/rebrand
+
+The section above ======= is your branch (HEAD). Below is the incoming change.
+
+Steps to resolve:
+  1. Open the conflicting file in your editor
+  2. Decide which version to keep (or combine them)
+  3. Delete all the conflict markers: <<<<<<, =======, >>>>>>>
+  4. Stage the resolved file:
+     git add src/styles/main.css
+  5. Continue the merge or rebase:
+     git commit          — if merging
+     git rebase --continue — if rebasing
+
+If you get stuck and want to start over:
+  git merge --abort
+  git rebase --abort`,
+      quiz: [
+        {
+          question: 'Which branch name prefix is most appropriate for fixing a broken skip-link?',
+          options: [
+            'feature/skip-link',
+            'fix/skip-link-focus',
+            'main/skip-link',
+            'update/skip-link',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What is the golden rule of rebasing?',
+          options: [
+            'Always rebase instead of merge to keep history linear',
+            'Only rebase after squashing your commits',
+            'Never rebase a branch that other people are also working on',
+            'Rebase before every commit to stay up to date',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'What does "Squash and merge" do to a pull request\'s commits?',
+          options: [
+            'Deletes all commits except the first one',
+            'Collapses all the PR commits into one commit on the target branch',
+            'Rebases the PR commits on top of main before merging',
+            'Merges without creating a merge commit',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'You open a file and see <<<<<<< HEAD markers. What do you do first?',
+          options: [
+            'Run git merge --abort to cancel and start over',
+            'Delete the entire file and rewrite it',
+            'Decide which version (or combination) to keep, remove all conflict markers, then stage the file',
+            'Commit immediately — Git resolves the conflict automatically after a commit',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Walk through the full branching workflow in the terminal below. Create a feature branch, make two commits, then write the git commands you would run to open a pull request and clean up afterward.',
+        starterCode: `# 1. Start from a clean main branch:
+git switch main
+git pull
+
+# 2. Create a branch for adding a "Lessons" page:
+# (write the command)
+
+# 3. Make your first commit (pretend you created lessons.html):
+git add lessons.html
+git commit -m "Add lessons page HTML structure"
+
+# 4. Make a second commit (pretend you styled it):
+git add styles/lessons.css
+git commit -m "Style lessons page for keyboard navigation"
+
+# 5. Push the branch to GitHub:
+# (write the command — include -u flag)
+
+# 6. After the PR is approved and merged, clean up locally:
+# (write the two commands: switch to main, delete the branch)`,
+        solution: `# 1. Start from a clean main branch:
+git switch main
+git pull
+
+# 2. Create a branch for adding a "Lessons" page:
+git switch -c feature/lessons-page
+
+# 3. Make your first commit:
+git add lessons.html
+git commit -m "Add lessons page HTML structure"
+
+# 4. Make a second commit:
+git add styles/lessons.css
+git commit -m "Style lessons page for keyboard navigation"
+
+# 5. Push the branch to GitHub:
+git push -u origin feature/lessons-page
+
+# 6. After the PR is merged, clean up locally:
+git switch main
+git branch -d feature/lessons-page`,
+      },
+    },
   ],
 };
 

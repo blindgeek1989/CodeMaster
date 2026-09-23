@@ -1513,6 +1513,691 @@ ACCESSIBILITY CHECKLIST FOR REACT COMPONENTS
 }`,
       },
     },
+
+    // ─────────────────────────────────────────────────────────────────
+    // LESSON 9 — useContext
+    // ─────────────────────────────────────────────────────────────────
+    {
+      id: 'react-9',
+      title: 'Lesson 9: Sharing Data with useContext',
+      content: `Props work well for passing data one or two levels down the component tree. But when many components at different nesting levels need the same data — a logged-in user, a color theme, a language preference — passing props through every intermediate component becomes tedious. This is called PROP DRILLING, and Context is React's solution.
+
+THE PROBLEM: PROP DRILLING
+  // userName must be passed through Layout and Sidebar just to reach UserGreeting
+  function App() {
+    const [userName] = useState('Alex');
+    return <Layout userName={userName} />;
+  }
+
+  function Layout({ userName }) {
+    return <Sidebar userName={userName} />;
+  }
+
+  function Sidebar({ userName }) {
+    return <UserGreeting userName={userName} />;
+  }
+
+  function UserGreeting({ userName }) {
+    return <p>Hello, {userName}</p>;
+  }
+
+Layout and Sidebar do not use userName — they only pass it along. Context eliminates this.
+
+CREATING CONTEXT
+  import { createContext } from 'react';
+
+  // Create the context object with a default value
+  const UserContext = createContext(null);
+
+createContext takes an optional default value that is used when a component reads the context without a Provider above it.
+
+THE PROVIDER
+Wrap the part of the tree that needs access to the value in the context's Provider:
+
+  function App() {
+    const [user, setUser] = useState({ name: 'Alex', role: 'admin' });
+
+    return (
+      <UserContext.Provider value={user}>
+        <Layout />
+      </UserContext.Provider>
+    );
+  }
+
+Every component inside the Provider — at any depth — can read the value directly.
+
+READING CONTEXT WITH useContext
+  import { useContext } from 'react';
+
+  function UserGreeting() {
+    const user = useContext(UserContext);
+    return <p>Hello, {user.name}</p>;
+  }
+
+No props needed. Layout and Sidebar do not need to know about user at all.
+
+PRACTICAL EXAMPLE: THEME CONTEXT
+  import { createContext, useContext, useState } from 'react';
+
+  const ThemeContext = createContext('light');
+
+  function ThemeProvider({ children }) {
+    const [theme, setTheme] = useState('light');
+    return (
+      <ThemeContext.Provider value={{ theme, setTheme }}>
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
+
+  function ThemeToggle() {
+    const { theme, setTheme } = useContext(ThemeContext);
+    return (
+      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+        Switch to {theme === 'light' ? 'dark' : 'light'} mode
+      </button>
+    );
+  }
+
+CUSTOM HOOK PATTERN
+Wrap useContext in a custom hook to get a better error message and cleaner imports:
+
+  function useUser() {
+    const user = useContext(UserContext);
+    if (!user) throw new Error('useUser must be used inside UserProvider');
+    return user;
+  }
+
+  // In any component:
+  const user = useUser();
+
+WHEN TO USE CONTEXT — AND WHEN NOT TO
+Use context for:
+  - Global app data: current user, auth token, language/locale, color theme
+  - Data that many components at many levels need
+
+Do NOT use context for:
+  - Data that only a few nearby components need — props are fine
+  - Rapidly changing values (every keystroke) — context re-renders all consumers
+
+Context is not a replacement for a state management library like Redux or Zustand. For large apps with complex state, consider those tools instead.
+
+RE-RENDERING CAVEAT
+When a Provider's value changes, ALL components that call useContext with that context re-render. To avoid unnecessary re-renders, split contexts (one for stable data, one for frequently changing data) or memoize the value object.`,
+      quiz: [
+        {
+          question: 'What problem does React Context solve?',
+          options: [
+            'It replaces useState for all state management needs',
+            'It eliminates prop drilling by letting any component in the tree read shared data directly',
+            'It makes component rendering faster',
+            'It provides a built-in database for storing user data',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'Where must a Context Provider be placed relative to the components that consume it?',
+          options: [
+            'It must be inside the component that needs the data',
+            'It must be in a separate file',
+            'It must be an ancestor (above) the components that need the context value',
+            'It can be anywhere in the tree — position does not matter',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'What happens to context consumers when the Provider\'s value changes?',
+          options: [
+            'Nothing — they must manually re-fetch the context value',
+            'Only the closest consumer re-renders',
+            'All components that call useContext with that context re-render',
+            'The entire application re-renders from the root',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'When should you NOT use Context?',
+          options: [
+            'For a color theme used across the whole app',
+            'For the currently logged-in user',
+            'For a value that only two adjacent sibling components share — props are simpler',
+            'For a language/locale setting',
+          ],
+          answer: 2,
+        },
+      ],
+      exercise: {
+        prompt: 'Create a LanguageContext that holds a language string ("en" or "es"). Build a LanguageProvider that wraps children with the context, and a Greeting component that reads the language and renders "Hello!" for "en" or "Hola!" for "es".',
+        starterCode: `import { createContext, useContext, useState } from 'react';
+
+// 1. Create LanguageContext with default value 'en'
+
+// 2. Build LanguageProvider that holds language state
+//    and wraps children in the Provider
+
+// 3. Build Greeting that reads the context and
+//    shows "Hello!" for 'en' or "Hola!" for 'es'
+
+// 4. Build LanguageToggle that switches between 'en' and 'es'
+
+// Usage:
+// <LanguageProvider>
+//   <Greeting />
+//   <LanguageToggle />
+// </LanguageProvider>`,
+        solution: `import { createContext, useContext, useState } from 'react';
+
+const LanguageContext = createContext({ language: 'en', setLanguage: () => {} });
+
+function LanguageProvider({ children }) {
+  const [language, setLanguage] = useState('en');
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+function Greeting() {
+  const { language } = useContext(LanguageContext);
+  return <p>{language === 'en' ? 'Hello!' : 'Hola!'}</p>;
+}
+
+function LanguageToggle() {
+  const { language, setLanguage } = useContext(LanguageContext);
+  return (
+    <button onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}>
+      Switch to {language === 'en' ? 'Spanish' : 'English'}
+    </button>
+  );
+}`,
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // LESSON 10 — useReducer
+    // ─────────────────────────────────────────────────────────────────
+    {
+      id: 'react-10',
+      title: 'Lesson 10: Complex State with useReducer',
+      content: `useState is great for simple, independent pieces of state. But when state logic grows — multiple sub-values that change together, transitions that depend on the previous state, or actions that affect several parts of state at once — useReducer gives you a cleaner, more predictable model.
+
+THE CONCEPT
+useReducer is inspired by the Redux pattern. Instead of calling multiple setters, you DISPATCH an ACTION — a plain object that describes what happened. A REDUCER FUNCTION takes the current state and the action, and returns the next state.
+
+  dispatch({ type: 'INCREMENT' })
+  // → reducer sees current state + this action → returns new state
+  // → React re-renders with new state
+
+THE SIGNATURE
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  - reducer: a pure function (state, action) => newState
+  - initialState: the starting state value
+  - state: the current state
+  - dispatch: a function to send actions to the reducer
+
+A BASIC REDUCER
+  function counterReducer(state, action) {
+    switch (action.type) {
+      case 'INCREMENT':
+        return { count: state.count + 1 };
+      case 'DECREMENT':
+        return { count: state.count - 1 };
+      case 'RESET':
+        return { count: 0 };
+      default:
+        return state;   // always return state for unknown actions
+    }
+  }
+
+  function Counter() {
+    const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+
+    return (
+      <div>
+        <p>Count: {state.count}</p>
+        <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+        <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+        <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
+      </div>
+    );
+  }
+
+ACTIONS WITH PAYLOADS
+Actions can carry extra data in a payload property:
+
+  function todosReducer(state, action) {
+    switch (action.type) {
+      case 'ADD_TASK':
+        return [...state, { id: Date.now(), text: action.payload, done: false }];
+      case 'TOGGLE_TASK':
+        return state.map(task =>
+          task.id === action.payload ? { ...task, done: !task.done } : task
+        );
+      case 'DELETE_TASK':
+        return state.filter(task => task.id !== action.payload);
+      default:
+        return state;
+    }
+  }
+
+  // Dispatching with payload:
+  dispatch({ type: 'ADD_TASK',    payload: 'Buy groceries' });
+  dispatch({ type: 'TOGGLE_TASK', payload: 42 });
+  dispatch({ type: 'DELETE_TASK', payload: 42 });
+
+REDUCER RULES
+  1. Reducers must be PURE — no side effects, no mutations
+  2. Always return a new object/array, never mutate state directly
+  3. Handle the default case by returning the current state
+
+WHY useReducer OVER useState?
+  Choose useReducer when:
+  - State has multiple sub-values that often change together
+  - Next state depends on previous state in complex ways
+  - You have many different state transitions (more than 2-3 update patterns)
+  - You want to test state logic in isolation (reducer is a plain function)
+
+  Stick with useState when:
+  - State is a single primitive or a simple boolean
+  - Updates are straightforward setters
+
+useReducer + useContext = GLOBAL STATE
+Combining useReducer with useContext gives you a lightweight global state solution without Redux:
+
+  const StateContext   = createContext(null);
+  const DispatchContext = createContext(null);
+
+  function AppProvider({ children }) {
+    const [state, dispatch] = useReducer(appReducer, initialState);
+    return (
+      <StateContext.Provider value={state}>
+        <DispatchContext.Provider value={dispatch}>
+          {children}
+        </DispatchContext.Provider>
+      </StateContext.Provider>
+    );
+  }
+
+Splitting state and dispatch into separate contexts means components that only dispatch (but don't read state) won't re-render when state changes.`,
+      quiz: [
+        {
+          question: 'What is a reducer function?',
+          options: [
+            'A function that combines multiple components into one',
+            'A pure function that takes current state and an action, and returns the next state',
+            'A function that reduces the number of renders',
+            'A function that merges two state objects together',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'What does dispatch do?',
+          options: [
+            'It directly updates a specific piece of state',
+            'It sends an action object to the reducer to describe what happened',
+            'It fetches data from an API',
+            'It triggers a re-render without changing state',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'A reducer receives an action type it does not recognize. What should it return?',
+          options: [
+            'null',
+            'An empty object {}',
+            'undefined',
+            'The current state unchanged',
+          ],
+          answer: 3,
+        },
+        {
+          question: 'When should you prefer useReducer over useState?',
+          options: [
+            'When state is a single boolean toggle',
+            'When state has multiple related sub-values and several distinct update patterns',
+            'Always — useReducer is strictly better than useState',
+            'Only when using Redux in the same project',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'Build a task list using useReducer. The reducer should handle three actions: ADD_TASK (payload: text string), TOGGLE_TASK (payload: task id), and CLEAR_COMPLETED. Render the list and wire up an input + button to add tasks.',
+        starterCode: `import { useReducer, useState } from 'react';
+
+function tasksReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_TASK':
+      // return new array with task added
+      // task shape: { id: Date.now(), text: action.payload, done: false }
+    case 'TOGGLE_TASK':
+      // return array with matching task's done toggled
+    case 'CLEAR_COMPLETED':
+      // return array with only incomplete tasks
+    default:
+      return state;
+  }
+}
+
+function TaskList() {
+  const [tasks, dispatch] = useReducer(tasksReducer, []);
+  const [input, setInput] = useState('');
+
+  function handleAdd() {
+    // dispatch ADD_TASK with input as payload, then clear input
+  }
+
+  return (
+    <div>
+      <input value={input} onChange={e => setInput(e.target.value)} />
+      <button onClick={handleAdd}>Add</button>
+      <button onClick={() => dispatch({ type: 'CLEAR_COMPLETED' })}>
+        Clear completed
+      </button>
+      <ul>
+        {tasks.map(task => (
+          <li key={task.id}>
+            {/* toggle done on click, show task.text */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}`,
+        solution: `import { useReducer, useState } from 'react';
+
+function tasksReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_TASK':
+      return [...state, { id: Date.now(), text: action.payload, done: false }];
+    case 'TOGGLE_TASK':
+      return state.map(t =>
+        t.id === action.payload ? { ...t, done: !t.done } : t
+      );
+    case 'CLEAR_COMPLETED':
+      return state.filter(t => !t.done);
+    default:
+      return state;
+  }
+}
+
+function TaskList() {
+  const [tasks, dispatch] = useReducer(tasksReducer, []);
+  const [input, setInput] = useState('');
+
+  function handleAdd() {
+    if (!input.trim()) return;
+    dispatch({ type: 'ADD_TASK', payload: input.trim() });
+    setInput('');
+  }
+
+  return (
+    <div>
+      <label htmlFor="task-input">New task</label>
+      <input
+        id="task-input"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+      />
+      <button onClick={handleAdd}>Add</button>
+      <button onClick={() => dispatch({ type: 'CLEAR_COMPLETED' })}>
+        Clear completed
+      </button>
+      <ul>
+        {tasks.map(task => (
+          <li key={task.id}>
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_TASK', payload: task.id })}
+              aria-pressed={task.done}
+            >
+              {task.done ? '[done] ' : '[    ] '}{task.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}`,
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // LESSON 11 — useMemo AND useCallback
+    // ─────────────────────────────────────────────────────────────────
+    {
+      id: 'react-11',
+      title: 'Lesson 11: Performance with useMemo and useCallback',
+      content: `React re-renders components when state or props change. Most of the time this is fast and fine. But occasionally a component does expensive work on every render, or passes a new function reference to a child on every render, causing unnecessary re-renders downstream. useMemo and useCallback are the tools for these specific situations.
+
+THE PROBLEM: EXPENSIVE RECALCULATIONS
+Imagine a component that filters and sorts a large list:
+
+  function ProductList({ products, filterText }) {
+    // This runs on EVERY render — even if products and filterText haven't changed
+    const filtered = products
+      .filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()))
+      .sort((a, b) => a.price - b.price);
+
+    return <ul>{filtered.map(p => <li key={p.id}>{p.name}</li>)}</ul>;
+  }
+
+If this component re-renders because some unrelated state changed, the filter+sort runs again unnecessarily.
+
+useMemo: MEMOIZE A COMPUTED VALUE
+useMemo caches the result of a function and only recomputes it when its dependencies change:
+
+  import { useMemo } from 'react';
+
+  function ProductList({ products, filterText }) {
+    const filtered = useMemo(() => {
+      return products
+        .filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()))
+        .sort((a, b) => a.price - b.price);
+    }, [products, filterText]);   // only recompute when these change
+
+    return <ul>{filtered.map(p => <li key={p.id}>{p.name}</li>)}</ul>;
+  }
+
+Now filtered is recalculated only when products or filterText changes — not on every render.
+
+THE PROBLEM: UNSTABLE FUNCTION REFERENCES
+In JavaScript, every time a function is defined, it creates a new object. So:
+
+  function Parent() {
+    function handleClick() { /* ... */ }
+    // handleClick is a NEW function on every render
+    return <ExpensiveChild onClick={handleClick} />;
+  }
+
+If ExpensiveChild is wrapped in React.memo (to skip re-renders when props haven't changed), it will still re-render because handleClick is technically a new value every time.
+
+useCallback: MEMOIZE A FUNCTION REFERENCE
+useCallback returns the same function reference between renders unless its dependencies change:
+
+  import { useCallback } from 'react';
+
+  function Parent() {
+    const [count, setCount] = useState(0);
+
+    const handleClick = useCallback(() => {
+      console.log('clicked');
+    }, []);   // no dependencies — same function forever
+
+    return (
+      <>
+        <button onClick={() => setCount(c => c + 1)}>Re-render parent</button>
+        <ExpensiveChild onClick={handleClick} />
+      </>
+    );
+  }
+
+Now ExpensiveChild gets the same handleClick reference on every render and does not re-render unnecessarily.
+
+React.memo: SKIPPING CHILD RE-RENDERS
+useCallback only helps if the child component is wrapped in React.memo:
+
+  const ExpensiveChild = React.memo(function ExpensiveChild({ onClick }) {
+    console.log('ExpensiveChild rendered');
+    return <button onClick={onClick}>Do something</button>;
+  });
+
+React.memo makes a component skip re-rendering if its props have not changed (using shallow equality). Without React.memo, the stable function reference from useCallback has no effect.
+
+WHEN TO USE THEM — AND WHEN NOT TO
+  Use useMemo when:
+  - A calculation is genuinely expensive (sorting/filtering large arrays, complex math)
+  - The result is used as a dependency in another useMemo or useEffect
+
+  Use useCallback when:
+  - You pass a callback to a child wrapped in React.memo
+  - A function is in the dependency array of a useEffect and would otherwise cause an infinite loop
+
+  Do NOT use them:
+  - As a default on every value and function — memoization itself has a cost
+  - On cheap computations (adding two numbers, simple string concatenation)
+  - When the component rarely re-renders anyway
+
+THE GOLDEN RULE
+Measure first. React is fast. Add useMemo and useCallback only when you have identified a real performance problem with profiling (React DevTools Profiler). Premature optimization adds complexity without benefit.
+
+QUICK REFERENCE
+  useMemo(fn, deps)       — cache a computed VALUE, recompute when deps change
+  useCallback(fn, deps)   — cache a FUNCTION REFERENCE, recreate when deps change
+  React.memo(Component)   — skip re-rendering a component when props are unchanged`,
+      quiz: [
+        {
+          question: 'What does useMemo do?',
+          options: [
+            'It prevents a component from ever re-rendering',
+            'It caches the result of a function and only recomputes it when its dependencies change',
+            'It stores values in localStorage automatically',
+            'It replaces useState for storing computed values',
+          ],
+          answer: 1,
+        },
+        {
+          question: 'Why does useCallback help when passing functions to child components?',
+          options: [
+            'It makes the function run faster',
+            'It ensures the function is only called once',
+            'It returns the same function reference between renders so React.memo children are not re-rendered unnecessarily',
+            'It automatically debounces the function call',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'useCallback only prevents child re-renders when paired with what?',
+          options: [
+            'useEffect',
+            'useMemo on the parent',
+            'React.memo on the child component',
+            'A dependency array with no entries',
+          ],
+          answer: 2,
+        },
+        {
+          question: 'When should you add useMemo to a computation?',
+          options: [
+            'By default on all computed values to keep the app fast',
+            'Only after profiling confirms the computation is causing a measurable performance problem',
+            'Whenever the computation involves more than one variable',
+            'Only in class components — function components are always fast enough',
+          ],
+          answer: 1,
+        },
+      ],
+      exercise: {
+        prompt: 'A SearchList component receives a large items array and a query string. Use useMemo to memoize the filtered list so it only recomputes when items or query changes. Then wrap an ItemRow child in React.memo and use useCallback to stabilize the onSelect handler passed to it.',
+        starterCode: `import { useState, useMemo, useCallback, memo } from 'react';
+
+// Wrap with React.memo so it skips re-renders when props are unchanged
+const ItemRow = memo(function ItemRow({ item, onSelect }) {
+  console.log('ItemRow rendered:', item.name);
+  return (
+    <li>
+      <button onClick={() => onSelect(item.id)}>{item.name}</button>
+    </li>
+  );
+});
+
+function SearchList({ items }) {
+  const [query, setQuery]       = useState('');
+  const [selected, setSelected] = useState(null);
+
+  // TODO: memoize filtered using useMemo
+  const filtered = items.filter(item =>
+    item.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  // TODO: stabilize with useCallback so ItemRow doesn't re-render on every keystroke
+  function handleSelect(id) {
+    setSelected(id);
+  }
+
+  return (
+    <div>
+      <label htmlFor="search">Search</label>
+      <input
+        id="search"
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+      />
+      {selected && <p>Selected ID: {selected}</p>}
+      <ul>
+        {filtered.map(item => (
+          <ItemRow key={item.id} item={item} onSelect={handleSelect} />
+        ))}
+      </ul>
+    </div>
+  );
+}`,
+        solution: `import { useState, useMemo, useCallback, memo } from 'react';
+
+const ItemRow = memo(function ItemRow({ item, onSelect }) {
+  console.log('ItemRow rendered:', item.name);
+  return (
+    <li>
+      <button onClick={() => onSelect(item.id)}>{item.name}</button>
+    </li>
+  );
+});
+
+function SearchList({ items }) {
+  const [query, setQuery]       = useState('');
+  const [selected, setSelected] = useState(null);
+
+  const filtered = useMemo(() =>
+    items.filter(item =>
+      item.name.toLowerCase().includes(query.toLowerCase())
+    ),
+    [items, query]
+  );
+
+  const handleSelect = useCallback((id) => {
+    setSelected(id);
+  }, []);
+
+  return (
+    <div>
+      <label htmlFor="search">Search</label>
+      <input
+        id="search"
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+      />
+      {selected && <p>Selected ID: {selected}</p>}
+      <ul>
+        {filtered.map(item => (
+          <ItemRow key={item.id} item={item} onSelect={handleSelect} />
+        ))}
+      </ul>
+    </div>
+  );
+}`,
+      },
+    },
   ],
 };
 

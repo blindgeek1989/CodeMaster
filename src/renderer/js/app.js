@@ -2,16 +2,47 @@
 
 // ===== Module data =====
 const MODULES = {
-  think:      window.thinkProgrammerModule,
-  html:       window.htmlModule,
-  css:        window.cssModule,
-  'css-sr':   window.cssScreenReaderModule,
-  javascript: window.jsModule,
-  python:     window.pythonModule,
-  sql:        window.sqlModule,
-  powershell: window.powershellModule,
-  aria:       window.ariaModule,
+  git:                  window.gitModule,
+  github:               window.githubModule,
+  typescript:           window.typescriptModule,
+  'async-js':           window.asyncJsModule,
+  react:                window.reactModule,
+  'prompt-engineering': window.promptEngineeringModule,
+  think:                window.thinkProgrammerModule,
+  html:                 window.htmlModule,
+  css:                  window.cssModule,
+  javascript:           window.jsModule,
+  python:               window.pythonModule,
+  sql:                  window.sqlModule,
+  powershell:           window.powershellModule,
+  aria:                 window.ariaModule,
+  'scrum-intro':        window.scrumIntroModule,
+  'scrum-master':       window.scrumMasterModule,
+  'scrum-ai':           window.scrumMasterAIModule,
+  'scrum-exam':         window.scrumExamPrepModule,
 };
+
+// ===== Module metadata (icon, label, lesson count source) =====
+const MODULE_DEFS = [
+  { id: 'think',                icon: '🧠', label: 'Think Like a Programmer', note: 'Start here' },
+  { id: 'html',                 icon: '📄', label: 'HTML' },
+  { id: 'css',                  icon: '🎨', label: 'CSS' },
+  { id: 'javascript',           icon: '⚡', label: 'JavaScript' },
+  { id: 'python',               icon: '🐍', label: 'Python' },
+  { id: 'sql',                  icon: '🗄️', label: 'SQL' },
+  { id: 'powershell',           icon: '💻', label: 'PowerShell' },
+  { id: 'aria',                 icon: '♿', label: 'ARIA' },
+  { id: 'git',                  icon: '🌿', label: 'Git & Version Control' },
+  { id: 'github',               icon: '🐙', label: 'GitHub' },
+  { id: 'typescript',           icon: '🔷', label: 'TypeScript' },
+  { id: 'async-js',             icon: '⏳', label: 'Async JavaScript' },
+  { id: 'react',                icon: '⚛️', label: 'React' },
+  { id: 'prompt-engineering',   icon: '✨', label: 'Prompt Engineering' },
+  { id: 'scrum-intro',          icon: '🔄', label: 'Intro to Scrum' },
+  { id: 'scrum-master',         icon: '🏉', label: 'Scrum Master' },
+  { id: 'scrum-ai',             icon: '🤖', label: 'Scrum Master with AI' },
+  { id: 'scrum-exam',           icon: '📝', label: 'Scrum Exam Prep' },
+];
 
 // ===== Languages that support real code execution =====
 const EXECUTABLE_LANGUAGES = new Set(['python', 'sql', 'powershell']);
@@ -20,15 +51,19 @@ const EXECUTABLE_LANGUAGES = new Set(['python', 'sql', 'powershell']);
 let state = {
   activeModuleId: null,
   currentLessonIndex: -1,   // -1 = module intro screen
-  srMode: false,
   completedLessons: {},      // { moduleId: Set<number> }
 };
 
 // ===== DOM refs =====
-const moduleNav    = document.getElementById('module-nav');
 const mainContent  = document.getElementById('main-content');
-const srModeCheckbox = document.getElementById('sr-mode-checkbox');
 const announcer    = document.getElementById('sr-announcer');
+const searchInput  = document.getElementById('lesson-search');
+const searchResults = document.getElementById('search-results');
+const searchStatus  = document.getElementById('search-status');
+const bookmarksPanel       = document.getElementById('bookmarks-panel');
+const bookmarksToggleBtn   = document.getElementById('bookmarks-toggle-btn');
+const bookmarksList        = document.getElementById('bookmarks-list');
+const homeBtn              = document.getElementById('home-btn');
 
 // ===== Announce to screen reader =====
 function announce(message) {
@@ -41,44 +76,501 @@ function focusMainHeading() {
   if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: false }); }
 }
 
-// ===== SR mode toggle =====
-srModeCheckbox.addEventListener('change', () => {
-  state.srMode = srModeCheckbox.checked;
+// ===== SEARCH ===== --------------------------------------------------------
 
-  // Re-label CSS button in sidebar
-  const cssBtn = document.querySelector('[data-module="css"]');
-  if (cssBtn) {
-    const icon = cssBtn.querySelector('.module-icon');
-    cssBtn.textContent = '';
-    if (icon) cssBtn.appendChild(icon);
-    cssBtn.appendChild(document.createTextNode(state.srMode ? 'CSS (Screen Reader)' : 'CSS'));
+function buildSearchIndex() {
+  const index = [];
+  Object.entries(MODULES).forEach(([moduleId, mod]) => {
+    if (!mod) return;
+    mod.lessons.forEach((lesson, i) => {
+      index.push({
+        moduleId,
+        navId: moduleId,
+        lessonIndex: i,
+        moduleName: mod.title,
+        lessonTitle: lesson.title,
+        searchText: (lesson.title + ' ' + (lesson.content || '')).toLowerCase(),
+      });
+    });
+  });
+  return index;
+}
+
+const searchIndex = buildSearchIndex();
+
+function getExcerpt(lesson, query) {
+  const content = lesson.content || '';
+  const lower = content.toLowerCase();
+  const pos = lower.indexOf(query.toLowerCase());
+  if (pos === -1) return content.slice(0, 100);
+  const start = Math.max(0, pos - 40);
+  const end = Math.min(content.length, pos + 80);
+  return (start > 0 ? '…' : '') + content.slice(start, end).trim() + (end < content.length ? '…' : '');
+}
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim();
+  if (q.length < 2) {
+    searchResults.hidden = true;
+    searchResults.innerHTML = '';
+    searchStatus.textContent = '';
+    return;
   }
+  const lower = q.toLowerCase();
+  const hits = searchIndex.filter(e => e.searchText.includes(lower)).slice(0, 12);
 
-  if (state.activeModuleId === 'css' || state.activeModuleId === 'css-sr') {
-    const target = state.srMode ? 'css-sr' : 'css';
-    loadModule(target);
-    announce(state.srMode
-      ? 'Screen Reader CSS mode enabled. Loading CSS for Screen Reader Users.'
-      : 'Standard CSS mode enabled. Loading CSS Fundamentals.');
+  searchResults.innerHTML = '';
+  if (hits.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'search-result-item';
+    li.textContent = 'No results found.';
+    li.style.padding = '0.6rem 0.85rem';
+    li.style.color = 'var(--text-muted)';
+    li.style.fontSize = '0.85rem';
+    searchResults.appendChild(li);
   } else {
-    announce(state.srMode
-      ? 'Screen Reader CSS mode enabled. Open the CSS module to use it.'
-      : 'Standard CSS mode enabled.');
+    const mod = Object.values(MODULES).find(m => m && m.lessons);
+    hits.forEach(hit => {
+      const li = document.createElement('li');
+      li.className = 'search-result-item';
+      li.setAttribute('role', 'option');
+
+      const btn = document.createElement('button');
+      btn.className = 'search-result-btn';
+
+      const moduleSpan = document.createElement('span');
+      moduleSpan.className = 'search-result-module';
+      moduleSpan.textContent = hit.moduleName;
+
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'search-result-title';
+      titleSpan.textContent = hit.lessonTitle;
+
+      const srcMod = MODULES[hit.moduleId];
+      const excerpt = srcMod ? getExcerpt(srcMod.lessons[hit.lessonIndex], q) : '';
+      const excerptSpan = document.createElement('span');
+      excerptSpan.className = 'search-result-excerpt';
+      excerptSpan.textContent = excerpt;
+
+      btn.appendChild(moduleSpan);
+      btn.appendChild(titleSpan);
+      btn.appendChild(excerptSpan);
+
+      btn.setAttribute('aria-label', `${hit.lessonTitle} in ${hit.moduleName}`);
+
+      btn.addEventListener('click', () => {
+        searchResults.hidden = true;
+        searchInput.value = '';
+        searchStatus.textContent = '';
+        showLesson(hit.moduleId, hit.lessonIndex);
+      });
+
+      li.appendChild(btn);
+      searchResults.appendChild(li);
+    });
   }
+  searchResults.hidden = false;
+  const count = hits.length;
+  searchStatus.textContent = count === 0 ? 'No results.' : `${count} result${count !== 1 ? 's' : ''} for "${q}"`;
 });
+
+// Close search results when focus leaves the search area
+searchInput.addEventListener('blur', () => {
+  setTimeout(() => {
+    if (!searchResults.contains(document.activeElement)) {
+      searchResults.hidden = true;
+    }
+  }, 150);
+});
+
+// ===== BOOKMARKS ===== ------------------------------------------------------
+
+const BOOKMARKS_KEY = 'codemaster-bookmarks';
+
+function loadBookmarks() {
+  try { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveBookmarks(arr) {
+  localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(arr));
+}
+
+function isBookmarked(moduleId, lessonIndex) {
+  return loadBookmarks().some(b => b.moduleId === moduleId && b.lessonIndex === lessonIndex);
+}
+
+function toggleBookmark(moduleId, lessonIndex) {
+  const bookmarks = loadBookmarks();
+  const idx = bookmarks.findIndex(b => b.moduleId === moduleId && b.lessonIndex === lessonIndex);
+  if (idx !== -1) {
+    bookmarks.splice(idx, 1);
+    saveBookmarks(bookmarks);
+    return false;
+  }
+  const mod = MODULES[moduleId];
+  if (!mod) return false;
+  const lesson = mod.lessons[lessonIndex];
+  if (!lesson) return false;
+  bookmarks.push({ moduleId, lessonIndex, moduleTitle: mod.title, lessonTitle: lesson.title });
+  saveBookmarks(bookmarks);
+  return true;
+}
+
+function renderBookmarksSidebar() {
+  const bookmarks = loadBookmarks();
+  bookmarksList.innerHTML = '';
+  if (bookmarks.length === 0) {
+    bookmarksPanel.hidden = true;
+    bookmarksToggleBtn.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  bookmarks.forEach(({ moduleId, lessonIndex, lessonTitle }) => {
+    const li = document.createElement('li');
+    li.className = 'bookmark-item';
+
+    const navBtn = document.createElement('button');
+    navBtn.className = 'bookmark-nav-btn';
+    navBtn.textContent = lessonTitle;
+    navBtn.setAttribute('aria-label', `Go to bookmarked lesson: ${lessonTitle}`);
+    navBtn.addEventListener('click', () => showLesson(moduleId, lessonIndex));
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'bookmark-remove-btn';
+    removeBtn.textContent = '×';
+    removeBtn.setAttribute('aria-label', `Remove bookmark: ${lessonTitle}`);
+    removeBtn.addEventListener('click', () => {
+      toggleBookmark(moduleId, lessonIndex);
+      renderBookmarksSidebar();
+      announce(`Bookmark removed: ${lessonTitle}`);
+    });
+
+    li.appendChild(navBtn);
+    li.appendChild(removeBtn);
+    bookmarksList.appendChild(li);
+  });
+}
+
+// ===== QUIZ HISTORY ===== ---------------------------------------------------
+
+const QUIZ_HISTORY_KEY = 'codemaster-quiz-history';
+
+function getQuizHistory(moduleId, lessonIndex) {
+  try {
+    const all = JSON.parse(localStorage.getItem(QUIZ_HISTORY_KEY) || '{}');
+    return all[`${moduleId}:${lessonIndex}`] || { attempts: 0, best: null, last: null };
+  } catch { return { attempts: 0, best: null, last: null }; }
+}
+
+function recordQuizResult(moduleId, lessonIndex, score, total) {
+  try {
+    const all = JSON.parse(localStorage.getItem(QUIZ_HISTORY_KEY) || '{}');
+    const key = `${moduleId}:${lessonIndex}`;
+    const prev = all[key] || { attempts: 0, best: null, last: null };
+    const pct = Math.round((score / total) * 100);
+    all[key] = {
+      attempts: prev.attempts + 1,
+      best: prev.best === null ? pct : Math.max(prev.best, pct),
+      last: pct,
+    };
+    localStorage.setItem(QUIZ_HISTORY_KEY, JSON.stringify(all));
+  } catch { /* storage unavailable */ }
+}
+
+function buildQuizHistoryWidget(moduleId, lessonIndex) {
+  const hist = getQuizHistory(moduleId, lessonIndex);
+  if (hist.attempts === 0) return null;
+
+  const section = document.createElement('div');
+  section.className = 'quiz-history-section';
+  section.setAttribute('aria-label', 'Quiz history');
+
+  const title = document.createElement('div');
+  title.className = 'quiz-history-title';
+  title.textContent = 'Your quiz history';
+  section.appendChild(title);
+
+  const stats = document.createElement('div');
+  stats.className = 'quiz-history-stats';
+
+  const addStat = (label, value, passing) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'quiz-history-stat';
+    const lbl = document.createElement('span');
+    lbl.className = 'quiz-history-stat-label';
+    lbl.textContent = label;
+    const val = document.createElement('span');
+    val.className = 'quiz-history-stat-value' + (passing === true ? ' passing' : passing === false ? ' failing' : '');
+    val.textContent = value;
+    wrap.appendChild(lbl);
+    wrap.appendChild(val);
+    stats.appendChild(wrap);
+  };
+
+  addStat('Attempts', hist.attempts);
+  addStat('Best score', hist.best + '%', hist.best >= 80);
+  addStat('Last score', hist.last + '%', hist.last >= 80);
+
+  section.appendChild(stats);
+  return section;
+}
+
+// ===== TIMED EXAM MODE ===== ------------------------------------------------
+
+const EXAM_MODULE_IDS = new Set(['scrum-exam']);
+const EXAM_DURATION_SECONDS = 60 * 60; // 60 minutes
+const EXAM_PASS_THRESHOLD = 0.85;
+
+function isExamLesson(moduleId, lessonIndex) {
+  if (!EXAM_MODULE_IDS.has(moduleId)) return false;
+  const mod = MODULES[moduleId];
+  if (!mod) return false;
+  const lesson = mod.lessons[lessonIndex];
+  return lesson && lesson.quiz && lesson.quiz.length >= 20;
+}
+
+function showTimedExam(moduleId, lessonIndex) {
+  const mod = MODULES[moduleId];
+  const lesson = mod.lessons[lessonIndex];
+  const questions = lesson.quiz;
+
+  mainContent.innerHTML = '';
+  announce('Timed exam started. 60 minutes remaining.');
+
+  // Timer bar
+  const timerBar = document.createElement('div');
+  timerBar.className = 'exam-timer-bar';
+  timerBar.setAttribute('role', 'timer');
+  timerBar.setAttribute('aria-label', 'Exam timer');
+
+  const timerLabel = document.createElement('span');
+  timerLabel.className = 'exam-timer-label';
+  timerLabel.textContent = 'Time remaining';
+
+  const timerDisplay = document.createElement('span');
+  timerDisplay.className = 'exam-timer-display';
+  timerDisplay.setAttribute('aria-live', 'off');
+  timerDisplay.id = 'exam-timer-display';
+
+  const progressText = document.createElement('span');
+  progressText.className = 'exam-progress-text';
+  progressText.textContent = `${questions.length} questions`;
+
+  timerBar.appendChild(timerLabel);
+  timerBar.appendChild(timerDisplay);
+  timerBar.appendChild(progressText);
+  mainContent.appendChild(timerBar);
+
+  // Questions wrap
+  const wrap = document.createElement('div');
+  wrap.className = 'exam-mode-wrap';
+
+  const h1 = document.createElement('h1');
+  h1.className = 'module-title';
+  h1.textContent = lesson.title;
+  h1.setAttribute('tabindex', '-1');
+  wrap.appendChild(h1);
+
+  // Build question blocks — store selected answers
+  const answers = new Array(questions.length).fill(null);
+  const radioGroups = [];
+
+  questions.forEach((q, qi) => {
+    const block = document.createElement('div');
+    block.className = 'exam-question-block';
+    block.id = `exam-q-${qi}`;
+
+    const num = document.createElement('div');
+    num.className = 'exam-question-num';
+    num.textContent = `Question ${qi + 1} of ${questions.length}`;
+
+    const text = document.createElement('p');
+    text.className = 'exam-question-text';
+    text.textContent = q.question;
+
+    const optList = document.createElement('ul');
+    optList.className = 'exam-options';
+    optList.setAttribute('role', 'group');
+    optList.setAttribute('aria-labelledby', `exam-q-label-${qi}`);
+    text.id = `exam-q-label-${qi}`;
+
+    const groupRadios = [];
+    q.options.forEach((opt, oi) => {
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      label.className = 'exam-option-label';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `exam-q-${qi}`;
+      radio.value = opt;
+      radio.addEventListener('change', () => { answers[qi] = opt; });
+
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(opt));
+      li.appendChild(label);
+      optList.appendChild(li);
+      groupRadios.push(radio);
+    });
+
+    radioGroups.push(groupRadios);
+    block.appendChild(num);
+    block.appendChild(text);
+    block.appendChild(optList);
+    wrap.appendChild(block);
+  });
+
+  // Submit button
+  const submitWrap = document.createElement('div');
+  submitWrap.className = 'exam-submit-wrap';
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'btn-start';
+  submitBtn.textContent = 'Submit Exam';
+  submitBtn.addEventListener('click', () => finishExam(moduleId, lessonIndex, questions, answers, secondsLeft));
+  submitWrap.appendChild(submitBtn);
+  wrap.appendChild(submitWrap);
+  mainContent.appendChild(wrap);
+
+  // Focus heading
+  h1.focus();
+
+  // Timer
+  let secondsLeft = EXAM_DURATION_SECONDS;
+  const announcedAt = new Set();
+
+  const formatTime = s => {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  };
+
+  timerDisplay.textContent = formatTime(secondsLeft);
+
+  const timerInterval = setInterval(() => {
+    secondsLeft--;
+    timerDisplay.textContent = formatTime(secondsLeft);
+
+    if (secondsLeft <= 300 && !announcedAt.has(300)) {
+      announcedAt.add(300); announce('5 minutes remaining on the exam.');
+      timerDisplay.classList.add('warning');
+    }
+    if (secondsLeft <= 60 && !announcedAt.has(60)) {
+      announcedAt.add(60); announce('1 minute remaining on the exam.');
+      timerDisplay.classList.remove('warning');
+      timerDisplay.classList.add('critical');
+    }
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      announce('Time is up. Submitting exam.');
+      finishExam(moduleId, lessonIndex, questions, answers, 0);
+    }
+  }, 1000);
+
+  // Store interval ref so finishExam can clear it
+  mainContent.dataset.examInterval = timerInterval;
+}
+
+function finishExam(moduleId, lessonIndex, questions, answers, secondsLeft) {
+  const interval = mainContent.dataset.examInterval;
+  if (interval) clearInterval(parseInt(interval, 10));
+
+  let correct = 0;
+  questions.forEach((q, i) => { if (answers[i] === q.answer) correct++; });
+  const total = questions.length;
+  const pct = Math.round((correct / total) * 100);
+  const passed = correct / total >= EXAM_PASS_THRESHOLD;
+
+  recordQuizResult(moduleId, lessonIndex, correct, total);
+
+  mainContent.innerHTML = '';
+
+  const results = document.createElement('div');
+  results.className = 'exam-results';
+
+  const h1 = document.createElement('h1');
+  h1.className = 'module-title';
+  h1.setAttribute('tabindex', '-1');
+  h1.textContent = passed ? 'Exam Passed!' : 'Keep Practising';
+  results.appendChild(h1);
+
+  const score = document.createElement('div');
+  score.className = `exam-results-score ${passed ? 'pass' : 'fail'}`;
+  score.textContent = `${pct}%`;
+  results.appendChild(score);
+
+  const verdict = document.createElement('p');
+  verdict.className = 'exam-results-verdict';
+  verdict.textContent = `${correct} of ${total} correct`;
+  results.appendChild(verdict);
+
+  const detail = document.createElement('p');
+  detail.className = 'exam-results-detail';
+  detail.textContent = passed
+    ? 'You met the PSM I passing threshold of 85%. Well done!'
+    : `The PSM I passing threshold is 85% (${Math.ceil(total * EXAM_PASS_THRESHOLD)} correct). Review the lessons and try again.`;
+  results.appendChild(detail);
+
+  // Breakdown
+  const breakdown = document.createElement('div');
+  breakdown.className = 'exam-results-breakdown';
+  const breakTitle = document.createElement('div');
+  breakTitle.className = 'exam-results-breakdown-title';
+  breakTitle.textContent = 'Question breakdown';
+  breakdown.appendChild(breakTitle);
+
+  questions.forEach((q, i) => {
+    const wasCorrect = answers[i] === q.answer;
+    const row = document.createElement('div');
+    row.className = 'exam-result-item';
+
+    const icon = document.createElement('span');
+    icon.className = 'exam-result-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = wasCorrect ? '✓' : '✗';
+
+    const qText = document.createElement('span');
+    qText.className = 'exam-result-question';
+    qText.textContent = `Q${i + 1}: ${q.question.slice(0, 80)}${q.question.length > 80 ? '…' : ''}`;
+
+    const ans = document.createElement('span');
+    ans.className = 'exam-result-answer';
+    ans.textContent = wasCorrect ? 'Correct' : `Your: ${answers[i] || 'No answer'} | Correct: ${q.answer}`;
+
+    row.appendChild(icon);
+    row.appendChild(qText);
+    row.appendChild(ans);
+    breakdown.appendChild(row);
+  });
+  results.appendChild(breakdown);
+
+  // Actions
+  const actionsDiv = document.createElement('div');
+  actionsDiv.style.display = 'flex';
+  actionsDiv.style.gap = '1rem';
+  actionsDiv.style.justifyContent = 'center';
+
+  const retryBtn = document.createElement('button');
+  retryBtn.className = 'btn-start';
+  retryBtn.textContent = 'Retake Exam';
+  retryBtn.addEventListener('click', () => showTimedExam(moduleId, lessonIndex));
+
+  const moduleBtn = document.createElement('button');
+  moduleBtn.className = 'btn-primary';
+  moduleBtn.textContent = 'Back to Module';
+  moduleBtn.addEventListener('click', () => loadModule(moduleId));
+
+  actionsDiv.appendChild(retryBtn);
+  actionsDiv.appendChild(moduleBtn);
+  results.appendChild(actionsDiv);
+
+  mainContent.appendChild(results);
+  h1.focus();
+  announce(`Exam complete. You scored ${pct}%. ${passed ? 'You passed!' : 'You did not pass this time.'}`);
+}
 
 // ===== Build sidebar =====
 function buildSidebar() {
-  const defs = [
-    { id: 'think',      icon: '🧠', label: 'Think Like a Programmer' },
-    { id: 'html',       icon: '📄', label: 'HTML' },
-    { id: 'css',        icon: '🎨', label: 'CSS' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript' },
-    { id: 'python',     icon: '🐍', label: 'Python' },
-    { id: 'sql',        icon: '🗄️', label: 'SQL' },
-    { id: 'powershell', icon: '💻', label: 'PowerShell' },
-    { id: 'aria',       icon: '♿', label: 'ARIA' },
-  ];
+  const defs = MODULE_DEFS;
 
   moduleNav.innerHTML = '';
   defs.forEach(({ id, icon, label }) => {
@@ -99,9 +591,16 @@ function buildSidebar() {
     btn.appendChild(document.createTextNode(label));
 
     btn.addEventListener('click', () => {
-      const targetId = (id === 'css' && state.srMode) ? 'css-sr' : id;
-      loadModule(targetId);
-      openLessonList(li, btn, targetId);
+      loadModule(id);
+    });
+
+    // Collapse lesson list when focus leaves the entire nav item (Tab or Shift+Tab)
+    li.addEventListener('focusout', (e) => {
+      if (!li.contains(e.relatedTarget)) {
+        const ul = li.querySelector('.module-lessons');
+        if (ul) ul.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
     });
 
     const lessonUl = buildLessonList(id);
@@ -116,8 +615,7 @@ function buildLessonList(moduleNavId) {
   ul.className = 'module-lessons';
   ul.id = `lessons-${moduleNavId}`;
 
-  const modId = (moduleNavId === 'css' && state.srMode) ? 'css-sr' : moduleNavId;
-  const mod   = MODULES[modId];
+  const mod = MODULES[moduleNavId];
   if (!mod) return ul;
 
   mod.lessons.forEach((lesson, i) => {
@@ -129,8 +627,7 @@ function buildLessonList(moduleNavId) {
     btn.dataset.moduleId    = moduleNavId;
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const tid = (moduleNavId === 'css' && state.srMode) ? 'css-sr' : moduleNavId;
-      showLesson(tid, i);
+      showLesson(moduleNavId, i);
     });
     li.appendChild(btn);
     ul.appendChild(li);
@@ -147,14 +644,12 @@ function openLessonList(li, btn, moduleId) {
 }
 
 function updateSidebarActive(moduleId, lessonIndex) {
-  const navId = moduleId === 'css-sr' ? 'css' : moduleId;
-
   document.querySelectorAll('.module-nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.module === navId);
+    btn.classList.toggle('active', btn.dataset.module === moduleId);
   });
 
   document.querySelectorAll('.lesson-nav-btn').forEach(btn => {
-    const match = btn.dataset.moduleId === navId &&
+    const match = btn.dataset.moduleId === moduleId &&
                   parseInt(btn.dataset.lessonIndex) === lessonIndex;
     btn.classList.toggle('active', match);
   });
@@ -169,9 +664,8 @@ function loadModule(moduleId) {
   const mod = MODULES[moduleId];
   if (!mod) return;
 
-  const navId = moduleId === 'css-sr' ? 'css' : moduleId;
   document.querySelectorAll('.module-nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.module === navId);
+    btn.classList.toggle('active', btn.dataset.module === moduleId);
   });
   document.querySelectorAll('.lesson-nav-btn').forEach(btn => btn.classList.remove('active'));
 
@@ -180,7 +674,7 @@ function loadModule(moduleId) {
   // Badge
   const badge = document.createElement('span');
   badge.className = 'module-badge';
-  badge.textContent = moduleId === 'css-sr' ? 'CSS — Screen Reader Edition' : mod.title;
+  badge.textContent = mod.title;
 
   // Title
   const h1 = document.createElement('h1');
@@ -274,8 +768,108 @@ function buildInfoCard(label, items, id) {
   return card;
 }
 
+// ===== Lesson content renderer =====
+function isContentHeading(text) {
+  return text.length > 0 && /[A-Z]/.test(text) && !/[a-z]/.test(text);
+}
+
+function parseAndRenderText(text, container) {
+  const lines = text.split('\n');
+  let pendingLines = [];
+
+  const flushParagraph = () => {
+    const joined = pendingLines.join('\n').trimEnd();
+    if (joined.trim()) {
+      const p = document.createElement('p');
+      p.className = 'lesson-para';
+      p.textContent = joined;
+      container.appendChild(p);
+    }
+    pendingLines = [];
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushParagraph();
+    } else if (isContentHeading(trimmed)) {
+      flushParagraph();
+      const h = document.createElement('h2');
+      h.className = 'lesson-section-heading';
+      h.textContent = trimmed;
+      container.appendChild(h);
+    } else {
+      pendingLines.push(line);
+    }
+  }
+  flushParagraph();
+}
+
+function buildContentTable(block) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'content-table-wrapper';
+
+  const table = document.createElement('table');
+  table.className = 'content-table';
+
+  if (block.caption) {
+    const caption = document.createElement('caption');
+    caption.textContent = block.caption;
+    table.appendChild(caption);
+  }
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  block.headers.forEach(headerText => {
+    const th = document.createElement('th');
+    th.setAttribute('scope', 'col');
+    th.textContent = headerText;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  block.rows.forEach(rowData => {
+    const tr = document.createElement('tr');
+    rowData.forEach(cellText => {
+      const td = document.createElement('td');
+      td.textContent = cellText;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  wrapper.appendChild(table);
+  return wrapper;
+}
+
+function renderLessonContent(lesson, container) {
+  if (lesson.contentBlocks) {
+    lesson.contentBlocks.forEach(block => {
+      if (block.type === 'text') {
+        parseAndRenderText(block.value, container);
+      } else if (block.type === 'table') {
+        container.appendChild(buildContentTable(block));
+      }
+    });
+  } else {
+    parseAndRenderText(lesson.content, container);
+  }
+}
+
 // ===== Show a single lesson =====
 function showLesson(moduleId, lessonIndex) {
+  // Route exam lessons to timed exam UI
+  if (isExamLesson(moduleId, lessonIndex)) {
+    state.activeModuleId     = moduleId;
+    state.currentLessonIndex = lessonIndex;
+    updateSidebarActive(moduleId, lessonIndex);
+    showTimedExam(moduleId, lessonIndex);
+    return;
+  }
+
   state.activeModuleId     = moduleId;
   state.currentLessonIndex = lessonIndex;
 
@@ -307,8 +901,25 @@ function showLesson(moduleId, lessonIndex) {
   lessonCounter.setAttribute('aria-label', `Lesson ${lessonIndex + 1} of ${total}`);
   lessonCounter.textContent = `Lesson ${lessonIndex + 1} of ${total}`;
 
+  // ── Bookmark button ──
+  const bookmarkBtn = document.createElement('button');
+  bookmarkBtn.className = 'lesson-bookmark-btn';
+  const bookmarked = isBookmarked(moduleId, lessonIndex);
+  bookmarkBtn.setAttribute('aria-pressed', String(bookmarked));
+  bookmarkBtn.setAttribute('aria-label', bookmarked ? `Remove bookmark for ${lesson.title}` : `Bookmark ${lesson.title}`);
+  bookmarkBtn.textContent = bookmarked ? '★' : '☆';
+  bookmarkBtn.addEventListener('click', () => {
+    const nowBookmarked = toggleBookmark(moduleId, lessonIndex);
+    bookmarkBtn.setAttribute('aria-pressed', String(nowBookmarked));
+    bookmarkBtn.setAttribute('aria-label', nowBookmarked ? `Remove bookmark for ${lesson.title}` : `Bookmark ${lesson.title}`);
+    bookmarkBtn.textContent = nowBookmarked ? '★' : '☆';
+    renderBookmarksSidebar();
+    announce(nowBookmarked ? `Bookmarked: ${lesson.title}` : `Bookmark removed: ${lesson.title}`);
+  });
+
   topBar.appendChild(moduleCrumb);
   topBar.appendChild(lessonCounter);
+  topBar.appendChild(bookmarkBtn);
   mainContent.appendChild(topBar);
 
   // ── Progress bar ──
@@ -358,12 +969,14 @@ function showLesson(moduleId, lessonIndex) {
   contentBox.className = 'lesson-content';
   contentBox.setAttribute('tabindex', '0');
   contentBox.setAttribute('aria-label', `${lesson.title} — lesson content`);
-  contentBox.textContent = lesson.content;
+  renderLessonContent(lesson, contentBox);
   mainContent.appendChild(contentBox);
 
   // ── Quiz ──
   if (lesson.quiz && lesson.quiz.length) {
     mainContent.appendChild(buildQuiz(lesson, progressFill, total, moduleId, lessonIndex));
+    const histWidget = buildQuizHistoryWidget(moduleId, lessonIndex);
+    if (histWidget) mainContent.appendChild(histWidget);
   }
 
   // ── Exercise ──
@@ -620,10 +1233,6 @@ function showModuleComplete(moduleId) {
     nextBtn.className = 'btn-start';
     nextBtn.textContent = `Start ${nextMod.title} →`;
     nextBtn.addEventListener('click', () => {
-      const navId = nextModuleId === 'css-sr' ? 'css' : nextModuleId;
-      const li = document.getElementById(`nav-item-${navId}`);
-      const btn = li && li.querySelector('.module-nav-btn');
-      if (li && btn) openLessonList(li, btn, nextModuleId);
       loadModule(nextModuleId);
     });
     actions.appendChild(nextBtn);
@@ -642,11 +1251,9 @@ function showModuleComplete(moduleId) {
 
 function getNextModuleId(currentId) {
   const order = ['think', 'html', 'css', 'javascript', 'python', 'sql', 'powershell'];
-  const navId = currentId === 'css-sr' ? 'css' : currentId;
-  const idx   = order.indexOf(navId);
+  const idx   = order.indexOf(currentId);
   if (idx === -1 || idx === order.length - 1) return null;
-  const next  = order[idx + 1];
-  return (next === 'css' && state.srMode) ? 'css-sr' : next;
+  return order[idx + 1];
 }
 
 // ===== Quiz builder =====
@@ -661,7 +1268,18 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
   h2.textContent = 'Knowledge Check';
   section.appendChild(h2);
 
+  const quizTotal = lesson.quiz.length;
+  // Track which questions have been checked and whether they were correct
+  const questionResults = new Array(quizTotal).fill(null); // null | true | false
+
   lesson.quiz.forEach((q, qi) => {
+    // Normalise answer: string answer → find matching option index
+    const answerIsString = typeof q.answer === 'string';
+    const correctIndex = answerIsString
+      ? q.options.indexOf(q.answer)
+      : q.answer;
+    const correctText = q.options[correctIndex] ?? q.answer;
+
     const qDiv    = document.createElement('div');
     qDiv.className = 'quiz-question';
 
@@ -714,11 +1332,23 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
         announce('Please select an answer before checking.');
         return;
       }
-      const isCorrect = parseInt(selected.value) === q.answer;
+      const selectedIndex = parseInt(selected.value);
+      const isCorrect = selectedIndex === correctIndex;
+
+      // Only record first attempt for quiz history
+      if (questionResults[qi] === null) {
+        questionResults[qi] = isCorrect;
+        const answered = questionResults.filter(r => r !== null).length;
+        if (answered === quizTotal) {
+          const correctCount = questionResults.filter(Boolean).length;
+          recordQuizResult(moduleId, lessonIndex, correctCount, quizTotal);
+        }
+      }
+
       fieldset.querySelectorAll('.option-label').forEach((lbl, i) => {
         lbl.classList.remove('correct', 'incorrect');
-        if (i === q.answer) lbl.classList.add('correct');
-        else if (i === parseInt(selected.value) && !isCorrect) lbl.classList.add('incorrect');
+        if (i === correctIndex) lbl.classList.add('correct');
+        else if (i === selectedIndex && !isCorrect) lbl.classList.add('incorrect');
       });
       if (isCorrect) {
         feedback.textContent = 'Correct! Well done.';
@@ -729,9 +1359,9 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
         progressFill.style.width = `${pct}%`;
         progressFill.setAttribute('aria-valuenow', pct);
       } else {
-        feedback.textContent = `Not quite. The correct answer is: ${q.options[q.answer]}`;
+        feedback.textContent = `Not quite. The correct answer is: ${correctText}`;
         feedback.className = 'quiz-feedback show incorrect';
-        announce(`Not quite. The correct answer is: ${q.options[q.answer]}`);
+        announce(`Not quite. The correct answer is: ${correctText}`);
       }
     });
 
@@ -976,22 +1606,19 @@ function showWelcome() {
   p1.textContent = 'A fully accessible coding learning platform built for keyboard and screen reader users. No experience needed — start from the very beginning.';
 
   const p2 = document.createElement('p');
-  p2.textContent = 'Choose a module below or from the sidebar to get started.';
+  p2.textContent = 'Choose a module below to get started.';
 
   const cards = document.createElement('ul');
   cards.className = 'module-cards';
 
-  const defs = [
-    { id: 'think',      icon: '🧠', label: 'Think Like a Programmer', desc: '9 lessons — Start here' },
-    { id: 'html',       icon: '📄', label: 'HTML',                    desc: '10 lessons' },
-    { id: 'css',        icon: '🎨', label: 'CSS',                     desc: '9 lessons' },
-    { id: 'javascript', icon: '⚡', label: 'JavaScript',              desc: '9 lessons' },
-    { id: 'python',     icon: '🐍', label: 'Python',                  desc: '10 lessons' },
-    { id: 'sql',        icon: '🗄️', label: 'SQL',                     desc: '10 lessons' },
-    { id: 'powershell', icon: '💻', label: 'PowerShell',              desc: '8 lessons' },
-  ];
+  const defs = MODULE_DEFS;
 
-  defs.forEach(({ id, icon, label, desc }) => {
+  defs.forEach(({ id, icon, label, note }) => {
+    const mod = MODULES[id];
+    if (!mod) return;
+    const count = mod.lessons.length;
+    const desc = note ? `${count} lessons — ${note}` : `${count} lessons`;
+
     const li = document.createElement('li');
 
     const card = document.createElement('button');
@@ -1017,9 +1644,6 @@ function showWelcome() {
     card.appendChild(labelSpan);
     card.appendChild(descSpan);
     card.addEventListener('click', () => {
-      const navLi = document.getElementById(`nav-item-${id}`);
-      const navBtn = navLi && navLi.querySelector('.module-nav-btn');
-      if (navLi && navBtn) openLessonList(navLi, navBtn, id);
       loadModule(id);
     });
     li.appendChild(card);
@@ -1158,16 +1782,35 @@ function initUpdater() {
 // ===== Init =====
 function init() {
   loadProgress();
-  buildSidebar();
+  renderBookmarksSidebar();
   initFontSize();
   showWelcome();
   initUpdater();
 
+  homeBtn.addEventListener('click', () => {
+    showWelcome();
+    announce('Home screen');
+  });
+
+  bookmarksToggleBtn.addEventListener('click', () => {
+    const isOpen = bookmarksPanel.hidden === false;
+    if (isOpen) {
+      bookmarksPanel.hidden = true;
+      bookmarksToggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+      renderBookmarksSidebar();
+      if (!bookmarksPanel.hidden) {
+        bookmarksToggleBtn.setAttribute('aria-expanded', 'true');
+        const first = bookmarksList.querySelector('button');
+        if (first) first.focus();
+      } else {
+        announce('No bookmarks saved yet.');
+      }
+    }
+  });
+
   document.getElementById('glossary-btn').addEventListener('click', () => {
     showGlossary();
-    // Deactivate sidebar module highlights
-    document.querySelectorAll('.module-nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.lesson-nav-btn').forEach(b => b.classList.remove('active'));
   });
 }
 

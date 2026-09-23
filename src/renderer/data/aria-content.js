@@ -279,7 +279,7 @@ If a page has more than one of the same landmark type (two navigation regions, f
 
 Without names, a screen reader listing the landmarks would show "navigation, navigation" with no way to distinguish them. With names, it shows "Main navigation, navigation" and "Breadcrumb, navigation."
 
-NAMING WITH aria-labelledby
+NAMING WITH ARIA-LABELLEDBY
 When the region already has a visible heading, use aria-labelledby instead of aria-label to avoid saying the same thing twice:
 
   <section aria-labelledby="recent-posts-heading">
@@ -392,7 +392,7 @@ When a screen reader needs to announce an element's name, the browser follows th
 
 The practical implication: aria-labelledby always wins. If you set both aria-label and aria-labelledby, aria-labelledby wins.
 
-aria-labelledby — REFERENCING EXISTING TEXT
+ARIA-LABELLEDBY — REFERENCING EXISTING TEXT
 aria-labelledby points to one or more element IDs whose text content becomes the name.
 
   <h2 id="billing-heading">Billing Address</h2>
@@ -410,7 +410,7 @@ Advantages:
 You can reference multiple IDs, and the browser concatenates them:
   <button aria-labelledby="icon-id label-id">...</button>
 
-aria-label — ADDING A NAME WHERE THERE IS NO VISIBLE TEXT
+ARIA-LABEL — ADDING A NAME WHERE THERE IS NO VISIBLE TEXT
 aria-label provides a string directly in the attribute. Use it when there is no existing visible text to reference.
 
   <button aria-label="Close dialog">
@@ -419,7 +419,7 @@ aria-label provides a string directly in the attribute. Use it when there is no 
 
 Note: When you use aria-label, the visible content of the element is overridden for AT. If the button says "OK" visually but has aria-label="Confirm and submit form", screen readers will say "Confirm and submit form, button" but sighted users see "OK." This mismatch can break voice control (WCAG 2.5.3 Label in Name). Keep aria-label values that start with the same words as any visible label text.
 
-aria-describedby — ADDING SUPPLEMENTARY INFORMATION
+ARIA-DESCRIBEDBY — ADDING SUPPLEMENTARY INFORMATION
 aria-describedby is different from labeling. It provides a description — supplementary information that comes after the name is announced.
 
   <label for="password">Password</label>
@@ -447,7 +447,7 @@ Icon-only buttons are the most common naming mistake. The correct pattern:
     </svg>
   </button>
 
-NAMING FORM INPUTS: ALWAYS USE <label>
+NAMING FORM INPUTS: ALWAYS USE A LABEL ELEMENT
 For all form inputs, the preferred technique is a visible <label> element. aria-label and aria-labelledby are fallbacks for cases where a visible label is genuinely not possible (for example, a search box inside a search landmark that is its own label).
 
   <!-- Preferred -->
@@ -917,7 +917,7 @@ STARTING HTML:
       title: 'Lesson 7: Common ARIA Patterns',
       content: `ARIA was designed to describe interface patterns that have no native HTML equivalent. Understanding the established patterns lets you build and test them correctly.
 
-TABS (role="tablist", role="tab", role="tabpanel")
+TABS
 Tabs are one of the most common patterns. The structure:
 
   <div role="tablist" aria-label="Settings sections">
@@ -1388,7 +1388,7 @@ WCAG 2.5.3 (Label in Name) requires that when an element has visible text, the a
   <!-- RIGHT: accessible name starts with the visible text -->
   <button aria-label="Submit and confirm subscription">Submit</button>
 
-MISTAKE 7: USING aria-live="assertive" FOR EVERYTHING
+MISTAKE 7: USING ARIA-LIVE ASSERTIVE FOR EVERYTHING
 Every assertive announcement interrupts whatever the screen reader is currently saying. If you use assertive for status updates, search results, or progress messages, you create a chaotic, interruption-heavy experience.
 
   <!-- WRONG for a non-urgent status message -->
@@ -1522,6 +1522,182 @@ MISTAKE 5 (scroll tracker):
 MISTAKE 6 (button):
   Violates: Rule 5 — "x" is not a meaningful accessible name; it describes the visual icon character, not the action.
   Fix: <button aria-label="Close"><svg aria-hidden="true"><!-- close icon --></svg></button>`,
+      },
+    },
+    {
+      id: 'aria-10',
+      title: 'Lesson 10: Accessible Data Tables',
+      content: `Data tables are one of the most complex accessibility challenges. A well-structured table is easy to navigate with a screen reader; a poorly structured one is incomprehensible.
+
+─────────────────────────────
+THE PROBLEM WITH TABLES AND SCREEN READERS
+─────────────────────────────
+A screen reader navigates a table cell by cell using arrow keys. When a user lands on a data cell, the screen reader announces the cell's value AND the associated column/row headers. Without proper headers, users hear raw data with no context — like hearing "145" with no idea if it is a price, a quantity, or a score.
+
+─────────────────────────────
+SIMPLE TABLE STRUCTURE
+─────────────────────────────
+For a simple table (one row of headers, one column of headers):
+
+  <table>
+    <caption>Quarterly sales by region</caption>
+    <thead>
+      <tr>
+        <th scope="col">Region</th>
+        <th scope="col">Q1</th>
+        <th scope="col">Q2</th>
+        <th scope="col">Q3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">North</th>
+        <td>£1,200</td>
+        <td>£1,450</td>
+        <td>£1,100</td>
+      </tr>
+      <tr>
+        <th scope="row">South</th>
+        <td>£980</td>
+        <td>£1,100</td>
+        <td>£1,300</td>
+      </tr>
+    </tbody>
+  </table>
+
+KEY ELEMENTS:
+  <caption>  — the table's accessible name; always include one
+  <thead>    — groups header rows
+  <tbody>    — groups data rows
+  <th scope="col"> — a column header (applies to all cells below it)
+  <th scope="row"> — a row header (applies to all cells to its right)
+  <td>       — a data cell
+
+When a user navigates to the £1,450 cell in the example above, JAWS and NVDA will announce: "Q2 North £1,450" — the column header, the row header, and the value.
+
+─────────────────────────────
+COMPLEX TABLES — USING HEADERS AND ID ATTRIBUTES
+─────────────────────────────
+When a table has merged cells (colspan/rowspan) or multiple header levels, scope alone is not enough. Use id and headers attributes:
+
+  <table>
+    <caption>Employee training completion</caption>
+    <thead>
+      <tr>
+        <td></td>
+        <th id="q1" scope="colgroup" colspan="2">Q1</th>
+        <th id="q2" scope="colgroup" colspan="2">Q2</th>
+      </tr>
+      <tr>
+        <td></td>
+        <th id="online" scope="col">Online</th>
+        <th id="class" scope="col">In-class</th>
+        <th id="online2" scope="col">Online</th>
+        <th id="class2" scope="col">In-class</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th id="team-a" scope="row">Team A</th>
+        <td headers="q1 online team-a">12</td>
+        <td headers="q1 class team-a">8</td>
+        <td headers="q2 online2 team-a">15</td>
+        <td headers="q2 class2 team-a">10</td>
+      </tr>
+    </tbody>
+  </table>
+
+The headers attribute takes a space-separated list of id values — it explicitly links each cell to its headers.
+
+─────────────────────────────
+WHAT NOT TO DO WITH TABLES
+─────────────────────────────
+  DO NOT use tables for layout — use CSS Grid or Flexbox
+  DO NOT use <td> for headers — always use <th>
+  DO NOT omit <caption> — it is the table's accessible name
+  DO NOT use display:block or display:flex on table elements — this breaks the accessibility tree
+
+─────────────────────────────
+SORTABLE TABLES
+─────────────────────────────
+When a column is sortable, announce the sort state:
+
+  <th scope="col" aria-sort="ascending">
+    Name <button>Sort</button>
+  </th>
+
+  aria-sort values: "ascending", "descending", "none", "other"`,
+      quiz: [
+        {
+          question: 'What does scope="col" on a <th> element tell a screen reader?',
+          options: [
+            'The cell spans multiple columns',
+            'This header applies to all cells below it in the same column',
+            'The column should be hidden from screen readers',
+            'This cell is part of a column group',
+          ],
+          answer: 'This header applies to all cells below it in the same column',
+        },
+        {
+          question: 'A data table has two levels of column headers (a parent group header spanning two columns, and two child headers). scope="col" alone is not enough. What should you use instead?',
+          options: [
+            'aria-label on each header cell',
+            'id on each header and headers attribute on each data cell listing the applicable header ids',
+            'th colspan and rowspan to merge the headers visually',
+            'A nested table inside each header cell',
+          ],
+          answer: 'id on each header and headers attribute on each data cell listing the applicable header ids',
+        },
+        {
+          question: 'Why should you not use display:flex or display:block on a <table> or its children?',
+          options: [
+            'It causes visual layout issues in all browsers',
+            'It breaks the accessibility tree — screen readers no longer recognise the element as a table',
+            'It prevents the table from being sortable',
+            'It removes the table borders in some browsers',
+          ],
+          answer: 'It breaks the accessibility tree — screen readers no longer recognise the element as a table',
+        },
+      ],
+      exercise: {
+        prompt: 'Write an accessible HTML table showing three students\' quiz scores for two subjects. Include: caption, thead with column headers (scope="col"), a row header for each student (scope="row"), and data cells.',
+        starterCode: `<!-- Accessible data table: 3 students, 2 subjects -->
+
+<table>
+  <!-- Add caption -->
+
+  <!-- Add thead with column headers -->
+
+  <!-- Add tbody with row headers and data cells -->
+
+</table>`,
+        solution: `<table>
+  <caption>Quiz scores by student and subject</caption>
+  <thead>
+    <tr>
+      <th scope="col">Student</th>
+      <th scope="col">HTML</th>
+      <th scope="col">CSS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Ada Lovelace</th>
+      <td>92</td>
+      <td>88</td>
+    </tr>
+    <tr>
+      <th scope="row">Grace Hopper</th>
+      <td>78</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th scope="row">Alan Turing</th>
+      <td>85</td>
+      <td>80</td>
+    </tr>
+  </tbody>
+</table>`,
       },
     },
   ],

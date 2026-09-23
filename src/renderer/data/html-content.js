@@ -789,14 +789,14 @@ Use ARIA when:
 - Native HTML does not have an element for what you need
 - You need to provide extra context that HTML alone cannot express
 
-aria-label
+ARIA-LABEL
 Provides a text label directly on an element, overriding its visible text (or providing one when there is none):
 
 <button aria-label="Close dialog">X</button>
 
 Without aria-label, a screen reader would say "X, button" — meaningless. With it, "Close dialog, button".
 
-aria-labelledby
+ARIA-LABELLEDBY
 Points to another element that serves as the label:
 
 <h2 id="billing-heading">Billing address</h2>
@@ -806,24 +806,24 @@ Points to another element that serves as the label:
 
 The section is now labeled by the heading text. Screen readers announce the heading when entering the section.
 
-aria-describedby
+ARIA-DESCRIBEDBY
 Points to an element that provides additional description (not the label, but extra context):
 
 <input id="email" aria-describedby="email-hint" />
 <p id="email-hint">We will never share your email with anyone.</p>
 
-aria-hidden
+ARIA-HIDDEN
 Hides an element from screen readers while keeping it visible on screen. Use for decorative content:
 
 <span aria-hidden="true">★★★★☆</span>
 <span class="sr-only">4 out of 5 stars</span>
 
-aria-live
+ARIA-LIVE
 Marks a region that will update dynamically. Screen readers announce changes:
 
 <div aria-live="polite" id="status"></div>
 
-role
+ROLE
 Tells screen readers what an element IS when a native element is not used. Rarely needed:
 
 <div role="alert">Your session is about to expire.</div>
@@ -1034,6 +1034,167 @@ Use this every time you build a page:
 
   </body>
 </html>`,
+      },
+    },
+    {
+      id: 'html-11',
+      title: 'Lesson 11: Modern HTML — dialog, Popover, and Web Components',
+      content: `Three powerful modern HTML features are now baseline across all major browsers: the native dialog element, the Popover API, and Web Components. Each reduces your dependency on JavaScript for common UI patterns.
+
+─────────────────────────────
+THE DIALOG ELEMENT
+─────────────────────────────
+The native <dialog> element gives you a modal or non-modal dialog without writing focus-trap JavaScript from scratch.
+
+MODAL DIALOG:
+  <dialog id="confirm-dialog" aria-labelledby="dialog-title">
+    <h2 id="dialog-title">Confirm deletion</h2>
+    <p>This action cannot be undone.</p>
+    <button id="confirm-yes">Delete</button>
+    <button id="confirm-no">Cancel</button>
+  </dialog>
+
+  <button id="open-dialog">Delete item</button>
+
+  <script>
+    const dialog = document.getElementById("confirm-dialog");
+    document.getElementById("open-dialog").addEventListener("click", () => {
+      dialog.showModal();   // opens as a modal — blocks background interaction
+    });
+    document.getElementById("confirm-no").addEventListener("click", () => {
+      dialog.close();       // closes the dialog
+    });
+  </script>
+
+What the browser gives you for free with showModal():
+  - Focus is moved into the dialog automatically
+  - Background page is inert (cannot be reached by keyboard or screen reader)
+  - Escape key closes the dialog automatically
+  - The ::backdrop pseudo-element provides a dimming overlay
+
+NON-MODAL DIALOG:
+  dialog.show();   // instead of dialog.showModal()
+
+─────────────────────────────
+THE POPOVER API
+─────────────────────────────
+The Popover API provides a native, accessible way to show tooltips, menus, and pop-up content without JavaScript.
+
+  <button popovertarget="my-popover">Show info</button>
+
+  <div id="my-popover" popover>
+    <p>This is pop-up content.</p>
+  </div>
+
+The browser handles:
+  - Toggle open/closed on button click
+  - Escape to close
+  - Light dismiss (click outside to close)
+  - Placement in the top layer (above all other content, no z-index needed)
+
+POPOVER TYPES:
+  popover="auto"    — light dismiss (clicking outside closes it), only one auto popover open at a time
+  popover="manual"  — stays open until explicitly closed
+
+─────────────────────────────
+WEB COMPONENTS
+─────────────────────────────
+Web Components let you create custom HTML elements that encapsulate their own structure, style, and behaviour. They are built from three browser APIs:
+
+CUSTOM ELEMENTS:
+  class MyCard extends HTMLElement {
+    connectedCallback() {
+      this.innerHTML = \`<div class="card">\${this.getAttribute("title")}</div>\`;
+    }
+  }
+  customElements.define("my-card", MyCard);
+
+  <!-- Now use it like any HTML element: -->
+  <my-card title="Welcome"></my-card>
+
+SHADOW DOM:
+  const shadow = this.attachShadow({ mode: "open" });
+  shadow.innerHTML = \`<style>p { color: red; }</style><p>Private content</p>\`;
+  // Styles inside Shadow DOM do not leak out, and page styles do not leak in
+
+HTML TEMPLATES:
+  <template id="card-template">
+    <div class="card"><slot></slot></div>
+  </template>
+
+ACCESSIBILITY NOTE:
+Web Components with Shadow DOM require careful ARIA implementation — ARIA attributes do not automatically cross shadow boundaries. Always test with a screen reader.`,
+      quiz: [
+        {
+          question: 'What does dialog.showModal() give you that dialog.show() does not?',
+          options: [
+            'It opens the dialog in a new browser tab',
+            'It moves focus into the dialog, makes the background inert, and allows Escape to close',
+            'It adds animation to the dialog opening',
+            'It saves the dialog state to localStorage',
+          ],
+          answer: 'It moves focus into the dialog, makes the background inert, and allows Escape to close',
+        },
+        {
+          question: 'What does the "popover" attribute on an element do?',
+          options: [
+            'It makes the element appear above the page in the browser\'s top layer with built-in dismiss behaviour',
+            'It converts the element into a tooltip that shows on hover',
+            'It requires the element to be absolutely positioned',
+            'It adds a CSS animation when the element appears',
+          ],
+          answer: 'It makes the element appear above the page in the browser\'s top layer with built-in dismiss behaviour',
+        },
+        {
+          question: 'Why do Web Components using Shadow DOM require extra care for accessibility?',
+          options: [
+            'Shadow DOM removes all semantic HTML from the component',
+            'ARIA attributes do not automatically cross shadow boundaries — screen readers may not see them',
+            'Web Components do not support keyboard events',
+            'The browser strips all ARIA from Shadow DOM for security',
+          ],
+          answer: 'ARIA attributes do not automatically cross shadow boundaries — screen readers may not see them',
+        },
+      ],
+      exercise: {
+        prompt: 'Write the HTML and minimal JavaScript for an accessible confirmation dialog using the native <dialog> element. The dialog should: have a heading, be opened by a button, close on Cancel, and return focus to the trigger.',
+        starterCode: `<!-- Accessible confirmation dialog using <dialog> -->
+
+<!-- Trigger button -->
+
+<!-- Dialog element -->
+
+<script>
+  // Open and close logic
+</script>`,
+        solution: `<!-- Trigger button -->
+<button id="open-btn">Delete account</button>
+
+<!-- Dialog element -->
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <h2 id="confirm-title">Confirm account deletion</h2>
+  <p>This action is permanent and cannot be undone.</p>
+  <button id="confirm-yes">Yes, delete</button>
+  <button id="confirm-no">Cancel</button>
+</dialog>
+
+<script>
+  const dialog = document.getElementById("confirm");
+  const openBtn = document.getElementById("open-btn");
+
+  openBtn.addEventListener("click", () => dialog.showModal());
+
+  document.getElementById("confirm-no").addEventListener("click", () => {
+    dialog.close();
+    openBtn.focus();  // return focus to the trigger
+  });
+
+  document.getElementById("confirm-yes").addEventListener("click", () => {
+    // handle deletion...
+    dialog.close();
+    openBtn.focus();
+  });
+</script>`,
       },
     },
   ],

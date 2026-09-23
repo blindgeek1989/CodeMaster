@@ -34,8 +34,9 @@ codemaster/
 │       └── data/          ← module content (one file per module)
 │           ├── html-content.js
 │           ├── css-content.js
-│           ├── css-screenreader-content.js
-│           └── js-content.js
+│           ├── js-content.js
+│           ├── github-content.js
+│           └── prompt-engineering-content.js
 └── tests/
     ├── unit/
     │   └── modules.test.js
@@ -66,15 +67,7 @@ Each module file in `src/renderer/data/` exports an object with this shape:
 }
 ```
 
-To add a new module, create `src/renderer/data/<name>-content.js` following this shape, expose it on `window`, then register it in `src/renderer/js/app.js` in the `MODULES` object and `buildSidebar()`.
-
-## SR Mode (Screen Reader CSS checkbox)
-
-Checking the "Screen Reader CSS Mode" checkbox in the sidebar swaps the CSS module:
-- Unchecked: loads `css-content.js` (standard CSS)
-- Checked: loads `css-screenreader-content.js` (CSS through the lens of accessibility)
-
-This is implemented in `app.js` via the `srModeCheckbox` change handler and the `state.srMode` flag.
+To add a new module, create `src/renderer/data/<name>-content.js` following this shape, expose it on `window`, then register it in `src/renderer/js/app.js` in the `MODULES` object and `MODULE_DEFS` array (which drives both the sidebar order and the search index).
 
 ## Accessibility requirements (non-negotiable)
 

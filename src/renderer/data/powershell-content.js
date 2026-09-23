@@ -724,6 +724,319 @@ KEYBOARD SHORTCUTS IN THE TERMINAL
         ],
       },
     },
+    {
+      id: 'ps-9',
+      title: 'Lesson 9: Error Handling with try/catch',
+      content: `PowerShell has a robust error handling system. Understanding it is essential for writing scripts that behave predictably when things go wrong — and in the real world, things always go wrong eventually.
+
+─────────────────────────────
+TERMINATING VS NON-TERMINATING ERRORS
+─────────────────────────────
+PowerShell distinguishes two types of errors:
+
+NON-TERMINATING ERRORS:
+  - The default for most cmdlets
+  - An error is written to the error stream but the script CONTINUES
+  - Example: Get-Item "missing.txt" — writes an error but execution continues
+
+TERMINATING ERRORS:
+  - Stop execution immediately
+  - Can be caught by try/catch
+  - Created by throw or by setting -ErrorAction Stop
+
+─────────────────────────────
+TRY / CATCH / FINALLY
+─────────────────────────────
+  try {
+    # code that might fail
+    $result = Get-Content "C:\data\config.json" -ErrorAction Stop
+    Write-Output "File loaded successfully"
+  }
+  catch {
+    # runs if a terminating error occurs
+    Write-Error "Failed to read config: $($_.Exception.Message)"
+  }
+  finally {
+    # always runs — use for cleanup
+    Write-Output "Finished attempt to load config"
+  }
+
+  $_ inside catch is the ErrorRecord object:
+    $_.Exception.Message    — the error message text
+    $_.Exception.GetType()  — the exception type
+    $_.InvocationInfo       — where in the script the error occurred
+
+─────────────────────────────
+MAKING CMDLETS THROW (ErrorAction Stop)
+─────────────────────────────
+Most cmdlets produce non-terminating errors by default. To make them catchable, add -ErrorAction Stop:
+
+  try {
+    Invoke-RestMethod -Uri "https://api.example.com/users" -ErrorAction Stop
+  }
+  catch {
+    Write-Error "API call failed: $($_.Exception.Message)"
+  }
+
+You can also set the default for the entire script:
+  $ErrorActionPreference = "Stop"
+
+─────────────────────────────
+CATCHING SPECIFIC EXCEPTION TYPES
+─────────────────────────────
+  try {
+    [int]"not a number"   # this throws a specific .NET exception
+  }
+  catch [System.InvalidCastException] {
+    Write-Output "Caught: invalid cast"
+  }
+  catch [System.IO.FileNotFoundException] {
+    Write-Output "Caught: file not found"
+  }
+  catch {
+    Write-Output "Caught: unexpected error — $($_.Exception.Message)"
+  }
+
+─────────────────────────────
+THROWING YOUR OWN ERRORS
+─────────────────────────────
+  function Get-PositiveNumber([int]$n) {
+    if ($n -le 0) {
+      throw [System.ArgumentException]"Number must be positive. Got: $n"
+    }
+    return $n
+  }
+
+  try {
+    Get-PositiveNumber -n -5
+  }
+  catch {
+    Write-Error $_.Exception.Message
+  }
+
+─────────────────────────────
+WRITE-ERROR vs THROW vs $PSCmdlet.WriteError
+─────────────────────────────
+  Write-Error "message"     — non-terminating; sets $? to $false but continues
+  throw "message"           — terminating; stops execution (or jumps to catch)
+  $PSCmdlet.ThrowTerminatingError(...)  — terminates from within an advanced function`,
+      quiz: [
+        {
+          question: 'By default, when a PowerShell cmdlet encounters an error (like a file not found), what happens?',
+          options: [
+            'The script throws a terminating error and stops immediately',
+            'A non-terminating error is written to the error stream and the script continues',
+            'The script pauses and asks the user what to do',
+            'The cmdlet retries the operation three times before failing',
+          ],
+          answer: 'A non-terminating error is written to the error stream and the script continues',
+        },
+        {
+          question: 'How do you make Get-Item catchable by try/catch?',
+          options: [
+            'Wrap it in a try block — all cmdlet errors are automatically catchable',
+            'Add -ErrorAction Stop to the cmdlet call',
+            'Set $global:ErrorAction = "Catch"',
+            'Use Get-Item inside a catch block',
+          ],
+          answer: 'Add -ErrorAction Stop to the cmdlet call',
+        },
+        {
+          question: 'Inside a catch block, what does $_.Exception.Message contain?',
+          options: [
+            'The name of the cmdlet that failed',
+            'The error message text from the exception',
+            'The line number where the error occurred',
+            'A boolean indicating whether the error is terminating',
+          ],
+          answer: 'The error message text from the exception',
+        },
+      ],
+      exercise: {
+        prompt: 'Write a PowerShell function "Read-ConfigFile" that takes a file path, reads it with Get-Content, and handles the case where the file does not exist by outputting a useful error message and returning $null.',
+        starterCode: `# Write Read-ConfigFile with error handling
+
+function Read-ConfigFile {
+    param([string]$Path)
+
+    # Use try/catch to handle file not found
+    # On success: return the file contents
+    # On failure: write an error message and return $null
+}
+
+# Test calls:
+$config = Read-ConfigFile -Path "C:\config.json"
+$missing = Read-ConfigFile -Path "C:\does-not-exist.json"`,
+        solution: `function Read-ConfigFile {
+    param([string]$Path)
+
+    try {
+        $content = Get-Content -Path $Path -Raw -ErrorAction Stop
+        Write-Output "Config loaded from: $Path"
+        return $content
+    }
+    catch {
+        Write-Error "Could not read config file '$Path': $($_.Exception.Message)"
+        return $null
+    }
+}
+
+$config = Read-ConfigFile -Path "C:\config.json"
+$missing = Read-ConfigFile -Path "C:\does-not-exist.json"`,
+      },
+    },
+    {
+      id: 'ps-10',
+      title: 'Lesson 10: Working with APIs Using Invoke-RestMethod',
+      content: `Invoke-RestMethod is PowerShell's built-in tool for calling REST APIs. It automatically parses JSON responses into PowerShell objects, making API integration clean and simple.
+
+─────────────────────────────
+BASIC GET REQUEST
+─────────────────────────────
+  $response = Invoke-RestMethod -Uri "https://api.example.com/users"
+
+  # The response is automatically parsed from JSON into a PSCustomObject
+  $response.Count       # number of users
+  $response[0].name     # first user's name
+
+─────────────────────────────
+GET WITH QUERY PARAMETERS
+─────────────────────────────
+  $response = Invoke-RestMethod -Uri "https://api.example.com/users?active=true&role=admin"
+
+  # Or build the URI cleanly:
+  $baseUri = "https://api.example.com/users"
+  $query   = "?active=true&role=admin"
+  $response = Invoke-RestMethod -Uri ($baseUri + $query)
+
+─────────────────────────────
+POST REQUEST WITH JSON BODY
+─────────────────────────────
+  $newUser = @{
+      name  = "Ada Lovelace"
+      email = "ada@example.com"
+      role  = "developer"
+  }
+
+  $response = Invoke-RestMethod `
+      -Uri    "https://api.example.com/users" `
+      -Method POST `
+      -ContentType "application/json" `
+      -Body   ($newUser | ConvertTo-Json)
+
+  Write-Output "Created user with ID: $($response.id)"
+
+─────────────────────────────
+AUTHENTICATION — API KEY IN HEADERS
+─────────────────────────────
+  $headers = @{
+      "Authorization" = "Bearer YOUR_API_KEY_HERE"
+      "Accept"        = "application/json"
+  }
+
+  $response = Invoke-RestMethod `
+      -Uri     "https://api.example.com/protected" `
+      -Headers $headers
+
+─────────────────────────────
+PAGINATION
+─────────────────────────────
+Many APIs return paginated results. Here is a pattern to collect all pages:
+
+  $allUsers = @()
+  $page = 1
+
+  do {
+      $response = Invoke-RestMethod -Uri "https://api.example.com/users?page=$page"
+      $allUsers += $response.data
+      $page++
+  } while ($response.hasNextPage)
+
+  Write-Output "Total users: $($allUsers.Count)"
+
+─────────────────────────────
+ERROR HANDLING WITH API CALLS
+─────────────────────────────
+  try {
+      $user = Invoke-RestMethod `
+          -Uri    "https://api.example.com/users/999" `
+          -ErrorAction Stop
+      return $user
+  }
+  catch {
+      $status = $_.Exception.Response.StatusCode.value__
+      if ($status -eq 404) {
+          Write-Output "User not found (404)"
+      } else {
+          Write-Error "API error ($status): $($_.Exception.Message)"
+      }
+      return $null
+  }
+
+─────────────────────────────
+SAVING RESULTS TO A FILE
+─────────────────────────────
+  $users = Invoke-RestMethod -Uri "https://api.example.com/users"
+
+  # Save as JSON
+  $users | ConvertTo-Json | Out-File "users.json"
+
+  # Save as CSV
+  $users | Select-Object id, name, email | Export-Csv "users.csv" -NoTypeInformation`,
+      quiz: [
+        {
+          question: 'What does Invoke-RestMethod do with a JSON response automatically?',
+          options: [
+            'Saves it to a file',
+            'Parses it into a PowerShell object (PSCustomObject)',
+            'Displays it as a formatted table',
+            'Converts it to XML format',
+          ],
+          answer: 'Parses it into a PowerShell object (PSCustomObject)',
+        },
+        {
+          question: 'To send a POST request with a JSON body, what must you include?',
+          options: [
+            '-Method POST, -ContentType "application/json", and -Body with the JSON string',
+            '-Method POST and -Data with a hashtable',
+            '-Method POST only — PowerShell serialises the body automatically',
+            '-Json with the data — this sets method, content-type, and body automatically',
+          ],
+          answer: '-Method POST, -ContentType "application/json", and -Body with the JSON string',
+        },
+        {
+          question: 'How do you convert a PowerShell hashtable to a JSON string for an API body?',
+          options: [
+            '$hashtable.ToJson()',
+            'JSON.stringify($hashtable)',
+            '$hashtable | ConvertTo-Json',
+            'Format-Json $hashtable',
+          ],
+          answer: '$hashtable | ConvertTo-Json',
+        },
+      ],
+      exercise: {
+        prompt: 'Write a PowerShell script that: (1) calls a GET endpoint at "https://jsonplaceholder.typicode.com/posts/1", (2) outputs the title and body from the response, and (3) handles any errors with try/catch.',
+        starterCode: `# Call the JSONPlaceholder API and display a post
+
+# 1. Make the GET request with error handling:
+
+# 2. Output the post's title:
+
+# 3. Output the post's body:`,
+        solution: `# Call the JSONPlaceholder API and display a post
+
+try {
+    $post = Invoke-RestMethod -Uri "https://jsonplaceholder.typicode.com/posts/1" -ErrorAction Stop
+
+    Write-Output "Title: $($post.title)"
+    Write-Output "Body: $($post.body)"
+}
+catch {
+    Write-Error "Failed to load post: $($_.Exception.Message)"
+}`,
+      },
+    },
   ],
 };
 

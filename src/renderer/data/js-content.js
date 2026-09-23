@@ -775,7 +775,7 @@ loadData();`,
       title: 'Lesson 8: Local Storage',
       content: `The web browser includes a small built-in database called localStorage. It stores text data permanently on the user's computer — it survives page refreshes and browser restarts. This is how websites remember your preferences, saved items, and progress without a server.
 
-WHAT localStorage IS
+WHAT LOCALSTORAGE IS
 localStorage is a key-value store: you save data with a name (key) and a value (always a string). You can store up to about 5–10 MB per domain.
 
 The data lives in the user's browser on their device. It is NOT sent to a server. It is NOT shared between users. It persists until the user clears their browser data, or your code deletes it.
@@ -1047,6 +1047,153 @@ document.addEventListener('keydown', (e) => {
     closeModal(modal, trigger);
   }
 });`,
+      },
+    },
+    {
+      id: 'js-10',
+      title: 'Lesson 10: ES Modules — import and export',
+      content: `ES Modules are the official JavaScript module system. They let you split code across multiple files and explicitly control what each file exposes to others.
+
+─────────────────────────────
+WHY MODULES EXIST
+─────────────────────────────
+Before modules, all JavaScript in a project shared the same global scope. If two files defined a variable called "data", they would collide. Modules solve this by giving each file its own private scope — nothing leaks out unless you explicitly export it.
+
+─────────────────────────────
+EXPORTING — SHARING THINGS FROM A FILE
+─────────────────────────────
+
+NAMED EXPORTS:
+  // utils.js
+  export function formatDate(date) {
+    return date.toLocaleDateString("en-GB");
+  }
+
+  export const MAX_LENGTH = 100;
+
+  export class Validator {
+    isValid(value) { return value.length <= MAX_LENGTH; }
+  }
+
+DEFAULT EXPORT:
+  // user.js
+  export default function createUser(name, email) {
+    return { id: Date.now(), name, email };
+  }
+
+A file can have BOTH named exports and a default export.
+
+─────────────────────────────
+IMPORTING — USING THINGS FROM ANOTHER FILE
+─────────────────────────────
+
+Import named exports (use exact names in curly braces):
+  import { formatDate, MAX_LENGTH } from "./utils.js";
+
+Import the default export (you name it yourself):
+  import createUser from "./user.js";
+
+Import both:
+  import createUser, { formatDate } from "./user.js";
+
+Import everything as a namespace object:
+  import * as utils from "./utils.js";
+  utils.formatDate(new Date());
+
+Rename on import:
+  import { formatDate as fd } from "./utils.js";
+
+─────────────────────────────
+USING MODULES IN HTML
+─────────────────────────────
+Add type="module" to your script tag:
+  <script type="module" src="app.js"></script>
+
+Important facts about module scripts:
+  - They are deferred automatically (run after the HTML is parsed)
+  - They are always in strict mode
+  - They have their own scope (no global pollution)
+  - They can use top-level await
+
+─────────────────────────────
+RE-EXPORTING (BARREL FILES)
+─────────────────────────────
+A common pattern is a barrel file (index.js) that re-exports from multiple files:
+  // components/index.js
+  export { Button } from "./Button.js";
+  export { Modal } from "./Modal.js";
+  export { Accordion } from "./Accordion.js";
+
+  // Now consumers import from one place:
+  import { Button, Modal } from "./components/index.js";`,
+      quiz: [
+        {
+          question: 'What is the difference between a named export and a default export?',
+          options: [
+            'Named exports are faster at runtime; default exports are slower',
+            'A file can have multiple named exports but only one default export',
+            'Default exports must be functions; named exports can be anything',
+            'Named exports require TypeScript; default exports work in plain JavaScript',
+          ],
+          answer: 'A file can have multiple named exports but only one default export',
+        },
+        {
+          question: 'You want to import the default export from "./api.js" and call it "fetchData". What is the correct syntax?',
+          options: [
+            'import { default as fetchData } from "./api.js"',
+            'import fetchData from "./api.js"',
+            'import * as fetchData from "./api.js"',
+            'const fetchData = require("./api.js")',
+          ],
+          answer: 'import fetchData from "./api.js"',
+        },
+        {
+          question: 'What does adding type="module" to a <script> tag do?',
+          options: [
+            'It loads the script from a CDN automatically',
+            'It enables ES module syntax and gives the script its own scope, defers execution, and enables strict mode',
+            'It converts the script to TypeScript before running',
+            'It prevents the script from accessing the DOM',
+          ],
+          answer: 'It enables ES module syntax and gives the script its own scope, defers execution, and enables strict mode',
+        },
+      ],
+      exercise: {
+        prompt: 'Create a mini module system for an accessible notification component. Write the exports for a "notifications.js" file, then write the imports you would use in "app.js".',
+        starterCode: `// notifications.js — write the exports
+
+// Export a function called showNotification(message, type)
+// Export a function called clearNotifications()
+// Export a constant DEFAULT_DURATION = 5000
+// Export a class NotificationQueue as the default export
+
+
+// ─────────────────────────────
+// app.js — write the imports
+
+// Import showNotification and clearNotifications by name
+// Import the default export as "Queue"
+// Import DEFAULT_DURATION by name`,
+        solution: `// notifications.js
+export function showNotification(message, type) {
+  console.log("[" + type + "] " + message);
+}
+
+export function clearNotifications() {
+  console.log("Cleared all notifications");
+}
+
+export const DEFAULT_DURATION = 5000;
+
+export default class NotificationQueue {
+  constructor() { this.items = []; }
+  add(item) { this.items.push(item); }
+}
+
+// ─────────────────────────────
+// app.js
+import Queue from "./notifications.js";
+import { showNotification, clearNotifications, DEFAULT_DURATION } from "./notifications.js";`,
       },
     },
   ],

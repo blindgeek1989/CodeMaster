@@ -1022,6 +1022,158 @@ This is not optional — it is an accessibility requirement.`,
 }`,
       },
     },
+    {
+      id: 'css-10',
+      title: 'Lesson 10: Modern CSS — :has(), Container Queries, and @layer',
+      content: `Three modern CSS features are now supported across all major browsers and are transforming how stylesheets are written: :has(), container queries, and cascade layers. Understanding them makes your CSS more powerful and more maintainable.
+
+─────────────────────────────
+:HAS() — THE PARENT SELECTOR
+─────────────────────────────
+:has() lets you style an element BASED ON ITS CONTENTS — something CSS could not do before.
+
+  /* Style a card differently if it contains an image */
+  .card:has(img) {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+
+  /* Style a label differently if its input is checked */
+  label:has(input:checked) {
+    background-color: #e0f2fe;
+    font-weight: bold;
+  }
+
+  /* Style a form that has an invalid field */
+  form:has(:invalid) {
+    border: 2px solid #dc2626;
+  }
+
+  /* Style nav items that have a nested ul (a dropdown) */
+  nav li:has(ul) > a {
+    font-weight: bold;
+  }
+
+Accessibility use case: style a field wrapper that contains an invalid input:
+  .field:has(input:invalid) .error-message {
+    display: block;
+  }
+
+─────────────────────────────
+CONTAINER QUERIES
+─────────────────────────────
+Media queries respond to the VIEWPORT size. Container queries respond to the SIZE OF THE PARENT ELEMENT — a much more powerful tool for component-based design.
+
+Step 1 — declare a container:
+  .card-wrapper {
+    container-type: inline-size;
+    container-name: card;
+  }
+
+Step 2 — query the container:
+  @container card (min-width: 400px) {
+    .card {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+Now the card layout adapts based on HOW WIDE ITS CONTAINER IS — not the viewport. The same card component can display as a stack in a narrow sidebar and as a horizontal layout in a wide main column, automatically.
+
+This solves a major problem: a responsive card component that always works correctly, regardless of where you drop it on the page.
+
+─────────────────────────────
+CASCADE LAYERS (@LAYER)
+─────────────────────────────
+Cascade layers let you explicitly control the order of CSS specificity — solving the "specificity war" problem in large stylesheets.
+
+  @layer base, components, utilities;
+
+  @layer base {
+    a { color: blue; }
+    button { border: none; }
+  }
+
+  @layer components {
+    .btn { background: #6366f1; color: white; }
+  }
+
+  @layer utilities {
+    .text-center { text-align: center; }
+  }
+
+Rules in LATER layers win, regardless of specificity. Utilities always win over components, which always win over base — no more writing !important to override framework styles.
+
+PRACTICAL USE — IMPORTING THIRD-PARTY STYLES INTO A LAYER:
+  @import "framework.css" layer(framework);
+
+  /* Your styles are outside any layer — they automatically win over the framework */
+  .btn { background: var(--color-primary); }
+
+This means framework updates can never unexpectedly override your styles.`,
+      quiz: [
+        {
+          question: 'What does .form:has(input:invalid) select?',
+          options: [
+            'All inputs that are invalid inside a form',
+            'A form element that contains at least one invalid input',
+            'An invalid input that is inside a form',
+            'A form with an invalid attribute',
+          ],
+          answer: 'A form element that contains at least one invalid input',
+        },
+        {
+          question: 'What is the key advantage of container queries over media queries for component styling?',
+          options: [
+            'Container queries are faster because they do not check the viewport',
+            'Container queries respond to the parent container\'s size, so components adapt correctly wherever they are placed',
+            'Container queries support more CSS properties than media queries',
+            'Container queries allow JavaScript to trigger style changes',
+          ],
+          answer: 'Container queries respond to the parent container\'s size, so components adapt correctly wherever they are placed',
+        },
+        {
+          question: 'In @layer base, components, utilities — if the same property is set in both "base" and "utilities" with equal specificity, which layer wins?',
+          options: [
+            'base — earlier layers always win',
+            'utilities — later layers win regardless of specificity',
+            'Whichever rule appears last in the stylesheet',
+            'The one with higher specificity always wins, regardless of layer order',
+          ],
+          answer: 'utilities — later layers win regardless of specificity',
+        },
+      ],
+      exercise: {
+        prompt: 'Write the CSS to: (1) style a .field div differently if it contains an input that is focused (using :has()), and (2) declare a container called "sidebar" and write a container query that stacks items vertically when the sidebar is narrower than 300px.',
+        starterCode: `/* (1) Use :has() to highlight a field wrapper when its input is focused */
+
+
+/* (2) Declare the sidebar as a container */
+.sidebar {
+
+}
+
+/* Container query: stack items when sidebar < 300px */`,
+        solution: `/* (1) Highlight field wrapper when input is focused */
+.field:has(input:focus) {
+  outline: 2px solid #6366f1;
+  border-radius: 4px;
+}
+
+/* (2) Declare the sidebar as a container */
+.sidebar {
+  container-type: inline-size;
+  container-name: sidebar;
+}
+
+/* Container query: stack items when sidebar < 300px */
+@container sidebar (max-width: 300px) {
+  .sidebar-nav {
+    flex-direction: column;
+  }
+}`,
+      },
+    },
   ],
 };
 

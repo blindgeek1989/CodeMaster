@@ -7,15 +7,24 @@
   <link rel="stylesheet" href="styles/main.css" />
 
   <!-- Module data -->
+  <script src="data/git-content.js"></script>
+  <script src="data/github-content.js"></script>
+  <script src="data/typescript-content.js"></script>
+  <script src="data/async-js-content.js"></script>
+  <script src="data/react-content.js"></script>
+  <script src="data/prompt-engineering-content.js"></script>
   <script src="data/think-programmer-content.js"></script>
   <script src="data/html-content.js"></script>
   <script src="data/css-content.js"></script>
-  <script src="data/css-screenreader-content.js"></script>
   <script src="data/js-content.js"></script>
   <script src="data/python-content.js"></script>
   <script src="data/sql-content.js"></script>
   <script src="data/powershell-content.js"></script>
   <script src="data/aria-content.js"></script>
+  <script src="data/scrum-intro-content.js"></script>
+  <script src="data/scrum-master-content.js"></script>
+  <script src="data/scrum-master-ai-content.js"></script>
+  <script src="data/scrum-exam-prep-content.js"></script>
   <script src="data/glossary-content.js"></script>
 </head>
 <body>
@@ -95,44 +104,63 @@
 
     <!-- ===== Header ===== -->
     <header class="app-header" role="banner">
-      <span class="app-logo" aria-label="CodeMaster">Code<span>Master</span></span>
-      <span class="app-tagline" aria-label="Accessible coding platform">Accessible Coding Platform</span>
-      <span id="app-version-display" class="app-version" aria-label="Application version"></span>
+      <div class="header-brand">
+        <span class="app-logo" aria-label="CodeMaster">Code<span>Master</span></span>
+        <span class="app-tagline" aria-label="Accessible coding platform">Accessible Coding Platform</span>
+        <span id="app-version-display" class="app-version" aria-label="Application version"></span>
+      </div>
+
+      <div class="header-toolbar">
+        <button id="home-btn" class="toolbar-btn" aria-label="Go to home screen">Home</button>
+
+        <div class="header-search" role="search">
+          <label for="lesson-search" class="sr-only">Search lessons</label>
+          <input
+            type="search"
+            id="lesson-search"
+            class="lesson-search-input"
+            placeholder="Search lessons…"
+            autocomplete="off"
+            aria-controls="search-results"
+            aria-autocomplete="list"
+          />
+          <ul
+            id="search-results"
+            class="search-results"
+            role="listbox"
+            aria-label="Search results"
+            hidden
+          ></ul>
+          <p id="search-status" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+        </div>
+
+        <button
+          id="bookmarks-toggle-btn"
+          class="toolbar-btn"
+          aria-expanded="false"
+          aria-controls="bookmarks-panel"
+        >Bookmarks</button>
+
+        <div class="font-size-controls" role="group" aria-label="Text size">
+          <button id="font-decrease" class="font-size-btn" aria-label="Decrease text size">A-</button>
+          <span id="font-size-display" class="font-size-display" aria-live="polite" aria-atomic="true"></span>
+          <button id="font-increase" class="font-size-btn" aria-label="Increase text size">A+</button>
+        </div>
+
+        <button id="glossary-btn" class="toolbar-btn">Glossary</button>
+      </div>
     </header>
 
-    <!-- ===== Sidebar ===== -->
-    <nav class="sidebar" aria-label="Course modules">
-      <p class="sidebar-section-title" aria-hidden="true">Modules</p>
-      <ul class="module-nav" id="module-nav" role="list"></ul>
-
-      <!-- SR Mode Toggle -->
-      <div class="sr-mode-toggle">
-        <label class="sr-mode-label">
-          <input
-            type="checkbox"
-            id="sr-mode-checkbox"
-            aria-describedby="sr-mode-desc"
-          />
-          Screen Reader CSS Mode
-        </label>
-        <p id="sr-mode-desc" class="sr-only-inline">
-          When checked, the CSS module switches to a version focused on what screen reader users need to know about CSS.
-        </p>
-      </div>
-
-      <!-- Font size controls -->
-      <div class="font-size-controls" role="group" aria-label="Text size">
-        <span class="font-size-label" aria-hidden="true">Text size</span>
-        <button id="font-decrease" class="font-size-btn" aria-label="Decrease text size">A−</button>
-        <span id="font-size-display" class="font-size-display" aria-live="polite" aria-atomic="true"></span>
-        <button id="font-increase" class="font-size-btn" aria-label="Increase text size">A+</button>
-      </div>
-
-      <!-- Glossary button -->
-      <button id="glossary-btn" class="glossary-btn">
-        <span aria-hidden="true">📖</span> Glossary
-      </button>
-    </nav>
+    <!-- Bookmarks panel (drops down from header) -->
+    <div
+      id="bookmarks-panel"
+      class="bookmarks-panel"
+      hidden
+      role="region"
+      aria-label="Bookmarks"
+    >
+      <ul id="bookmarks-list" class="bookmarks-list" role="list"></ul>
+    </div>
 
     <!-- ===== Main ===== -->
     <main class="main-content" id="main-content" tabindex="-1">

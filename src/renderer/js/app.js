@@ -832,7 +832,7 @@ function parseAndRenderText(text, container) {
       h.textContent = trimmed;
       container.appendChild(h);
     } else {
-      pendingLines.push(line);
+      pendingLines.push(line.trim());
     }
   }
   flushParagraph();

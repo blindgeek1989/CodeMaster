@@ -385,7 +385,7 @@ body {
 }
 
 .lesson-content .lesson-para {
-  white-space: pre-wrap;
+  white-space: pre-line;
   margin-bottom: 0.75rem;
 }
 

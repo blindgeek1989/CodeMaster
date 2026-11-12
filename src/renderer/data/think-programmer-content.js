@@ -358,14 +358,12 @@ The core of decision-making in programming is the if/then/else structure:
 
   IF some condition is true
     THEN do this
-  ELSE
-    do that instead
+  ELSE do that instead
 
 Everyday example — deciding what to wear:
   IF it is raining outside
     THEN bring an umbrella
-  ELSE
-    leave the umbrella at home
+  ELSE leave the umbrella at home
 
 In code, this looks roughly like:
   if (isRaining) {
@@ -414,8 +412,7 @@ Sometimes you need more than two paths:
     THEN say "It is warm"
   ELSE IF temperature > 10
     THEN say "It is cool"
-  ELSE
-    THEN say "It is cold"
+  ELSE THEN say "It is cold"
 
 THE KEY INSIGHT: any time a program does different things depending on the situation, there is a condition (or several) controlling it.`,
       quiz: [
@@ -732,22 +729,22 @@ Most error messages have the same three parts:
 
 COMMON ERROR TYPES AND WHAT THEY MEAN
 
-SYNTAXERROR
+SYNTAX ERROR
 The code breaks the grammar rules of the language. The program cannot even start.
 Typical message: "Unexpected token" or "Missing )"
 What to do: Go to the line number shown. Look for a missing character — a closing bracket, a comma, a quote mark.
 
-REFERENCEERROR
+REFERENCE ERROR
 The code refers to something that does not exist.
 Typical message: "variableName is not defined"
 What to do: Check the spelling. Check that you created the variable before using it. Check that you are looking in the right place.
 
-TYPEERROR
+TYPE ERROR
 The code tries to do something with the wrong type of value.
 Typical message: "Cannot read properties of null" or "x is not a function"
 What to do: Check what type of value the variable actually holds. It may be null, undefined, or a number when you expected text.
 
-VALUEERROR / RANGEERROR
+VALUE ERROR / RANGE ERROR
 The code uses a value that is outside the allowed range or wrong format.
 Typical message: "Invalid date" or "Maximum call stack size exceeded"
 What to do: Check the values you are passing into functions or calculations.

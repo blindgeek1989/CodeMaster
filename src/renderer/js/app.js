@@ -1876,6 +1876,7 @@ function buildExercise(exercise, lessonTitle, moduleId) {
   resetBtn.addEventListener('click', () => {
     editor.value = steps[currentStep].starterCode;
     solShown = false;
+    attemptCount = 0;
     solBtn.textContent = 'Show solution';
     output.textContent = '';
     output.classList.remove('show', 'success', 'error');

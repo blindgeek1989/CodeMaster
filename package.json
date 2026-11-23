@@ -1,6 +1,6 @@
 {
   "name": "codemaster",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Accessible coding learning platform for screen reader and keyboard users",
   "main": "src/main.js",
   "scripts": {

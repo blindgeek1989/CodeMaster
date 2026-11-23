@@ -21,6 +21,10 @@ const asyncJsModule = {
     'Use Promise.all to load multiple resources simultaneously',
     'Identify the difference between sequential and parallel async execution',
   ],
+  project: {
+    name: 'Live Data Profile Page',
+    description: 'Upgrade the profile page to fetch and display live data asynchronously.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS ASYNC?
@@ -103,11 +107,21 @@ JavaScript's async story has evolved through three stages:
       ],
       exercise: {
         prompt: 'Explain in your own words why a web page would freeze if JavaScript loaded data synchronously. Write 2-3 sentences.',
-        starterCode: `// Why would synchronous network requests freeze the UI?
+        projectStep: 1,
+        projectStepLabel: 'Explain async vs synchronous',
+        starterCode: `// Profile project - step 1
+// Why would synchronous network
+// requests freeze the profile page?
 
 // Explanation:`,
-        solution: `// Explanation:
-// JavaScript runs on a single thread — when it is waiting for a synchronous operation (like a network request), no other code can run. This means the browser cannot respond to user interactions, update the screen, or process any other events. The page appears completely frozen until the synchronous operation finishes, which is a terrible user experience.`,
+        solution: `// Profile project - step 1
+// Explanation:
+// JavaScript runs on one thread.
+// When waiting for a network call,
+// no other code can run - buttons
+// stop responding, the screen
+// freezes, and the page is locked
+// until the request finishes.`,
       },
     },
 
@@ -203,31 +217,51 @@ WHAT THIS MEANS IN PRACTICE
       ],
       exercise: {
         prompt: 'Predict the output of this code. Write the output order and briefly explain why each line runs when it does.',
-        starterCode: `// Predict the output of this code:
+        projectStep: 2,
+        projectStepLabel: 'Predict event loop output',
+        starterCode: `// Profile project - step 2
+// Predict the output:
 
 console.log("start");
 
-setTimeout(() => console.log("timeout 1"), 100);
-setTimeout(() => console.log("timeout 2"), 0);
+setTimeout(
+  () => console.log("timeout 1"),
+  100
+);
+setTimeout(
+  () => console.log("timeout 2"),
+  0
+);
 
-Promise.resolve().then(() => console.log("promise 1"));
-Promise.resolve().then(() => console.log("promise 2"));
+Promise.resolve().then(
+  () => console.log("promise 1")
+);
+Promise.resolve().then(
+  () => console.log("promise 2")
+);
 
 console.log("end");
 
-// Predicted output (write in order):
+// Predicted output:
 // 1.
 // 2.
 // 3.
 // 4.
 // 5.
 // 6.`,
-        solution: `// 1. start       — synchronous, runs immediately
-// 2. end         — synchronous, runs before any async callbacks
-// 3. promise 1   — microtask queue, runs before any setTimeout callbacks
-// 4. promise 2   — microtask queue, all microtasks drain before tasks
-// 5. timeout 2   — 0ms delay fires before 100ms delay
-// 6. timeout 1   — 100ms delay fires last`,
+        solution: `// Profile project - step 2
+// 1. start
+//    synchronous, runs immediately
+// 2. end
+//    synchronous, before callbacks
+// 3. promise 1
+//    microtask - before setTimeout
+// 4. promise 2
+//    all microtasks drain first
+// 5. timeout 2
+//    0ms fires before 100ms
+// 6. timeout 1
+//    100ms fires last`,
       },
     },
 
@@ -327,25 +361,34 @@ These are not "async" in the Promise sense — they are just the function-passin
       ],
       exercise: {
         prompt: 'Write a function "delayedDouble" that takes a number and a callback. After 500ms, it calls the callback with double the number. Then call it and log the result.',
-        starterCode: `// Write delayedDouble using a callback
+        projectStep: 3,
+        projectStepLabel: 'Write a callback function',
+        starterCode: `// Profile project - step 3
+// Write a callback function
 
-function delayedDouble(number, callback) {
-  // After 500ms, call callback with number * 2
-
+function delayedDouble(
+  number, callback
+) {
+  // After 500ms call callback
+  // with number * 2
 }
 
-// Call it and log the result
 delayedDouble(21, function(result) {
-  console.log(result); // should log 42 after 500ms
+  // should log 42 after 500ms
+  console.log(result);
 });`,
-        solution: `function delayedDouble(number, callback) {
+        solution: `// Profile project - step 3
+function delayedDouble(
+  number, callback
+) {
   setTimeout(() => {
     callback(number * 2);
   }, 500);
 }
 
 delayedDouble(21, function(result) {
-  console.log(result); // 42 (after 500ms)
+  console.log(result);
+  // 42 (after 500ms)
 });`,
       },
     },
@@ -453,51 +496,61 @@ These are useful for testing and for wrapping non-Promise values in a consistent
       ],
       exercise: {
         prompt: 'Convert this callback-based function to return a Promise instead. The function simulates loading a user by ID.',
-        starterCode: `// BEFORE — callback style:
-function loadUserCallback(id, callback) {
+        projectStep: 4,
+        projectStepLabel: 'Convert a callback to a Promise',
+        starterCode: `// Profile project - step 4
+// Convert callback to Promise
+
+// BEFORE - callback style:
+function loadProfileCb(id, cb) {
   setTimeout(() => {
     if (id <= 0) {
-      callback(new Error("Invalid ID"), null);
+      cb(new Error("Invalid ID"), null);
     } else {
-      callback(null, { id, name: "User " + id });
+      cb(null, { id, name: id + "" });
     }
   }, 300);
 }
 
-// AFTER — rewrite as a Promise:
-function loadUser(id) {
-  return new Promise((resolve, reject) => {
-    // your code here
-  });
+// AFTER - rewrite as a Promise:
+function loadProfile(id) {
+  return new Promise(
+    (resolve, reject) => {
+      // your code here
+    }
+  );
 }
 
-// Test it:
-loadUser(5)
-  .then(user => console.log(user.name))  // "User 5"
-  .catch(err => console.error(err.message));
-
-loadUser(-1)
-  .then(user => console.log(user.name))
-  .catch(err => console.error(err.message));  // "Invalid ID"`,
-        solution: `function loadUser(id) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
+loadProfile(5)
+  .then(p => console.log(p.name))
+  .catch(e => console.error(e.message));
+loadProfile(-1)
+  .catch(e => console.error(e.message));`,
+        solution: `// Profile project - step 4
+function loadProfile(id) {
+  return new Promise(
+    (resolve, reject) => {
       if (id <= 0) {
-        reject(new Error("Invalid ID"));
-      } else {
-        resolve({ id, name: "User " + id });
+        reject(
+          new Error("Invalid ID")
+        );
+        return;
       }
-    }, 300);
-  });
+      resolve({
+        id,
+        name: "Profile " + id,
+      });
+    }
+  );
 }
 
-loadUser(5)
-  .then(user => console.log(user.name))  // User 5
-  .catch(err => console.error(err.message));
-
-loadUser(-1)
-  .then(user => console.log(user.name))
-  .catch(err => console.error(err.message));  // Invalid ID`,
+loadProfile(5)
+  .then(p => console.log(p.name))
+  // Profile 5
+  .catch(e => console.error(e.message));
+loadProfile(-1)
+  .catch(e => console.error(e.message));
+  // Invalid ID`,
       },
     },
 
@@ -617,30 +670,44 @@ Use parallel when operations are independent.`,
       ],
       exercise: {
         prompt: 'Rewrite this Promise chain using async/await syntax. Keep the same error handling behaviour.',
-        starterCode: `// BEFORE — Promise chain:
+        projectStep: 5,
+        projectStepLabel: 'Rewrite with async/await',
+        starterCode: `// Profile project - step 5
+// Rewrite as async/await
+
+// BEFORE - Promise chain:
 function getUserProfile(userId) {
   return fetchUser(userId)
     .then(user => {
       return fetchAvatar(user.avatarId)
-        .then(avatar => ({ ...user, avatar }));
+        .then(avatar =>
+          ({ ...user, avatar })
+        );
     })
     .catch(error => {
-      console.error("Failed to load profile:", error.message);
+      console.error(
+        "Failed:", error.message
+      );
       return null;
     });
 }
 
-// AFTER — rewrite using async/await:
+// AFTER - rewrite using async/await:
 async function getUserProfile(userId) {
   // your code here
 }`,
-        solution: `async function getUserProfile(userId) {
+        solution: `// Profile project - step 5
+async function getUserProfile(userId) {
   try {
-    const user = await fetchUser(userId);
-    const avatar = await fetchAvatar(user.avatarId);
+    const user =
+      await fetchUser(userId);
+    const avatar =
+      await fetchAvatar(user.avatarId);
     return { ...user, avatar };
   } catch (error) {
-    console.error("Failed to load profile:", error.message);
+    console.error(
+      "Failed:", error.message
+    );
     return null;
   }
 }`,
@@ -759,32 +826,42 @@ Cancel a fetch request (useful for cleanup when components unmount):
       ],
       exercise: {
         prompt: 'Write an async function "searchUsers" that fetches users from "/api/users?query=X" where X is a parameter. Handle the case where the response is not OK, and return the parsed JSON array.',
-        starterCode: `// Write searchUsers using fetch and async/await
+        projectStep: 6,
+        projectStepLabel: 'Fetch profile data from an API',
+        starterCode: `// Profile project - step 6
+// Fetch profile data from an API
 
 async function searchUsers(query) {
-  // Build the URL with the query parameter
-  // Check response.ok and throw if not
+  // Build URL with the query param
+  // Check response.ok, throw if not
   // Return the parsed JSON
 }
 
-// Test call:
+// Test:
 searchUsers("ada")
-  .then(users => console.log(users))
-  .catch(err => console.error(err.message));`,
-        solution: `async function searchUsers(query) {
-  const url = \`/api/users?query=\${encodeURIComponent(query)}\`;
+  .then(u => console.log(u))
+  .catch(e => console.error(e.message));`,
+        solution: `// Profile project - step 6
+async function searchUsers(query) {
+  const encoded =
+    encodeURIComponent(query);
+  const url =
+    '/api/users?query=' + encoded;
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(\`Search failed: \${response.status} \${response.statusText}\`);
+    throw new Error(
+      'Search failed: ' +
+      response.status
+    );
   }
 
   return response.json();
 }
 
 searchUsers("ada")
-  .then(users => console.log(users))
-  .catch(err => console.error(err.message));`,
+  .then(u => console.log(u))
+  .catch(e => console.error(e.message));`,
       },
     },
 
@@ -896,33 +973,50 @@ USE WHEN: you have multiple fallbacks and want the first one that succeeds.`,
       ],
       exercise: {
         prompt: 'Write an async function "loadDashboard" that loads three pieces of data in parallel — user, notifications, and recentActivity — using Promise.all. Then return an object combining all three.',
-        starterCode: `// These functions return Promises:
+        projectStep: 7,
+        projectStepLabel: 'Load profile data in parallel',
+        starterCode: `// Profile project - step 7
+// These functions return Promises:
 // fetchUser(id) -> { id, name }
-// fetchNotifications(userId) -> [notification, ...]
-// fetchRecentActivity(userId) -> [activity, ...]
+// fetchNotifications(id) -> [...]
+// fetchRecentActivity(id) -> [...]
 
 async function loadDashboard(userId) {
-  // Load all three in parallel with Promise.all
-  // Return { user, notifications, recentActivity }
+  // Use Promise.all to load all three
+  // Return { user, notifications,
+  //          recentActivity }
 }
 
-loadDashboard(1).then(dashboard => {
-  console.log("User:", dashboard.user.name);
-  console.log("Notifications:", dashboard.notifications.length);
+loadDashboard(1).then(d => {
+  console.log("User:", d.user.name);
+  console.log(
+    "Alerts:", d.notifications.length
+  );
 });`,
-        solution: `async function loadDashboard(userId) {
-  const [user, notifications, recentActivity] = await Promise.all([
+        solution: `// Profile project - step 7
+async function loadDashboard(userId) {
+  const [
+    user,
+    notifications,
+    recentActivity,
+  ] = await Promise.all([
     fetchUser(userId),
     fetchNotifications(userId),
     fetchRecentActivity(userId),
   ]);
 
-  return { user, notifications, recentActivity };
+  return {
+    user,
+    notifications,
+    recentActivity,
+  };
 }
 
-loadDashboard(1).then(dashboard => {
-  console.log("User:", dashboard.user.name);
-  console.log("Notifications:", dashboard.notifications.length);
+loadDashboard(1).then(d => {
+  console.log("User:", d.user.name);
+  console.log(
+    "Alerts:", d.notifications.length
+  );
 });`,
       },
     },

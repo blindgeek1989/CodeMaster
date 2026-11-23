@@ -23,6 +23,10 @@ const nextjsModule = {
     'Set an environment variable and read it inside a Next.js page',
     'Deploy a Next.js app to Vercel from a GitHub repository',
   ],
+  project: {
+    name: 'Next.js Portfolio Site',
+    description: 'Deploy the React profile page as a server-rendered Next.js site.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS NEXT.JS?
@@ -141,7 +145,10 @@ For anything beyond a personal project or prototype, Next.js is the standard cho
       ],
       exercise: {
         prompt: 'No code to run yet. In the text area below, write a comment describing which rendering strategy you would choose for each scenario and why: (1) a company blog, (2) a stock price ticker, (3) a user account settings page.',
-        starterCode: `// Choose SSG, SSR, or CSR for each and explain why:
+        projectStep: 1,
+        projectStepLabel: 'Choose a rendering strategy',
+        starterCode: `// Profile project - step 1
+// Choose SSG, SSR, or CSR and why:
 
 // (1) Company blog:
 //
@@ -149,20 +156,23 @@ For anything beyond a personal project or prototype, Next.js is the standard cho
 // (2) Stock price ticker:
 //
 
-// (3) User account settings page:
+// (3) User account settings:
 //`,
-        solution: `// (1) Company blog: SSG
-//     Blog posts rarely change. Pre-rendering at build time gives the
-//     fastest load and best SEO with no per-request cost.
+        solution: `// Profile project - step 1
+
+// (1) Company blog: SSG
+//   Posts rarely change. Pre-built
+//   HTML gives fastest load + SEO.
 
 // (2) Stock price ticker: CSR
-//     Prices change every second. CSR lets the browser poll or
-//     subscribe to live data without a full page reload.
+//   Prices change every second.
+//   CSR polls for live data.
 
-// (3) User account settings page: SSR (or CSR behind auth)
-//     Settings are personalised per user — SSR fetches the user's
-//     data on each request and renders fresh HTML. Alternatively,
-//     CSR behind a login check is also fine since SEO is not needed.`,
+// (3) User account settings: SSR
+//   Data is personalised per user.
+//   SSR fetches fresh HTML on each
+//   request. CSR behind auth also
+//   works since SEO is not needed.`,
       },
     },
 
@@ -348,7 +358,10 @@ Create pages/404.js to customise the not-found page:
       ],
       exercise: {
         prompt: 'Write the file structure (as comments) for a Next.js pages/ directory that has: a home page, an about page, a blog index page, individual blog post pages at /blog/[slug], and a 404 page. Then write the BlogPost component that reads the slug from the router and renders it in an <h1>.',
-        starterCode: `// File structure:
+        projectStep: 2,
+        projectStepLabel: 'Build the portfolio page routes',
+        starterCode: `// Profile project - step 2
+// File structure:
 // pages/
 //   ...
 
@@ -356,16 +369,16 @@ Create pages/404.js to customise the not-found page:
 import { useRouter } from 'next/router';
 
 export default function BlogPost() {
-  // Read the slug from the router and render it
+  // Read slug, render it in h1
 }`,
-        solution: `// File structure:
+        solution: `// Profile project - step 2
 // pages/
-//   index.js          → /
-//   about.js          → /about
-//   404.js            → (custom 404)
+//   index.js      -> /
+//   about.js      -> /about
+//   404.js        -> (custom 404)
 //   blog/
-//     index.js        → /blog
-//     [slug].js       → /blog/:slug
+//     index.js    -> /blog
+//     [slug].js   -> /blog/:slug
 
 // pages/blog/[slug].js
 import { useRouter } from 'next/router';
@@ -373,11 +386,10 @@ import { useRouter } from 'next/router';
 export default function BlogPost() {
   const router = useRouter();
   const { slug } = router.query;
-
   return (
     <main>
       <h1>{slug}</h1>
-      <p>Content for post: {slug}</p>
+      <p>Post: {slug}</p>
     </main>
   );
 }`,
@@ -535,48 +547,66 @@ Do NOT use SSG when:
       ],
       exercise: {
         prompt: 'Write a complete Next.js page at pages/users/[id].js that uses getStaticPaths and getStaticProps to pre-render user profiles. Fetch the list of users from https://jsonplaceholder.typicode.com/users for paths, and fetch individual user data for props.',
-        starterCode: `// pages/users/[id].js
+        projectStep: 3,
+        projectStepLabel: 'Pre-render the portfolio with static props',
+        starterCode: `// Profile project - step 3
+// pages/users/[id].js
 
-export default function UserProfile({ user }) {
-  // Render user.name, user.email, user.company.name
+export default function UserProfile(
+  { user }
+) {
+  // Render user.name and user.email
 }
 
+const BASE =
+  'https://jsonplaceholder.typicode.com';
+
 export async function getStaticPaths() {
-  // Fetch users and return paths array
+  // Fetch BASE/users, return paths
   // Use fallback: false
 }
 
-export async function getStaticProps({ params }) {
-  // Fetch single user by params.id
+export async function getStaticProps(
+  { params }
+) {
+  // Fetch BASE/users/:id
   // Return { props: { user } }
 }`,
-        solution: `// pages/users/[id].js
+        solution: `// Profile project - step 3
+// pages/users/[id].js
 
-export default function UserProfile({ user }) {
+const BASE =
+  'https://jsonplaceholder.typicode.com';
+
+export default function UserProfile(
+  { user }
+) {
   return (
     <main>
       <h1>{user.name}</h1>
       <p>Email: {user.email}</p>
-      <p>Company: {user.company.name}</p>
     </main>
   );
 }
 
 export async function getStaticPaths() {
-  const res   = await fetch('https://jsonplaceholder.typicode.com/users');
+  const res = await fetch(
+    BASE + '/users'
+  );
   const users = await res.json();
-
-  const paths = users.map(user => ({
-    params: { id: String(user.id) },
+  const paths = users.map(u => ({
+    params: { id: String(u.id) },
   }));
-
   return { paths, fallback: false };
 }
 
-export async function getStaticProps({ params }) {
-  const res  = await fetch(\`https://jsonplaceholder.typicode.com/users/\${params.id}\`);
+export async function getStaticProps(
+  { params }
+) {
+  const res = await fetch(
+    BASE + '/users/' + params.id
+  );
   const user = await res.json();
-
   return { props: { user } };
 }`,
       },
@@ -715,49 +745,73 @@ This gives you a fast first render with SSR plus live updates via client-side po
         },
       ],
       exercise: {
-        prompt: 'Write a getServerSideProps function for a /search page that reads the "q" query parameter from the URL (/search?q=javascript) and fetches matching posts from https://jsonplaceholder.typicode.com/posts. Pass the query string and results as props.',
-        starterCode: `// pages/search.js
+        prompt: 'Write a getServerSideProps function for a /search page that reads the "q" query parameter from the URL and fetches matching posts from jsonplaceholder. Pass the query string and results as props.',
+        projectStep: 4,
+        projectStepLabel: 'Add server-side profile rendering',
+        starterCode: `// Profile project - step 4
+// pages/search.js
 
-export default function SearchResults({ query, posts }) {
+const BASE =
+  'https://jsonplaceholder.typicode.com';
+
+export default function SearchResults(
+  { query, posts }
+) {
   return (
     <main>
       <h1>Results for: {query}</h1>
       <ul>
-        {posts.map(p => <li key={p.id}>{p.title}</li>)}
+        {posts.map(p => (
+          <li key={p.id}>{p.title}</li>
+        ))}
       </ul>
     </main>
   );
 }
 
-export async function getServerSideProps(context) {
-  // 1. Read context.query.q (default to empty string if missing)
-  // 2. Fetch posts from the API
-  // 3. Filter posts whose title includes the query (case-insensitive)
+export async function getServerSideProps(
+  context
+) {
+  // 1. Read context.query.q
+  // 2. Fetch BASE/posts
+  // 3. Filter by query
   // 4. Return { props: { query, posts } }
 }`,
-        solution: `// pages/search.js
+        solution: `// Profile project - step 4
+// pages/search.js
 
-export default function SearchResults({ query, posts }) {
+const BASE =
+  'https://jsonplaceholder.typicode.com';
+
+export default function SearchResults(
+  { query, posts }
+) {
   return (
     <main>
       <h1>Results for: {query}</h1>
       <ul>
-        {posts.map(p => <li key={p.id}>{p.title}</li>)}
+        {posts.map(p => (
+          <li key={p.id}>{p.title}</li>
+        ))}
       </ul>
     </main>
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(
+  context
+) {
   const query = context.query.q || '';
-
-  const res   = await fetch('https://jsonplaceholder.typicode.com/posts');
-  const all   = await res.json();
-
+  const res = await fetch(
+    BASE + '/posts'
+  );
+  const all = await res.json();
   const posts = query
-    ? all.filter(p => p.title.toLowerCase().includes(query.toLowerCase()))
+    ? all.filter(p =>
+        p.title.toLowerCase()
+          .includes(query.toLowerCase())
+      )
     : all.slice(0, 10);
-
   return { props: { query, posts } };
 }`,
       },
@@ -924,56 +978,53 @@ IMPORTANT NOTES
         },
       ],
       exercise: {
-        prompt: 'Write a Next.js API route at pages/api/todos/[id].js that handles GET (return the todo), PUT (update it), and DELETE (remove it). Use a simple in-memory array as the data store. Return 405 for unsupported methods and 404 if the id is not found.',
-        starterCode: `// pages/api/todos/[id].js
+        prompt: 'Write a Next.js API route at pages/api/contact.js that handles POST requests (save a message with name and email) and returns 405 for other methods. Store messages in an in-memory array.',
+        projectStep: 5,
+        projectStepLabel: 'Create a contact form API route',
+        starterCode: `// Profile project - step 5
+// pages/api/contact.js
 
-// Simple in-memory store (resets on server restart)
-const todos = [
-  { id: 1, text: 'Learn Next.js', done: false },
-  { id: 2, text: 'Build an app', done: false },
-];
+const messages = [];
 
-export default function handler(req, res) {
-  const id   = parseInt(req.query.id);
-  const todo = todos.find(t => t.id === id);
+export default function handler(
+  req, res
+) {
+  if (req.method === 'POST') {
+    // Read name, email from req.body
+    // 400 if name or email missing
+    // Push to messages, return 201
+  }
 
-  // Handle 404 if not found
-
-  // Handle GET, PUT, DELETE
-  // Return 405 for other methods
+  res.setHeader('Allow', ['POST']);
+  res.status(405).json({
+    error: 'Method not allowed',
+  });
 }`,
-        solution: `// pages/api/todos/[id].js
+        solution: `// Profile project - step 5
+// pages/api/contact.js
 
-const todos = [
-  { id: 1, text: 'Learn Next.js', done: false },
-  { id: 2, text: 'Build an app', done: false },
-];
+const messages = [];
 
-export default function handler(req, res) {
-  const id    = parseInt(req.query.id);
-  const index = todos.findIndex(t => t.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Todo not found' });
+export default function handler(
+  req, res
+) {
+  if (req.method === 'POST') {
+    const { name, email } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({
+        error: 'Missing name or email',
+      });
+    }
+    messages.push({ name, email });
+    return res.status(201).json({
+      message: 'Received',
+    });
   }
 
-  if (req.method === 'GET') {
-    return res.status(200).json(todos[index]);
-  }
-
-  if (req.method === 'PUT') {
-    const { text, done } = req.body;
-    todos[index] = { ...todos[index], ...(text !== undefined && { text }), ...(done !== undefined && { done }) };
-    return res.status(200).json(todos[index]);
-  }
-
-  if (req.method === 'DELETE') {
-    todos.splice(index, 1);
-    return res.status(200).json({ message: 'Deleted' });
-  }
-
-  res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
-  res.status(405).json({ error: \`Method \${req.method} not allowed\` });
+  res.setHeader('Allow', ['POST']);
+  res.status(405).json({
+    error: 'Method not allowed',
+  });
 }`,
       },
     },
@@ -1153,60 +1204,67 @@ The fetch cache option controls the rendering strategy per-request, not per-page
         },
       ],
       exercise: {
-        prompt: 'Write the root layout (app/layout.js) for an accessible Next.js app. It should set the page lang, include a skip link, a nav with two links (Home and About), and a main landmark. Then write app/page.js as a Server Component that fetches the first 3 posts from https://jsonplaceholder.typicode.com/posts?_limit=3 and renders them.',
-        starterCode: `// app/layout.js
+        prompt: 'Write the root App Router layout (app/layout.js) for the portfolio site with a skip link, nav (Home and About), and main landmark. Then write app/page.js as a Server Component that shows a heading and a short bio.',
+        projectStep: 6,
+        projectStepLabel: 'Build the App Router layout',
+        starterCode: `// Profile project - step 6
+// app/layout.js
 export const metadata = {
-  title: 'My App',
+  title: 'Portfolio',
 };
 
-export default function RootLayout({ children }) {
-  // Include: lang="en", skip link, nav with Home and About, <main>
+export default function RootLayout(
+  { children }
+) {
+  // lang="en", skip link
+  // nav: Home + About links
+  // <main id="main">
 }
 
 // app/page.js
-// Server Component — fetch posts and render a list
-export default async function HomePage() {
-
+// Server Component
+export default async function Home() {
+  // Return an <h1> with your name
+  // and a short bio paragraph
 }`,
-        solution: `// app/layout.js
+        solution: `// Profile project - step 6
+// app/layout.js
 export const metadata = {
-  title: 'My App',
+  title: 'Portfolio',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout(
+  { children }
+) {
   return (
     <html lang="en">
       <body>
-        <a href="#main-content" className="skip-link">
+        <a
+          href="#main"
+          className="skip-link"
+        >
           Skip to main content
         </a>
         <header>
-          <nav aria-label="Main navigation">
+          <nav aria-label="Main">
             <a href="/">Home</a>
             <a href="/about">About</a>
           </nav>
         </header>
-        <main id="main-content">{children}</main>
+        <main id="main">
+          {children}
+        </main>
       </body>
     </html>
   );
 }
 
 // app/page.js
-export default async function HomePage() {
-  const res   = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=3', {
-    cache: 'force-cache',
-  });
-  const posts = await res.json();
-
+export default async function Home() {
   return (
     <section>
-      <h1>Latest Posts</h1>
-      <ul>
-        {posts.map(post => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
+      <h1>Ada Lovelace</h1>
+      <p>Mathematician and writer.</p>
     </section>
   );
 }`,
@@ -1378,43 +1436,56 @@ CHECKLIST BEFORE DEPLOYING
         },
       ],
       exercise: {
-        prompt: 'Set up environment variable usage for a Next.js project. Write: (1) a .env.local file with a server-only DATABASE_URL and a public NEXT_PUBLIC_APP_NAME, (2) an API route that reads DATABASE_URL, and (3) a page component that reads NEXT_PUBLIC_APP_NAME. Add a comment explaining why each variable is or is not prefixed.',
-        starterCode: `// .env.local
-// Add your two environment variables here
+        prompt: 'Set up environment variables for the portfolio site. Write a .env.local with a server-only CONTACT_EMAIL and a public NEXT_PUBLIC_SITE_NAME. Write an API route that reads CONTACT_EMAIL and a page that reads NEXT_PUBLIC_SITE_NAME.',
+        projectStep: 7,
+        projectStepLabel: 'Configure and deploy the portfolio',
+        starterCode: `// Profile project - step 7
 
-// pages/api/db-status.js
-export default function handler(req, res) {
-  // Read DATABASE_URL and return whether it is configured (not the value!)
+// .env.local
+// Add two env vars here:
+// CONTACT_EMAIL (server-only)
+// NEXT_PUBLIC_SITE_NAME (public)
+
+// pages/api/contact-info.js
+export default function handler(
+  req, res
+) {
+  // Read CONTACT_EMAIL
+  // Return whether it is configured
+  // (never expose the actual value)
 }
 
 // pages/index.js
 export default function Home() {
-  // Read and display NEXT_PUBLIC_APP_NAME
+  // Read NEXT_PUBLIC_SITE_NAME
+  // Display it in an <h1>
 }`,
-        solution: `// .env.local
-// No NEXT_PUBLIC_ prefix — stays on the server only, never in the browser bundle
-// DATABASE_URL=postgresql://user:password@localhost/mydb
-//
-// NEXT_PUBLIC_ prefix — safe to expose in the browser (it is not a secret)
-// NEXT_PUBLIC_APP_NAME=My Awesome App
+        solution: `// Profile project - step 7
 
-// pages/api/db-status.js
-export default function handler(req, res) {
-  // process.env.DATABASE_URL is available here (server-side)
-  // We return only whether it is set — never expose the actual connection string
-  const configured = Boolean(process.env.DATABASE_URL);
-  res.status(200).json({ databaseConfigured: configured });
+// .env.local
+// Server-only - never sent to browser
+// CONTACT_EMAIL=ada@example.com
+//
+// Public - safe to expose
+// NEXT_PUBLIC_SITE_NAME=Ada Portfolio
+
+// pages/api/contact-info.js
+export default function handler(
+  req, res
+) {
+  const configured =
+    Boolean(process.env.CONTACT_EMAIL);
+  res.status(200).json({ configured });
 }
 
 // pages/index.js
 export default function Home() {
-  // NEXT_PUBLIC_ variables are available in the browser because
-  // Next.js replaces them with their values at build time
-  const appName = process.env.NEXT_PUBLIC_APP_NAME;
+  const site =
+    process.env.NEXT_PUBLIC_SITE_NAME;
 
   return (
     <main>
-      <h1>Welcome to {appName}</h1>
+      <h1>{site}</h1>
     </main>
   );
 }`,

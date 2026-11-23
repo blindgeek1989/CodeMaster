@@ -20,4 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('update-downloaded', (_e, info) => cb(info)),
   onUpdateError: (cb) =>
     ipcRenderer.on('update-error', (_e, msg) => cb(msg)),
+
+  // Open a URL in the system default browser
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
 });

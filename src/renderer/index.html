@@ -152,6 +152,8 @@
         </div>
 
         <button id="glossary-btn" class="toolbar-btn">Glossary</button>
+        <button id="feedback-btn" class="toolbar-btn" aria-label="Send feedback or report a bug">Feedback</button>
+        <button id="help-btn" class="toolbar-btn" aria-label="Help and support">Help</button>
       </div>
     </header>
 
@@ -171,6 +173,89 @@
       <!-- Content is loaded dynamically by app.js -->
     </main>
 
+  </div>
+
+  <!-- ===== Feedback modal ===== -->
+  <div
+    id="feedback-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feedback-modal-heading"
+    hidden
+  >
+    <div class="modal-dialog">
+      <h2 id="feedback-modal-heading">Send Feedback</h2>
+      <p>Submit a bug report or feature request on GitHub. Your browser will open with the form pre-filled.</p>
+
+      <form id="feedback-form" novalidate>
+        <div class="form-field">
+          <label for="feedback-type">Feedback type</label>
+          <select id="feedback-type">
+            <option value="bug">Bug report</option>
+            <option value="feature">Feature request</option>
+            <option value="general">General feedback</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="feedback-title">Title (required)</label>
+          <input
+            id="feedback-title"
+            type="text"
+            required
+            aria-describedby="feedback-title-hint"
+            placeholder="Brief description of the issue or idea"
+          />
+          <p id="feedback-title-hint" class="field-hint">Keep it short and specific.</p>
+          <p id="feedback-title-error" role="alert" class="field-error" hidden></p>
+        </div>
+
+        <div class="form-field">
+          <label for="feedback-body">Details (optional)</label>
+          <textarea
+            id="feedback-body"
+            rows="5"
+            placeholder="Steps to reproduce, expected behaviour, what you would like to see..."
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Open on GitHub</button>
+          <button type="button" id="btn-close-feedback">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Help modal ===== -->
+  <div
+    id="help-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="help-modal-heading"
+    hidden
+  >
+    <div class="modal-dialog">
+      <h2 id="help-modal-heading">Help &amp; Support</h2>
+      <p>Need help with CodeMaster? Reach out directly — your message goes straight to the developer's inbox.</p>
+
+      <ul class="help-links">
+        <li>
+          <strong>Email support:</strong>
+          <a id="help-email-link" href="#">blindgeek1989@gmail.com</a>
+        </li>
+        <li>
+          <strong>GitHub:</strong>
+          <a id="help-github-link" href="#">View repository, report issues, and read the wiki</a>
+        </li>
+      </ul>
+
+      <p class="field-hint">When emailing, include the module name, lesson title, and a description of the problem.</p>
+
+      <button id="btn-close-help" class="btn-primary">Close</button>
+    </div>
   </div>
 
   <script src="js/app.js"></script>

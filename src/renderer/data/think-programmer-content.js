@@ -16,6 +16,10 @@ const thinkProgrammerModule = {
     'Explain variables, conditions, and loops without writing a single line of code',
     'Read an error message and identify what it is telling you to fix',
   ],
+  project: {
+    name: 'Problem-Solving Journal',
+    description: 'Build a journal documenting your problem-solving process for 9 real challenges.',
+  },
   lessons: [
     {
       id: 'think-1',
@@ -85,7 +89,30 @@ THE KEY INSIGHT: programming is a conversation with a very precise, very fast, v
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Journal entry 1: Instructions',
+        prompt: 'Write step-by-step instructions for making a cup of tea. Write exactly 7 steps. Each step must be precise enough that a robot could follow it without any extra knowledge.',
+        starterCode: `// Journal Entry 1: Instructions
+// Write 7 steps to make a cup of tea.
+// Be precise -- nothing assumed.
+
+Step 1:
+Step 2:
+Step 3:
+Step 4:
+Step 5:
+Step 6:
+Step 7:`,
+        solution: `// Journal Entry 1: Instructions
+Step 1: Boil water in the kettle.
+Step 2: Place a teabag in a mug.
+Step 3: Pour boiling water into mug.
+Step 4: Wait 3 minutes to brew.
+Step 5: Remove and discard the teabag.
+Step 6: Add milk and stir if desired.
+Step 7: Check temp before drinking.`,
+      },
     },
     {
       id: 'think-2',
@@ -176,7 +203,30 @@ If you are stuck on a programming problem, the fix is almost always the same: yo
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Journal entry 2: Decompose a problem',
+        prompt: 'Break the goal "build a website" into 5 smaller sub-problems. Each sub-problem should be one clear, actionable task that could stand alone.',
+        starterCode: `// Journal Entry 2: Decompose a Problem
+// Break "build a website" into
+// 5 smaller sub-problems.
+
+Sub-problem 1:
+Sub-problem 2:
+Sub-problem 3:
+Sub-problem 4:
+Sub-problem 5:`,
+        solution: `// Journal Entry 2: Decompose a Problem
+Sub-problem 1: Plan content and
+  page structure.
+Sub-problem 2: Write HTML markup
+  for each page.
+Sub-problem 3: Style pages with CSS.
+Sub-problem 4: Add interactivity
+  with JavaScript.
+Sub-problem 5: Test on devices
+  and fix any issues found.`,
+      },
     },
     {
       id: 'think-3',
@@ -255,7 +305,31 @@ Before you code, run through your algorithm step by step in your head. Ask: "If 
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Journal entry 3: Write an algorithm',
+        prompt: 'Write a pseudocode algorithm that checks whether a number is odd or even. Your algorithm should work as a reusable function that takes a number as input and returns "odd" or "even".',
+        starterCode: `// Journal Entry 3: Algorithm
+// Write pseudocode to check if
+// a number is odd or even.
+
+FUNCTION isOddOrEven(number):
+  IF ...:
+    RETURN "even"
+  ELSE:
+    RETURN "odd"`,
+        solution: `// Journal Entry 3: Algorithm
+FUNCTION isOddOrEven(number):
+  IF number divided by 2 has
+    no remainder:
+    RETURN "even"
+  ELSE:
+    RETURN "odd"
+
+// Test your function:
+// isOddOrEven(4) -- returns "even"
+// isOddOrEven(7) -- returns "odd"`,
+      },
     },
     {
       id: 'think-4',
@@ -346,7 +420,54 @@ Without variables, a program could not remember anything. Every piece of informa
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Journal entry 4: Identify variables',
+        prompt: 'Name 4 variables you would need to track a to-do list app. For each variable, write its name, its type (text, number, true/false, or list), and an example value.',
+        starterCode: `// Journal Entry 4: Variables
+// Name 4 variables for a to-do app.
+// For each: name, type, example value.
+
+Variable 1:
+  Name:
+  Type:
+  Example value:
+
+Variable 2:
+  Name:
+  Type:
+  Example value:
+
+Variable 3:
+  Name:
+  Type:
+  Example value:
+
+Variable 4:
+  Name:
+  Type:
+  Example value:`,
+        solution: `// Journal Entry 4: Variables
+Variable 1:
+  Name: taskTitle
+  Type: text (string)
+  Example value: "Buy groceries"
+
+Variable 2:
+  Name: isComplete
+  Type: true/false (boolean)
+  Example value: false
+
+Variable 3:
+  Name: dueDate
+  Type: text (string)
+  Example value: "2026-12-01"
+
+Variable 4:
+  Name: taskCount
+  Type: number (integer)
+  Example value: 5`,
+      },
     },
     {
       id: 'think-5',
@@ -447,7 +568,28 @@ THE KEY INSIGHT: any time a program does different things depending on the situa
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Journal entry 5: Write a condition',
+        prompt: 'Write an if/else decision in pseudocode for this scenario: "If I have enough money, buy coffee at a shop. Otherwise, make coffee at home." Use variables to represent the values being compared.',
+        starterCode: `// Journal Entry 5: Conditions
+// Write an if/else for this scenario:
+// "If I have enough money, buy coffee.
+// Otherwise, make coffee at home."
+
+IF ...:
+  ...
+ELSE:
+  ...`,
+        solution: `// Journal Entry 5: Conditions
+IF moneyAvailable >= coffeeCost:
+  GO TO coffee shop
+  ORDER coffee
+  PAY coffeeCost
+ELSE:
+  GO TO kitchen
+  MAKE coffee at home`,
+      },
     },
     {
       id: 'think-6',
@@ -538,7 +680,35 @@ THE KEY INSIGHT: whenever a program needs to do the same thing multiple times â€
           answer: 0,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Journal entry 6: Write a loop',
+        prompt: 'Write pseudocode that prints the numbers 1 to 5. Write it twice: once using a FOR loop, and once using a WHILE loop. This shows you understand both loop types.',
+        starterCode: `// Journal Entry 6: Loops
+// Print numbers 1 to 5.
+// Write as both a FOR and WHILE loop.
+
+// Option 1: FOR loop
+FOR ...:
+  PRINT ...
+
+// Option 2: WHILE loop
+count = 1
+WHILE ...:
+  PRINT ...
+  count = ...`,
+        solution: `// Journal Entry 6: Loops
+
+// Option 1: FOR loop
+FOR number FROM 1 TO 5:
+  PRINT number
+
+// Option 2: WHILE loop
+count = 1
+WHILE count <= 5:
+  PRINT count
+  count = count + 1`,
+      },
     },
     {
       id: 'think-7',
@@ -620,7 +790,30 @@ A function should do one thing and do it well. If a function is getting very lon
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Journal entry 7: Write a function',
+        prompt: 'Write a pseudocode function called "add" that takes two numbers as parameters and returns their sum. Then call it twice with different numbers to test it.',
+        starterCode: `// Journal Entry 7: Functions
+// Write a function that adds two numbers.
+
+FUNCTION add(numberA, numberB):
+  ...
+  RETURN ...
+
+// Test it:
+add(3, 4)  -- should return 7
+add(10, 25) -- should return 35`,
+        solution: `// Journal Entry 7: Functions
+FUNCTION add(numberA, numberB):
+  total = numberA + numberB
+  RETURN total
+
+// Test it:
+add(3, 4)   -- returns 7
+add(10, 25) -- returns 35
+add(0, 100) -- returns 100`,
+      },
     },
     {
       id: 'think-8',
@@ -702,7 +895,39 @@ Debugging is not a sign of failure. It is a normal, essential part of programmin
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Journal entry 8: Debug a process',
+        prompt: 'The recipe below for making toast has a bug â€” the steps are in the wrong order. Identify the bug, explain why it is wrong, and write the corrected recipe.',
+        starterCode: `// Journal Entry 8: Debugging
+// This toast recipe has a bug.
+// The steps are in the wrong order.
+// Find it and fix it.
+
+Buggy recipe:
+1. Put bread in the toaster.
+2. Turn the toaster on.
+3. Plug the toaster into the wall.
+
+Fixed recipe:
+1.
+2.
+3.
+
+// What was the bug?`,
+        solution: `// Journal Entry 8: Debugging
+// Bug: steps 2 and 3 are swapped.
+// The toaster must be plugged in
+// before it can be turned on.
+
+Fixed recipe:
+1. Put bread in the toaster.
+2. Plug the toaster into the wall.
+3. Turn the toaster on.
+
+// The fix: order matters in algorithms.
+// Step 2 and Step 3 were reversed.`,
+      },
     },
     {
       id: 'think-9',
@@ -792,7 +1017,33 @@ An error message is the computer trying to help you. It always points at somethi
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Journal entry 9: Complete program',
+        prompt: 'Write a complete pseudocode program that asks the user for their name and then greets them. Your program must use: output (DISPLAY), input (GET), a variable, and string joining.',
+        starterCode: `// Journal Entry 9: Complete Program
+// Write pseudocode that asks for
+// the user's name and greets them.
+
+START
+  DISPLAY ...
+  GET ... FROM user
+  DISPLAY ... + ... + ...
+END`,
+        solution: `// Journal Entry 9: Complete Program
+START
+  DISPLAY "What is your name?"
+  GET name FROM user
+  DISPLAY "Hello, " + name + "!"
+  DISPLAY "Welcome to CodeMaster."
+END
+
+// This program uses:
+// - Output (DISPLAY)
+// - Input (GET)
+// - Variables (name)
+// - String joining (+)`,
+      },
     },
   ],
 };

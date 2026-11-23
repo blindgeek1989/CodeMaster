@@ -16,6 +16,10 @@ const cssModule = {
     'Create a navigation bar using Flexbox',
     'Write CSS that respects keyboard users with visible focus indicators',
   ],
+  project: {
+    name: 'Style the Profile Page',
+    description: 'Apply CSS to transform the HTML profile page into a polished, readable design.',
+  },
   lessons: [
     {
       id: 'css-1',
@@ -83,6 +87,8 @@ You can have as many property: value pairs as you need inside one selector.`,
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Set base typography styles',
         prompt: 'Write a CSS rule that styles all <h1> elements with: a color of #1e293b (a dark navy), a font-size of 2rem, and a margin-bottom of 1rem. Then write a second rule that styles all <p> elements with a color of #475569 (a medium grey) and a line-height of 1.7.',
         starterCode: `/* Style all h1 elements */
 
@@ -176,6 +182,8 @@ This uses :focus-visible, which only shows the outline for keyboard users — no
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Style links and add focus indicators',
         prompt: 'Write CSS that: (1) Gives all <a> elements a color of #2563eb and no text underline by default. (2) Gives all <a> elements an underline on hover. (3) Gives all focusable elements (:focus-visible) a 3px solid orange (#f59e0b) outline with 3px offset. (4) Gives elements with the class "card" a white background, 1.5rem padding, and a 1px solid #e2e8f0 border.',
         starterCode: `/* Links */
 
@@ -283,6 +291,8 @@ Avoid centering long paragraphs — it is much harder to read than left-aligned 
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Define colors and font styles for the page',
         prompt: 'Write a CSS rule for the <body> element that sets: a background color of #f8fafc, a text color of #1e293b, a font-family of "Segoe UI", Arial, sans-serif, a font-size of 1rem, and a line-height of 1.6. Then write a rule for <h1> that sets font-size to 2.5rem, font-weight to 700, and color to #0f172a.',
         starterCode: `/* Body styles */
 
@@ -374,6 +384,8 @@ height: auto;                 — grows to fit content (usually what you want)`,
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Apply spacing and the box model',
         prompt: 'Write CSS for a .card element that: applies the box-sizing fix globally first (*, *::before, *::after), then gives .card a max-width of 500px, padding of 2rem, a background of white, a border of 1px solid #e2e8f0, a border-radius of 12px, and a margin of 0 auto (to center it).',
         starterCode: `/* Box-sizing fix */
 
@@ -465,6 +477,8 @@ nav {
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Build the navigation bar with Flexbox',
         prompt: 'Write CSS for a navigation bar. The HTML is: <nav class="main-nav"><a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a></nav>. Style .main-nav to: use Flexbox, space items evenly with gap of 1.5rem, align items centered vertically, have a background of #1e293b, padding of 1rem 2rem. Also style the links inside it: white color, no text underline, font-weight 600.',
         starterCode: `/* Navigation bar */
 .main-nav {
@@ -582,6 +596,8 @@ footer  { grid-column: 1 / -1; }`,
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Create the page grid layout',
         prompt: 'Write CSS for a classic page layout with a header, sidebar, main content area, and footer. The grid should have: two columns (sidebar: 240px, main: remaining space), three rows (header: auto, content: 1fr, footer: auto), 0 gap, min-height of 100vh. Make the header and footer span both columns.',
         starterCode: `/* Page layout grid */
 .page-layout {
@@ -700,6 +716,8 @@ font-size: clamp(1rem, 2.5vw, 1.5rem);
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Make the page responsive',
         prompt: 'Write responsive CSS for a card grid. On mobile (base styles): cards stack in a single column, full width. At 600px and wider: cards display in a 2-column grid with 1.5rem gap. At 900px and wider: cards display in a 3-column grid. Also add the flexible image rule so images inside cards never overflow.',
         starterCode: `/* Base styles — mobile: single column */
 .card-grid {
@@ -831,6 +849,8 @@ Name variables by what they REPRESENT, not what they look like:
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Build a CSS variable design system',
         prompt: 'Create a complete CSS variable system for a small design. In :root, declare variables for: primary color (#6366f1), text color (#1e293b), background (#f8fafc), border radius (8px), and two spacing values (small: 0.75rem, medium: 1.5rem). Then write styles for a .btn element and a .card element that use only var() references — no hardcoded values.',
         starterCode: `/* Design tokens */
 :root {
@@ -965,6 +985,8 @@ This is not optional — it is an accessibility requirement.`,
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Add transitions and animations',
         prompt: 'Write CSS for a button that: smoothly transitions its background color and transform over 0.2s ease on hover (lift up 2px with translateY). Also write a @keyframes animation called "slideIn" that animates from opacity 0 and translateY(16px) to opacity 1 and translateY(0). Apply it to .card elements with 0.3s duration. Finally, write the prefers-reduced-motion override.',
         starterCode: `/* Button with hover transition */
 .btn {
@@ -1144,6 +1166,8 @@ This means framework updates can never unexpectedly override your styles.`,
         },
       ],
       exercise: {
+        projectStep: 10,
+        projectStepLabel: 'Apply modern CSS features',
         prompt: 'Write the CSS to: (1) style a .field div differently if it contains an input that is focused (using :has()), and (2) declare a container called "sidebar" and write a container query that stacks items vertically when the sidebar is narrower than 300px.',
         starterCode: `/* (1) Use :has() to highlight a field wrapper when its input is focused */
 

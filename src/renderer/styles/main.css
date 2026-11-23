@@ -766,6 +766,53 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* ===== Category filter bar ===== */
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.category-filter-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.category-filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.category-filter-btn[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ===== Category badge on module cards ===== */
+.card-category-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.card-category-badge--beginner     { background: #052e16; color: #22c55e; }
+.card-category-badge--intermediate { background: #1c1008; color: #f59e0b; }
+.card-category-badge--advanced     { background: #1f0a0a; color: #ef4444; }
+
 .module-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -817,6 +864,98 @@ body {
   display: block;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+/* ===== Code blocks (lesson content) ===== */
+.code-block-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.code-block-header {
+  align-items: center;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.4rem 0.75rem;
+}
+
+.code-lang-label {
+  color: var(--accent-hover);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.code-block-caption {
+  color: var(--text-secondary);
+  flex: 1;
+  font-size: 0.8rem;
+}
+
+.code-copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin-left: auto;
+  padding: 0.2rem 0.6rem;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.code-copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+/* Braille panning: allow horizontal scroll, never hide overflow */
+.code-block {
+  background: #0a0f1e;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0;
+  overflow-x: auto;
+  padding: 1rem;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.code-block code {
+  display: block;
+}
+
+/* ===== Project context banner in exercises ===== */
+.project-context {
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.project-label {
+  color: var(--accent-hover);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.project-step-label {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 /* ===== Lesson top bar (breadcrumb + counter) ===== */
@@ -1119,6 +1258,83 @@ body {
   font-size: 0.85rem;
   color: var(--error, #f87171);
   line-height: 1.5;
+}
+
+/* ===== Feedback & Help modal form elements ===== */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+  border-color: #ef4444;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.field-error {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin: 0;
+  font-weight: 600;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.help-links {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.help-links a {
+  color: var(--accent-light);
+  text-decoration: underline;
+}
+
+.help-links a:hover {
+  color: var(--text-primary);
 }
 
 /* ===== What's new modal ===== */

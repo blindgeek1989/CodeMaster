@@ -23,6 +23,10 @@ const reactModule = {
     'Fetch data from an API inside useEffect and display it',
     'Use an aria-live region inside a React component to announce updates',
   ],
+  project: {
+    name: 'React Profile Application',
+    description: 'Rebuild the profile page as a component-based React application.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS REACT?
@@ -123,8 +127,10 @@ If any of these feel shaky, revisit the JavaScript and Async JavaScript modules 
       ],
       exercise: {
         prompt: 'No code to run yet — this lesson is conceptual. In the text area below, write a one-sentence answer: what is the main advantage of React\'s virtual DOM approach compared to manually updating the DOM in plain JavaScript?',
-        starterCode: '// Your answer (as a comment):\n// The virtual DOM helps because...',
-        solution: '// The virtual DOM helps because React automatically calculates the minimal\n// set of real DOM changes needed when data updates, so you never manually\n// hunt for elements to update — you just re-describe the desired UI.',
+        projectStep: 1,
+        projectStepLabel: 'Explain the virtual DOM',
+        starterCode: '// Profile project - step 1\n// The virtual DOM helps because...',
+        solution: '// Profile project - step 1\n// React diffs the virtual DOM and\n// applies only the minimal real DOM\n// changes needed when data updates.\n// You describe the desired UI and\n// React handles all the DOM work.',
       },
     },
 
@@ -265,20 +271,34 @@ A COMPLETE JSX EXAMPLE
       ],
       exercise: {
         prompt: 'Fix the JSX below. It has three errors: a missing root wrapper, a wrong attribute name, and an unclosed tag.',
-        starterCode: `// Fix the three JSX errors in this component:
+        projectStep: 2,
+        projectStepLabel: 'Fix JSX for the profile card',
+        starterCode: `// Profile project - step 2
+// Fix three JSX errors:
+// 1. missing root wrapper
+// 2. wrong attribute name
+// 3. unclosed tag
 function ProfileCard() {
   const name = "Jordan";
   return (
-    <h2 class="profile-name">{name}</h2>
+    <h2 class="profile-name">
+      {name}
+    </h2>
     <img src="avatar.png">
   );
 }`,
-        solution: `function ProfileCard() {
+        solution: `// Profile project - step 2
+function ProfileCard() {
   const name = "Jordan";
   return (
     <>
-      <h2 className="profile-name">{name}</h2>
-      <img src="avatar.png" alt="Jordan's avatar" />
+      <h2 className="profile-name">
+        {name}
+      </h2>
+      <img
+        src="avatar.png"
+        alt="Jordan's avatar"
+      />
     </>
   );
 }`,
@@ -427,25 +447,34 @@ Real apps are trees of components. A top-level App renders layout components; th
         },
       ],
       exercise: {
-        prompt: 'Write a BookCard component that accepts title, author, and year as props and renders them in an <article> element with appropriate headings.',
-        starterCode: `// Write a BookCard component:
-// - Accepts: title (string), author (string), year (number)
-// - Returns an <article> with an <h2> for title,
-//   a <p> for author, and a <p> for year
-// - Use "Book title:" and "Author:" as labels
+        prompt: 'Write a ProfileCard component that accepts name, bio, and skills (string array) as props and renders them in an <article> element with an h2, a paragraph, and a list of skills.',
+        projectStep: 3,
+        projectStepLabel: 'Build the ProfileCard component',
+        starterCode: `// Profile project - step 3
+// Build the ProfileCard component
 
-function BookCard({ title, author, year }) {
-  // your code here
-}
-
-// How it would be used:
-// <BookCard title="Dune" author="Frank Herbert" year={1965} />`,
-        solution: `function BookCard({ title, author, year }) {
+// Props: name, bio, skills: string[]
+function ProfileCard({
+  name, bio, skills
+}) {
+  // return an <article> with:
+  // - <h2> for name
+  // - <p> for bio
+  // - <ul> listing each skill
+}`,
+        solution: `// Profile project - step 3
+function ProfileCard({
+  name, bio, skills
+}) {
   return (
     <article>
-      <h2>Book title: {title}</h2>
-      <p>Author: {author}</p>
-      <p>Published: {year}</p>
+      <h2>{name}</h2>
+      <p>{bio}</p>
+      <ul>
+        {skills.map(s => (
+          <li key={s}>{s}</li>
+        ))}
+      </ul>
     </article>
   );
 }`,
@@ -590,35 +619,47 @@ These rules ensure React can track which hook call corresponds to which state.`,
         },
       ],
       exercise: {
-        prompt: 'Build a ToggleMessage component that shows and hides a message when a button is clicked. The button should say "Show message" when the message is hidden and "Hide message" when it is visible.',
-        starterCode: `import { useState } from 'react';
+        prompt: 'Add a bio toggle to ProfileCard. When the user clicks "Show bio", the bio text appears. When they click "Hide bio", it disappears. Use useState.',
+        projectStep: 4,
+        projectStepLabel: 'Add a bio toggle with useState',
+        starterCode: `// Profile project - step 4
+import { useState } from 'react';
 
-function ToggleMessage() {
-  // Declare a boolean state variable called "visible"
+function ProfileCard({ name, bio }) {
+  // Declare: showBio, setShowBio
   // initial value: false
 
   return (
-    <div>
-      <button onClick={/* toggle visible */}>
-        {/* Show "Show message" or "Hide message" based on state */}
+    <article>
+      <h2>{name}</h2>
+      <button onClick={/* toggle */}>
+        {/* "Show bio" or "Hide bio" */}
       </button>
-      {/* Conditionally render this paragraph when visible is true: */}
-      {/* <p>React state makes UIs interactive!</p> */}
-    </div>
+      {/* show <p>{bio}</p> when true */}
+    </article>
   );
 }`,
-        solution: `import { useState } from 'react';
+        solution: `// Profile project - step 4
+import { useState } from 'react';
 
-function ToggleMessage() {
-  const [visible, setVisible] = useState(false);
+function ProfileCard({ name, bio }) {
+  const [showBio, setShowBio] =
+    useState(false);
 
   return (
-    <div>
-      <button onClick={() => setVisible(prev => !prev)}>
-        {visible ? 'Hide message' : 'Show message'}
+    <article>
+      <h2>{name}</h2>
+      <button
+        onClick={() =>
+          setShowBio(v => !v)
+        }
+      >
+        {showBio
+          ? 'Hide bio'
+          : 'Show bio'}
       </button>
-      {visible && <p>React state makes UIs interactive!</p>}
-    </div>
+      {showBio && <p>{bio}</p>}
+    </article>
   );
 }`,
       },
@@ -770,85 +811,92 @@ Error messages must be linked to their input with aria-describedby:
         },
       ],
       exercise: {
-        prompt: 'Complete the LoginForm component. It should have email and password inputs, both controlled. On submit, prevent the default behavior and call console.log with the form data.',
-        starterCode: `import { useState } from 'react';
+        prompt: 'Build a ProfileContact form component with name and email inputs, both controlled. On submit, prevent default and log the form data. Each input must have a label.',
+        projectStep: 5,
+        projectStepLabel: 'Build the contact form',
+        starterCode: `// Profile project - step 5
+import { useState } from 'react';
 
-function LoginForm() {
-  const [form, setForm] = useState({ email: '', password: '' });
+function ProfileContact() {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+  });
 
   function handleChange(event) {
-    // Update form state using the input's name attribute as the key
+    // Update state via input name key
   }
 
   function handleSubmit(event) {
-    // Prevent page reload
-    // Log form data
+    // Prevent reload, log form
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        <label htmlFor="name">Name</label>
+        <input
+          id="name" name="name"
+          value={form.name}
+          onChange={handleChange}
+        />
+      </div>
+      <div>
         <label htmlFor="email">Email</label>
         <input
-          id="email"
-          name="email"
+          id="email" name="email"
           type="email"
           value={form.email}
           onChange={handleChange}
         />
       </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Log in</button>
+      <button type="submit">Send</button>
     </form>
   );
 }`,
-        solution: `import { useState } from 'react';
+        solution: `// Profile project - step 5
+import { useState } from 'react';
 
-function LoginForm() {
-  const [form, setForm] = useState({ email: '', password: '' });
+function ProfileContact() {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+  });
 
   function handleChange(event) {
-    const { name, value } = event.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    const { name, value } =
+      event.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log('Logging in with:', form);
+    console.log('Contact:', form);
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        <label htmlFor="name">Name</label>
+        <input
+          id="name" name="name"
+          value={form.name}
+          onChange={handleChange}
+        />
+      </div>
+      <div>
         <label htmlFor="email">Email</label>
         <input
-          id="email"
-          name="email"
+          id="email" name="email"
           type="email"
           value={form.email}
           onChange={handleChange}
         />
       </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Log in</button>
+      <button type="submit">Send</button>
     </form>
   );
 }`,
@@ -993,34 +1041,32 @@ CONDITIONAL RENDERING PATTERNS
         },
       ],
       exercise: {
-        prompt: 'Write a MovieList component that accepts an array of movie objects (each with id, title, year) and renders them as an accessible <ul> list. Handle the empty state with a message.',
-        starterCode: `// Each movie object: { id: number, title: string, year: number }
+        prompt: 'Write a SkillsList component that accepts a skills array (strings) and renders them as an accessible <ul> list. Use the index as the key. Handle the empty state with a "No skills listed" message.',
+        projectStep: 6,
+        projectStepLabel: 'Render the skills list',
+        starterCode: `// Profile project - step 6
+// Each skill is a string
 
-function MovieList({ movies }) {
+function SkillsList({ skills }) {
   // Handle empty state
 
-  // Render a <ul> with each movie as an <li>
-  // Show title and year for each movie
-  // Use movie.id as the key
+  // Render a <ul> with each skill
+  // Use index as key
 }
 
-// Example usage:
-// const data = [
-//   { id: 1, title: 'Inception', year: 2010 },
-//   { id: 2, title: 'The Matrix', year: 1999 },
-// ];
-// <MovieList movies={data} />`,
-        solution: `function MovieList({ movies }) {
-  if (movies.length === 0) {
-    return <p>No movies found.</p>;
+// Example:
+// const data = ['HTML', 'CSS', 'JS'];
+// <SkillsList skills={data} />`,
+        solution: `// Profile project - step 6
+function SkillsList({ skills }) {
+  if (skills.length === 0) {
+    return <p>No skills listed.</p>;
   }
 
   return (
     <ul>
-      {movies.map(movie => (
-        <li key={movie.id}>
-          {movie.title} ({movie.year})
-        </li>
+      {skills.map((skill, i) => (
+        <li key={i}>{skill}</li>
       ))}
     </ul>
   );
@@ -1189,72 +1235,95 @@ COMMON MISTAKES
         },
       ],
       exercise: {
-        prompt: 'Complete the PostLoader component. It should fetch a post from "https://jsonplaceholder.typicode.com/posts/{postId}" when postId changes, handle loading and error states, and display the post title and body.',
-        starterCode: `import { useState, useEffect } from 'react';
+        prompt: 'Complete the ProfileLoader component. It should fetch a profile from "/api/profile/{id}" when profileId changes, handle loading and error states, and display the name and bio.',
+        projectStep: 7,
+        projectStepLabel: 'Fetch and display profile data',
+        starterCode: `// Profile project - step 7
+import {
+  useState,
+  useEffect,
+} from 'react';
 
-function PostLoader({ postId }) {
-  const [post, setPost]       = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+function ProfileLoader({ profileId }) {
+  const [profile, setProfile] =
+    useState(null);
+  const [loading, setLoading] =
+    useState(true);
+  const [error, setError] =
+    useState(null);
 
   useEffect(() => {
-    // 1. Reset loading and error state
-    // 2. Fetch the post from the URL
-    // 3. On success: setPost and setLoading(false)
-    // 4. On error: setError and setLoading(false)
-    // 5. Return a cleanup function using AbortController
-  }, [postId]);  // re-run when postId changes
+    // 1. Reset loading and error
+    // 2. Fetch /api/profile/profileId
+    // 3. On success: setProfile
+    // 4. On error: setError
+    // 5. AbortController cleanup
+  }, [profileId]);
 
   // Handle loading state
   // Handle error state
-  // Handle missing post
 
   return (
     <article>
-      {/* Render post.title and post.body */}
+      {/* Render name and bio */}
     </article>
   );
 }`,
-        solution: `import { useState, useEffect } from 'react';
+        solution: `// Profile project - step 7
+import {
+  useState,
+  useEffect,
+} from 'react';
 
-function PostLoader({ postId }) {
-  const [post, setPost]       = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+function ProfileLoader({ profileId }) {
+  const [profile, setProfile] =
+    useState(null);
+  const [loading, setLoading] =
+    useState(true);
+  const [error, setError] =
+    useState(null);
 
   useEffect(() => {
-    const controller = new AbortController();
+    const ctrl = new AbortController();
     setLoading(true);
     setError(null);
 
-    fetch('https://jsonplaceholder.typicode.com/posts/' + postId, {
-      signal: controller.signal,
-    })
+    fetch(
+      '/api/profile/' + profileId,
+      { signal: ctrl.signal }
+    )
       .then(res => {
-        if (!res.ok) throw new Error('Post not found');
+        if (!res.ok) {
+          throw new Error('Not found');
+        }
         return res.json();
       })
       .then(data => {
-        setPost(data);
+        setProfile(data);
         setLoading(false);
       })
       .catch(err => {
-        if (err.name === 'AbortError') return;
+        if (err.name === 'AbortError') {
+          return;
+        }
         setError(err.message);
         setLoading(false);
       });
 
-    return () => controller.abort();
-  }, [postId]);
+    return () => ctrl.abort();
+  }, [profileId]);
 
-  if (loading) return <p>Loading post...</p>;
-  if (error)   return <p>Error: {error}</p>;
-  if (!post)   return null;
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <article>
-      <h2>{post.title}</h2>
-      <p>{post.body}</p>
+      <h2>{profile.name}</h2>
+      <p>{profile.bio}</p>
     </article>
   );
 }`,

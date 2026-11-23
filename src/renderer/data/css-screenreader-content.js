@@ -16,6 +16,10 @@ const cssScreenReaderModule = {
     'Build a WCAG-compliant focus indicator',
     'Write a prefers-reduced-motion media query that disables animations',
   ],
+  project: {
+    name: 'Screen Reader-Optimised Page',
+    description: 'Build and test a web page optimised for screen reader users.',
+  },
   lessons: [
     {
       id: 'css-sr-1',
@@ -65,6 +69,8 @@ The accessibility tree and the visual render are separate systems. CSS mostly co
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Build page: CSS visibility rules',
         prompt: 'For each CSS property below, write a comment labeling it as either "affects screen readers" or "visual only". Think carefully about opacity vs display.',
         starterCode: `p {
   color: #333;           /*  */
@@ -165,6 +171,8 @@ The X is decorative (hidden from screen readers with aria-hidden="true"), and th
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Build page: Visually hidden text',
         prompt: 'Write the complete sr-only CSS class from memory. Then in a comment, write the HTML for a "Delete" icon button where the trash icon (use the letter "D" as a stand-in) is hidden from screen readers and the text "Delete item" is visually hidden but accessible.',
         starterCode: `/* Write the sr-only class */
 .sr-only {

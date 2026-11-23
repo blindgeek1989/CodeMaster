@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const gitModule = {
   id: 'git',
@@ -21,6 +21,10 @@ const gitModule = {
     'Resolve a merge conflict manually',
     'Clone a repository, make changes, push them, and open a pull request',
   ],
+  project: {
+    name: 'Version-Controlled Profile Page',
+    description: 'Track all changes to the profile page project using Git.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS VERSION CONTROL?
@@ -110,12 +114,22 @@ This two-step process (stage then commit) gives you precise control over exactly
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Understand why version control matters',
         prompt: 'In your own words, explain to a non-programmer why version control is useful. Write 3-4 sentences using a non-technical analogy.',
-        starterCode: `// Explain version control using a non-technical analogy
-// Examples: writing a book, designing a building, editing a document
+        starterCode: `// Explain using a non-technical analogy
+// Examples: writing a book, editing a document
 
 Version control is like...`,
-        solution: `Version control is like having a detailed history of every draft of a book you are writing. Every time you save a major version, a snapshot is recorded — who made changes, when, and what they changed. If a later editor deletes a chapter by mistake, you can go back to any earlier snapshot and restore it. When multiple co-authors work on different chapters simultaneously, version control merges their changes without overwriting each other's work.`,
+        solution: `Version control is like having a detailed history
+of every draft of a book you are writing.
+Every time you save a major version, a snapshot
+is recorded -- who made changes, when, and what
+they changed. If a later editor deletes a chapter
+by mistake, you can restore any earlier snapshot.
+When multiple co-authors work on different chapters,
+version control merges their changes without
+overwriting each other's work.`,
       },
     },
 
@@ -215,8 +229,10 @@ A typical .gitconfig looks like:
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Configure Git on your machine',
         prompt: 'Write the three git config commands you would run to set up Git on a new computer: set your name, set your email, and set the default branch to "main".',
-        starterCode: `# Set up Git on a new computer — write the three commands
+        starterCode: `# Set up Git on a new computer
 
 # 1. Set your name:
 
@@ -349,14 +365,16 @@ Each commit has a unique SHA hash (like a3f91bc) — you use this to reference s
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Initialise the portfolio repository',
         prompt: 'Write the sequence of Git commands to: create a new folder called "portfolio", initialise a Git repository, create a file called index.html, stage it, and commit it with a good message.',
-        starterCode: `# Create a portfolio project and make the first commit
+        starterCode: `# Create a portfolio project and make first commit
 
 # 1. Create and enter the folder:
 
 # 2. Initialise a Git repository:
 
-# 3. Create index.html (hint: on Windows use "echo. > index.html" or just create the file normally):
+# 3. Create index.html:
 
 # 4. Stage index.html:
 
@@ -369,13 +387,13 @@ cd portfolio
 git init
 
 # 3. Create index.html:
-echo "<!DOCTYPE html><html><body></body></html>" > index.html
+echo "<!DOCTYPE html>" > index.html
 
 # 4. Stage index.html:
 git add index.html
 
 # 5. Commit with a good message:
-git commit -m "Add initial HTML structure for portfolio homepage"`,
+git commit -m "Add initial HTML for portfolio"`,
       },
     },
 
@@ -481,6 +499,8 @@ Bad branch names: "test", "stuff", "my-branch", "fix"`,
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Create a feature branch',
         prompt: 'Write the commands to: check your current branch, create and switch to a branch called "feature-skip-link", make a pretend commit, then switch back to main.',
         starterCode: `# Branch workflow exercise
 
@@ -488,7 +508,8 @@ Bad branch names: "test", "stuff", "my-branch", "fix"`,
 
 # 2. Create and switch to "feature-skip-link":
 
-# 3. Stage and commit a file (assume skip-link.html already exists):
+# 3. Stage and commit a file
+#    (assume skip-link.html already exists):
 
 # 4. Switch back to main:`,
         solution: `# 1. Check which branch you are on:
@@ -499,7 +520,7 @@ git switch -c feature-skip-link
 
 # 3. Stage and commit a file:
 git add skip-link.html
-git commit -m "Add skip link for keyboard navigation accessibility"
+git commit -m "Add skip link for keyboard accessibility"
 
 # 4. Switch back to main:
 git switch main`,
@@ -598,6 +619,8 @@ You can view the full merged history:
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Merge the feature branch into main',
         prompt: 'Write the Git commands to merge a branch called "feature-aria-labels" into main, then delete the feature branch.',
         starterCode: `# Merge workflow
 
@@ -605,7 +628,7 @@ You can view the full merged history:
 
 # 2. Merge the feature branch:
 
-# 3. Delete the feature branch (it is no longer needed):`,
+# 3. Delete the feature branch:`,
         solution: `# 1. Switch to main:
 git switch main
 
@@ -722,22 +745,25 @@ To use SSH:
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Connect to a remote repository',
         prompt: 'Write the commands to: connect a local repository to a GitHub remote called "origin", push main to that remote, then pull down any changes from teammates the next morning.',
         starterCode: `# Working with remotes
 
-# 1. Connect the local repo to a GitHub remote:
-# (Use https://github.com/yourname/my-project.git as the URL)
+# 1. Connect the local repo to a remote:
+# (Use https://github.com/yourname/portfolio.git)
 
-# 2. Push the main branch to GitHub for the first time:
+# 2. Push the main branch for the first time:
 
-# 3. Next morning — get the latest changes from teammates:`,
-        solution: `# 1. Connect the local repo to a GitHub remote:
-git remote add origin https://github.com/yourname/my-project.git
+# 3. Next morning -- get latest from teammates:`,
+        solution: `# 1. Connect the local repo to a remote:
+git remote add origin \
+  https://github.com/yourname/portfolio.git
 
-# 2. Push the main branch to GitHub for the first time:
+# 2. Push the main branch for the first time:
 git push -u origin main
 
-# 3. Next morning — get the latest changes from teammates:
+# 3. Next morning -- get latest from teammates:
 git pull`,
       },
     },
@@ -836,6 +862,8 @@ GitHub lets you open a "Draft" PR to share work in progress before it is ready f
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Write a pull request description',
         prompt: 'Write a Pull Request description for a change that adds a skip-link to a web application for keyboard accessibility. Include: what changed, why, and how to test it.',
         starterCode: `## Pull Request Description
 
@@ -849,21 +877,30 @@ GitHub lets you open a "Draft" PR to share work in progress before it is ready f
         solution: `## Pull Request Description
 
 ### What changed
-Added a visually hidden skip link as the first focusable element on every page. The link becomes visible on focus and sends keyboard users to the #main-content landmark, bypassing the repeated navigation on every page.
+Added a visually hidden skip link as the first
+focusable element on every page. The link becomes
+visible on focus and sends keyboard users to the
+#main-content landmark, bypassing the navigation.
 
 ### Why
-Keyboard-only users had to Tab through the entire navigation (12 items) on every page load to reach the main content. This is a WCAG 2.1 Success Criterion 2.4.1 (Bypass Blocks) violation.
+Keyboard-only users had to Tab through 12 nav items
+on every page load to reach the main content.
+This violates WCAG 2.1 Success Criterion 2.4.1
+(Bypass Blocks).
 
 ### How to test
 1. Open any page in the app
-2. Press Tab once — a "Skip to main content" link should appear in the top-left corner
-3. Press Enter — focus should move to the main content heading
-4. Verify the link is not visible with a mouse (no visual clutter for sighted users)
+2. Press Tab once -- a "Skip to main content"
+   link should appear in the top-left corner
+3. Press Enter -- focus should move to the
+   main content heading
+4. Verify the link is not visible with a mouse
 
 ### Accessibility notes
-- Tested with NVDA on Chrome: skip link announced correctly as "Skip to main content, link"
-- Tested with keyboard only: focus indicator clearly visible on the link
-- VoiceOver (macOS) also reads the link correctly`,
+- Tested with NVDA on Chrome: skip link
+  announced correctly as "Skip to main content"
+- Keyboard only: focus indicator clearly visible
+- VoiceOver (macOS): link reads correctly`,
       },
     },
 
@@ -955,23 +992,27 @@ NEVER USE ON MAIN OR SHARED BRANCHES:
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Safely undo a pushed commit',
         prompt: 'Write the commands for these three undo scenarios: (1) you edited app.css but have not staged it and want to discard the edit, (2) you staged index.html but want to unstage it without losing edits, (3) you pushed a bad commit (hash: d4e5f6a) to the shared main branch and need to safely reverse it.',
         starterCode: `# Undo scenarios
 
 # Scenario 1: Discard unstaged edits to app.css:
 
-# Scenario 2: Unstage index.html without losing edits:
+# Scenario 2: Unstage index.html, keep edits:
 
-# Scenario 3: Safely reverse a pushed commit (hash: d4e5f6a) on main:`,
+# Scenario 3: Safely reverse pushed commit
+#             (hash: d4e5f6a) on main:`,
         solution: `# Scenario 1: Discard unstaged edits to app.css:
 git restore app.css
 
-# Scenario 2: Unstage index.html without losing edits:
+# Scenario 2: Unstage index.html, keep edits:
 git restore --staged index.html
 
-# Scenario 3: Safely reverse a pushed commit on main:
+# Scenario 3: Safely reverse pushed commit:
 git revert d4e5f6a
-# This creates a new commit that undoes d4e5f6a — safe for shared branches`,
+# Creates a new commit that undoes d4e5f6a
+# Safe for shared branches`,
       },
     },
 
@@ -1082,20 +1123,22 @@ QUICK REFERENCE — DAILY COMMANDS
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Complete the full Git workflow',
         prompt: 'Without looking at the lesson, write the complete sequence of Git commands for a typical feature workflow: start from main, create a branch, make two commits, push, and clean up after the PR merges.',
-        starterCode: `# Full feature workflow — write every command
+        starterCode: `# Full feature workflow
 
 # 1. Get latest from the team:
 
 # 2. Create your feature branch:
 
-# 3. Make first commit (assume file1.js exists):
+# 3. First commit (assume file1.js exists):
 
-# 4. Make second commit (assume file2.css exists):
+# 4. Second commit (assume file2.css exists):
 
 # 5. Push the branch to GitHub:
 
-# 6. After the PR merges — clean up locally:`,
+# 6. After the PR merges -- clean up locally:`,
         solution: `# 1. Get latest from the team:
 git switch main
 git pull
@@ -1103,18 +1146,18 @@ git pull
 # 2. Create your feature branch:
 git switch -c feature/your-feature-name
 
-# 3. Make first commit:
+# 3. First commit:
 git add file1.js
-git commit -m "Add feature logic for X"
+git commit -m "Add feature logic"
 
-# 4. Make second commit:
+# 4. Second commit:
 git add file2.css
-git commit -m "Style feature X for keyboard focus visibility"
+git commit -m "Style feature for keyboard focus"
 
 # 5. Push the branch to GitHub:
 git push -u origin feature/your-feature-name
 
-# 6. After the PR merges — clean up locally:
+# 6. After the PR merges -- clean up locally:
 git switch main
 git pull
 git branch -d feature/your-feature-name`,
@@ -1312,6 +1355,8 @@ If you get stuck and want to start over:
         },
       ],
       exercise: {
+        projectStep: 10,
+        projectStepLabel: 'Practice the full branch and PR cycle',
         prompt: 'Walk through the full branching workflow in the terminal below. Create a feature branch, make two commits, then write the git commands you would run to open a pull request and clean up afterward.',
         starterCode: `# 1. Start from a clean main branch:
 git switch main
@@ -1320,19 +1365,20 @@ git pull
 # 2. Create a branch for adding a "Lessons" page:
 # (write the command)
 
-# 3. Make your first commit (pretend you created lessons.html):
+# 3. First commit (pretend you created lessons.html):
 git add lessons.html
 git commit -m "Add lessons page HTML structure"
 
-# 4. Make a second commit (pretend you styled it):
+# 4. Second commit (pretend you styled it):
 git add styles/lessons.css
-git commit -m "Style lessons page for keyboard navigation"
+git commit -m "Style lessons page for keyboard nav"
 
 # 5. Push the branch to GitHub:
-# (write the command — include -u flag)
+# (write the command -- include -u flag)
 
-# 6. After the PR is approved and merged, clean up locally:
-# (write the two commands: switch to main, delete the branch)`,
+# 6. After the PR is approved and merged:
+# (write the two commands: switch to main,
+#  delete the branch)`,
         solution: `# 1. Start from a clean main branch:
 git switch main
 git pull
@@ -1340,13 +1386,13 @@ git pull
 # 2. Create a branch for adding a "Lessons" page:
 git switch -c feature/lessons-page
 
-# 3. Make your first commit:
+# 3. First commit:
 git add lessons.html
 git commit -m "Add lessons page HTML structure"
 
-# 4. Make a second commit:
+# 4. Second commit:
 git add styles/lessons.css
-git commit -m "Style lessons page for keyboard navigation"
+git commit -m "Style lessons page for keyboard nav"
 
 # 5. Push the branch to GitHub:
 git push -u origin feature/lessons-page

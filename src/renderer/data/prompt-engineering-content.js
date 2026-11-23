@@ -21,6 +21,10 @@ const promptEngineeringModule = {
     'Use chain-of-thought to solve a multi-step problem',
     'Write a prompt that generates a working JavaScript function with tests',
   ],
+  project: {
+    name: 'AI Content Assistant',
+    description: 'Build a reusable prompt library for generating, refining, and evaluating AI content.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS PROMPT ENGINEERING?
@@ -95,6 +99,8 @@ You do not always need all of these. A simple factual question might just need a
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Library entry 1: Prompt anatomy',
         prompt: 'Rewrite the following weak prompt into a strong prompt using all five components (task, context, format, examples, constraints).\n\nWeak prompt: "Write me a function"',
         starterCode: `// Weak prompt: "Write me a function"
 
@@ -221,6 +227,8 @@ One-shot is the middle ground — a single example. Use it when you just need to
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Library entry 2: Few-shot pattern',
         prompt: 'Convert this zero-shot prompt into a three-shot prompt by adding examples. The task is to extract the programming language mentioned in a sentence.\n\nZero-shot: "Extract the programming language mentioned. Sentence: I built this using Ruby on Rails."',
         starterCode: `// Zero-shot (original):
 // Extract the programming language mentioned.
@@ -342,6 +350,8 @@ You can also specify output format in the system prompt:
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Library entry 3: System prompt',
         prompt: 'Write a system prompt for a customer support AI assistant for a coding education platform. It should: define the persona, set the tone, specify format rules, and include at least two hard constraints.',
         starterCode: `// System prompt for a coding education platform support assistant
 
@@ -459,6 +469,8 @@ Chain-of-thought is most valuable for:
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Library entry 4: Chain-of-thought',
         prompt: 'Rewrite this prompt to use chain-of-thought reasoning.\n\nOriginal: "Which of these two sorting algorithms is better for sorting a nearly-sorted array of 10,000 elements: Quicksort or Insertion Sort?"',
         starterCode: `// Original prompt (asks for a direct answer):
 // "Which is better for a nearly-sorted array of 10,000 elements: Quicksort or Insertion Sort?"
@@ -582,6 +594,8 @@ REVIEWING CODE FOR ACCESSIBILITY
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Library entry 5: Code generation',
         prompt: 'Write a strong code generation prompt for the following task:\n\nYou need a Python function that reads a CSV file and returns a list of dictionaries, where each dictionary represents a row. The function must handle the case where the file does not exist.',
         starterCode: `// Write a strong code generation prompt for a Python CSV reader function.
 // Include: language/version, exact inputs/outputs, error handling requirements,
@@ -715,6 +729,8 @@ Never trust structured output blindly in production code:
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Library entry 6: Structured output',
         prompt: 'Write a prompt that extracts structured data from a job posting and returns it as JSON. The JSON should include: job title, company, location, salary range (if mentioned), and a list of required skills.',
         starterCode: `// Write a prompt to extract job posting data as JSON.
 // Specify the exact JSON schema you want, handle missing fields,
@@ -860,6 +876,8 @@ For code generation and JSON extraction, use a lower temperature for consistency
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Library entry 7: Refine and fix',
         prompt: 'This prompt is producing inconsistent, poorly formatted output. Diagnose the problems and rewrite it.\n\nBroken prompt: "Tell me about CSS flexbox properties"',
         starterCode: `// Broken prompt: "Tell me about CSS flexbox properties"
 // Problems observed:
@@ -988,6 +1006,8 @@ Do not paste private data into commercial AI systems unless you have reviewed th
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Library entry 8: Security review',
         prompt: 'You are building a simple AI-powered code review tool. A user can paste any code and the model will review it. Identify the security risks and write a system prompt that mitigates them.',
         starterCode: `// AI code review tool — security analysis
 

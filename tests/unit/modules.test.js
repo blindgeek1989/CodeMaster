@@ -41,9 +41,13 @@ describe('Think Like a Programmer Module', () => {
     });
   });
 
-  test('all lessons have exercise: null (conceptual module — no code editor)', () => {
+  test('every non-null exercise has prompt, starterCode, and solution', () => {
     thinkModule.lessons.forEach(lesson => {
-      expect(lesson.exercise).toBeNull();
+      if (lesson.exercise !== null) {
+        expect(lesson.exercise).toHaveProperty('prompt');
+        expect(lesson.exercise).toHaveProperty('starterCode');
+        expect(lesson.exercise).toHaveProperty('solution');
+      }
     });
   });
 });

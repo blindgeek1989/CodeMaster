@@ -24,6 +24,10 @@ const nodejsModule = {
     'Handle route errors with Express error-handling middleware',
     'Load and save data to a JSON file from within a route handler',
   ],
+  project: {
+    name: 'Profile Page Backend API',
+    description: 'Build a Node.js/Express REST API that serves data for the profile page.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS NODE.JS?
@@ -155,6 +159,8 @@ Useful for quick experiments without writing a file.`,
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Run your first Node.js script',
         prompt: 'Create a Node.js script that prints your name, the current date, and the Node.js version to the console. Use process.version to get the Node version and new Date().toLocaleDateString() for the date.',
         starterCode: `// greeting.js
 // Print three lines:
@@ -167,8 +173,11 @@ console.log('Date: ');
 console.log('Node version: ');`,
         solution: `// greeting.js
 console.log('Name: Alex');
-console.log('Date: ' + new Date().toLocaleDateString());
-console.log('Node version: ' + process.version);`,
+const now = new Date();
+const date = now.toLocaleDateString();
+console.log('Date: ' + date);
+const v = process.version;
+console.log('Node version: ' + v);`,
       },
     },
 
@@ -316,6 +325,8 @@ These are not available in ES modules — use import.meta.url instead.`,
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Create a reusable module',
         prompt: 'Create two files: a greetings.js module that exports a greet(name) function returning "Hello, <name>!", and an app.js that requires it, calls greet with your name, and logs the result.',
         starterCode: `// greetings.js
 // Export a function greet(name) that returns "Hello, <name>!"
@@ -494,6 +505,8 @@ Hard-coding paths like 'data/users.json' breaks when you run the script from a d
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Read and write files with fs',
         prompt: 'Write an async function saveNote(filename, content) that writes content to a .txt file in a "notes" subdirectory (creating the directory if it does not exist). Then write loadNote(filename) that reads and returns the content.',
         starterCode: `const fs = require('fs').promises;
 const path = require('path');
@@ -524,12 +537,14 @@ const NOTES_DIR = path.join(__dirname, 'notes');
 
 async function saveNote(filename, content) {
   await fs.mkdir(NOTES_DIR, { recursive: true });
-  await fs.writeFile(path.join(NOTES_DIR, filename), content, 'utf8');
+  const fp = path.join(NOTES_DIR, filename);
+  await fs.writeFile(fp, content, 'utf8');
 }
 
 async function loadNote(filename) {
   try {
-    return await fs.readFile(path.join(NOTES_DIR, filename), 'utf8');
+    const fp = path.join(NOTES_DIR, filename);
+    return await fs.readFile(fp, 'utf8');
   } catch {
     return null;
   }
@@ -683,6 +698,8 @@ Run with: npm run dev`,
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Build a raw HTTP server',
         prompt: 'Build a raw HTTP server (no Express) that responds to GET /ping with 200 and JSON { status: "ok" }, and responds to any other route with 404 and JSON { error: "Not found" }.',
         starterCode: `const http = require('http');
 
@@ -870,6 +887,8 @@ COMPLETE MINIMAL EXAMPLE
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Build your first Express API',
         prompt: 'Build an Express API for a simple todo list. GET /todos returns all todos. POST /todos creates a new todo from req.body.text and assigns it the next ID. GET /todos/:id returns a single todo or 404.',
         starterCode: `const express = require('express');
 const app = express();
@@ -1070,6 +1089,8 @@ Real APIs often need filtering and pagination via query params:
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Add a PATCH route',
         prompt: 'Add a PATCH /todos/:id route to update the "done" and/or "text" fields of a todo. Only update the fields that are present in req.body. Return 404 if the todo does not exist.',
         starterCode: `const express = require('express');
 const app = express();
@@ -1279,6 +1300,8 @@ The order is critical: middleware → routes → 404 → error handler.`,
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Add middleware and error handling',
         prompt: 'Add to an Express app: (1) a request logger middleware that prints the method and URL, (2) a route GET /secret that requires an "x-api-key: abc123" header and returns 401 if missing, (3) an error-handling middleware that returns { error: message } with the right status code.',
         starterCode: `const express = require('express');
 const app = express();
@@ -1479,6 +1502,8 @@ SQLite is a great first "real" database — it is a file on disk (like your JSON
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Persist data to a JSON file',
         prompt: 'Build a complete persistent Express API for a "notes" resource stored in a JSON file. Support: GET /notes (list all), POST /notes (create with title and body), DELETE /notes/:id. Auto-generate IDs.',
         starterCode: `const express = require('express');
 const fs      = require('fs').promises;
@@ -1535,10 +1560,15 @@ app.get('/notes', async (req, res, next) => {
 app.post('/notes', async (req, res, next) => {
   try {
     const { title, body } = req.body;
-    if (!title || !body) return res.status(400).json({ error: 'title and body required' });
+    if (!title || !body) {
+      return res.status(400).json({
+        error: 'title and body required',
+      });
+    }
     const notes = await readDB();
-    const maxId = notes.reduce((m, n) => Math.max(m, n.id), 0);
-    const note  = { id: maxId + 1, title, body };
+    const maxId = notes.reduce(
+      (m, n) => Math.max(m, n.id), 0);
+    const note = { id: maxId + 1, title, body };
     notes.push(note);
     await writeDB(notes);
     res.status(201).json(note);
@@ -1547,9 +1577,14 @@ app.post('/notes', async (req, res, next) => {
 
 app.delete('/notes/:id', async (req, res, next) => {
   try {
-    const notes    = await readDB();
-    const filtered = notes.filter(n => n.id !== Number(req.params.id));
-    if (filtered.length === notes.length) return res.status(404).json({ error: 'Not found' });
+    const notes = await readDB();
+    const id = Number(req.params.id);
+    const filtered =
+      notes.filter(n => n.id !== id);
+    if (filtered.length === notes.length) {
+      return res.status(404).json(
+        { error: 'Not found' });
+    }
     await writeDB(filtered);
     res.sendStatus(204);
   } catch (err) { next(err); }

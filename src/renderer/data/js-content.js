@@ -24,6 +24,10 @@ const jsModule = {
     'Save and retrieve a user preference from localStorage',
     'Implement a focus-trapping modal with Escape-to-close',
   ],
+  project: {
+    name: 'Interactive Profile Page',
+    description: 'Add JavaScript to bring the profile page to life with dynamic behaviour.',
+  },
   lessons: [
     {
       id: 'js-1',
@@ -157,6 +161,8 @@ NULL AND UNDEFINED
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Declare page data variables',
         prompt: 'Declare the following variables: (1) A const called appName set to the string "CodeMaster". (2) A let called currentLesson set to the number 1. (3) A const called isLoggedIn set to true. (4) A const called modules set to an array of three strings: "HTML", "CSS", and "JavaScript". (5) A const called user set to an object with two properties: name (your name as a string) and lessonsCompleted (the number 0).',
         starterCode: `// 1. App name (const, string)
 
@@ -270,6 +276,8 @@ logScore(95);   // Prints to the console; returns undefined`,
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Write utility functions',
         prompt: 'Write three functions: (1) An arrow function called "double" that takes one number and returns that number multiplied by 2. (2) A regular function called "fullName" that takes two parameters (firstName and lastName) and returns them combined with a space between. (3) An arrow function called "isEven" that takes a number and returns true if it is even, false if it is odd. Hint: use the % (modulo) operator — a number is even if number % 2 === 0.',
         starterCode: `// 1. double arrow function
 
@@ -372,6 +380,8 @@ fruits.forEach((fruit) => {
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Add conditional logic and loops',
         prompt: 'Write a function called "gradeScore" that takes a number (the score) and returns a string grade: "A" for 90+, "B" for 80-89, "C" for 70-79, "D" for 60-69, and "F" for anything below 60. Then write a forEach loop that takes the array [95, 82, 67, 55, 78] and logs each score alongside its grade, like: "95: A".',
         starterCode: `// gradeScore function
 
@@ -477,6 +487,8 @@ This is called focus management and is essential for screen reader users navigat
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Connect JavaScript to the page DOM',
         prompt: 'Write JavaScript that: (1) Selects a button with id="check-btn". (2) Selects a div with id="result" that has aria-live="polite" on it. (3) Adds a click event listener to the button. (4) When clicked, sets the result div\'s textContent to "Answer checked! 3 out of 5 correct." (5) Also moves focus to the result div after updating it (add tabindex="-1" first).',
         starterCode: `// 1. Select the button
 
@@ -598,6 +610,8 @@ KEY PRINCIPLES
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Handle form submissions',
         prompt: 'Write a submit handler for a form with id="signup-form". It should: (1) Call event.preventDefault(). (2) Read the value of an input with id="email". (3) If the value is empty after trimming, set aria-invalid="true" on the email input and set the textContent of an element with id="email-error" to "Email is required." then focus the email input and return early. (4) If valid, log "Submitting: " + the email value to console.',
         starterCode: `const form = document.querySelector('#signup-form');
 const emailInput = document.querySelector('#email');
@@ -725,6 +739,8 @@ document.querySelector('#status').textContent = 'Posts loaded.';`,
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Fetch and display dynamic data',
         prompt: 'Write an async function called loadData that: (1) Selects an element with id="output". (2) Sets its textContent to "Loading..." while the request is in progress. (3) Awaits a fetch from "https://jsonplaceholder.typicode.com/todos/1". (4) Awaits response.json() to parse the result. (5) Sets output.textContent to the "title" property of the returned object. (6) Catches any errors and sets output.textContent to "Error loading data." Call the function at the end.',
         starterCode: `async function loadData() {
   const output = document.querySelector('#output');
@@ -855,6 +871,8 @@ If your app uses localStorage to store accessibility preferences (like high cont
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Save user preferences to localStorage',
         prompt: 'Write two functions: (1) saveColor(color) — saves the string color under the key "favoriteColor" in localStorage. (2) loadColor() — reads "favoriteColor" from localStorage and returns it. If nothing is stored yet, return the string "blue" as a default. Then call loadColor() and log the result.',
         starterCode: `function saveColor(color) {
   // Save to localStorage
@@ -1015,6 +1033,8 @@ THE THREE RULES OF ACCESSIBLE JAVASCRIPT
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Build an accessible modal component',
         prompt: 'Write a closeModal function that: (1) Takes a modal element and a trigger element as parameters. (2) Sets the "hidden" attribute on the modal. (3) Moves focus back to the trigger element. Then write a keydown event listener on the document that calls closeModal when Escape is pressed and the modal does not have the "hidden" attribute. Assume modal and trigger are already declared as variables above your code.',
         starterCode: `// modal and trigger are already declared
 
@@ -1159,6 +1179,8 @@ A common pattern is a barrel file (index.js) that re-exports from multiple files
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Organise code as ES modules',
         prompt: 'Create a mini module system for an accessible notification component. Write the exports for a "notifications.js" file, then write the imports you would use in "app.js".',
         starterCode: `// notifications.js — write the exports
 

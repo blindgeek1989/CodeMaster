@@ -18,6 +18,10 @@ const ariaModule = {
     'Build a live region that announces status updates to screen readers',
     'Audit a page for common ARIA mistakes and explain how to fix each one',
   ],
+  project: {
+    name: 'Accessible Profile Page Components',
+    description: 'Layer ARIA attributes onto the profile page so it works perfectly with screen readers.',
+  },
   lessons: [
     {
       id: 'aria-1',
@@ -192,6 +196,8 @@ The shorthand: ARIA tells screen readers what something IS. HTML and JavaScript 
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Fix ARIA rule violations on the page',
         prompt: `The code below has violations of the five ARIA rules. In the text area, identify which rule each violation breaks and rewrite the corrected version.
 
 BROKEN CODE:
@@ -330,6 +336,8 @@ For any page you build or test, verify:
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Add landmark structure',
         prompt: `Below is a page layout using only <div> elements. Rewrite it using the correct semantic HTML elements and/or ARIA landmark roles. Add aria-label attributes where needed. Write your answer in the text area.
 
 STARTING MARKUP:
@@ -491,6 +499,8 @@ Never rely on placeholder text as a label. Placeholder text disappears when the 
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Fix element naming issues',
         prompt: `Fix the naming problems in each snippet below. Write the corrected HTML in the text area and explain what you changed and why.
 
 SNIPPET 1: An icon-only close button with no accessible name.
@@ -666,6 +676,8 @@ Browsers and screen readers announce: "Home, current page, link" — letting scr
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Add ARIA states to interactive components',
         prompt: `Complete the JavaScript below so the accordion button correctly manages the aria-expanded state and toggles the panel visibility. Then answer the follow-up question.
 
 HTML:
@@ -840,6 +852,8 @@ A live region is for information the user needs to know that they are not active
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Wire up aria-live announcements',
         prompt: `Below is an HTML form with a submit button. When submitted, a success or error message should be announced to screen readers. Write the HTML live region and the JavaScript to make this work correctly.
 
 Requirements:
@@ -1049,6 +1063,8 @@ Every ARIA pattern has a defined keyboard interaction model in the ARIA Authorin
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Build a tab widget with ARIA',
         prompt: `Write the HTML structure (attributes only — no CSS or full JS needed) for an accessible tab widget with two tabs: "Profile" and "Security". Include:
   - The tablist with an accessible name
   - Both tab buttons with correct roles and states (Profile is selected by default)
@@ -1244,6 +1260,8 @@ Moving focus to the summary heading causes it to be read aloud, and then the use
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Build an accessible form with inline validation',
         prompt: `Build the HTML and JavaScript for a single field form with accessible inline validation. Requirements:
 
 HTML:
@@ -1459,6 +1477,8 @@ The correct order:
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Audit and fix ARIA mistakes on the page',
         prompt: `The component below has multiple ARIA mistakes. List each mistake, identify which rule or concept it violates, and write the corrected version.
 
 BROKEN COMPONENT:
@@ -1660,6 +1680,8 @@ When a column is sortable, announce the sort state:
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Build an accessible data table',
         prompt: 'Write an accessible HTML table showing three students\' quiz scores for two subjects. Include: caption, thead with column headers (scope="col"), a row header for each student (scope="row"), and data cells.',
         starterCode: `<!-- Accessible data table: 3 students, 2 subjects -->
 

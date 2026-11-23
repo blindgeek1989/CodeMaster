@@ -23,6 +23,10 @@ const regexModule = {
     'Replace all occurrences of a word in a string using replace with the g flag',
     'Validate an email address with a practical regex pattern',
   ],
+  project: {
+    name: 'Profile Page Form Validator',
+    description: 'Write regular expressions to validate every field in a profile contact form.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT ARE REGULAR EXPRESSIONS?
@@ -145,6 +149,8 @@ This sliding-window model explains most regex behaviour.`,
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Match a simple word pattern',
         prompt: 'Open your browser console and run the three expressions below. Write what each one returns as a comment.',
         starterCode: `// Run each line in the browser console and record the result:
 
@@ -303,6 +309,8 @@ Suppose you want to find version strings like "1.0", "2.14", "10.3":
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Validate a name field pattern',
         prompt: 'Write regex patterns that match each of the described strings. Use the browser console to test them.',
         starterCode: `// 1. A pattern that matches "dog", "fog", "log", "bog" (any 3-letter word ending in "og")
 const pattern1 = //;
@@ -468,6 +476,8 @@ Writing [0-z] covers the whole ASCII range including punctuation characters — 
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Match character types',
         prompt: 'Write regex patterns for each requirement below. Test each one in the browser console.',
         starterCode: `// 1. Match any single uppercase vowel (A, E, I, O, U)
 const upperVowel = //;
@@ -639,6 +649,8 @@ This is almost always a bug. When you need at least one digit, use \d+ not \d*.`
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Validate field lengths',
         prompt: 'Write patterns using quantifiers to match each described string.',
         starterCode: `// 1. Match a word of 3 to 10 lowercase letters
 const shortWord = //;
@@ -805,6 +817,8 @@ Choose ^ and $ deliberately based on whether you are validating a whole string o
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Anchor and validate fields',
         prompt: 'Write patterns using anchors and word boundaries for each requirement.',
         starterCode: `// 1. Validate that a string is exactly 10 digits (a US phone number without formatting)
 const tenDigits = //;
@@ -982,6 +996,8 @@ These are powerful tools for extracting data in context.`,
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Extract named field parts',
         prompt: 'Use groups and alternation to solve each problem.',
         starterCode: `// 1. Write a pattern that matches "Mr.", "Mrs.", "Ms.", or "Dr." followed by a space and a name
 //    Use alternation inside a non-capturing group
@@ -1180,6 +1196,8 @@ No regex is perfect. For critical validation (financial data, medical records), 
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Build the complete form validator',
         prompt: 'Complete the validateForm function using regular expressions. It should return an object with an error message for each invalid field, or an empty object if everything is valid.',
         starterCode: `function validateForm({ email, zip, phone }) {
   const errors = {};
@@ -1204,9 +1222,15 @@ No regex is perfect. For critical validation (financial data, medical records), 
 }`,
         solution: `function validateForm({ email, zip, phone }) {
   const errors = {};
+  const emailRe = new RegExp(
+    "^[a-zA-Z0-9._%+-]+" +
+    "@[a-zA-Z0-9.-]+" +
+    "\\\\.[a-zA-Z]{2,}$"
+  );
 
-  if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/.test(email)) {
-    errors.email = 'Please enter a valid email address';
+  if (!emailRe.test(email)) {
+    errors.email =
+      'Please enter a valid email address';
   }
 
   if (!/^\\d{5}$/.test(zip)) {
@@ -1214,7 +1238,8 @@ No regex is perfect. For critical validation (financial data, medical records), 
   }
 
   if (!/^\\d{10}$/.test(phone)) {
-    errors.phone = 'Phone must be 10 digits with no spaces or dashes';
+    errors.phone =
+      'Phone must be 10 digits (no spaces)';
   }
 
   return errors;

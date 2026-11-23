@@ -21,6 +21,10 @@ const githubModule = {
     'Deploy a static HTML site using GitHub Pages',
     'Fork a repository and open a pull request to the original project',
   ],
+  project: {
+    name: 'Published Profile Page Repository',
+    description: 'Host the profile page on GitHub with CI, Pages deployment, and security policy.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — GITHUB OVERVIEW
@@ -92,6 +96,8 @@ GitHub Explore (github.com/explore) lets you discover trending repositories, top
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Design your GitHub profile',
         prompt: 'Describe what you would put on your GitHub profile to make it stand out as a developer. What should your profile README include? What repos would you pin?',
         starterCode: `// Describe your ideal GitHub profile
 
@@ -216,6 +222,8 @@ This ensures no one accidentally breaks the main branch.`,
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Create a .gitignore file',
         prompt: 'Write a .gitignore file for a Node.js web project. Include entries for: npm dependencies, environment variables, compiled output, and common OS files.',
         starterCode: `# .gitignore for a Node.js web project
 
@@ -344,6 +352,8 @@ Use filters to find issues quickly:
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'File a detailed bug report',
         prompt: 'Write a well-structured bug report Issue for the following problem: On your web app, the modal dialog does not trap focus — pressing Tab moves focus outside the modal while it is open, which breaks keyboard navigation.',
         starterCode: `**Title:**
 
@@ -463,6 +473,8 @@ BEST PRACTICES
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Design a project board',
         prompt: 'Design a GitHub Project board for a small team building a web app. List the columns you would create, three example Issues you would add, and one automation rule.',
         starterCode: `// GitHub Project board design
 
@@ -595,6 +607,8 @@ Add a workflow status badge to your README to show if tests are passing:
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Write a CI workflow',
         prompt: 'Write a GitHub Actions workflow that runs on every push to main. It should: check out the code, install Python 3.11, and run "python audit.py" (an accessibility audit script).',
         starterCode: `# .github/workflows/accessibility-audit.yml
 
@@ -726,6 +740,8 @@ GitHub Pages natively supports Jekyll — a static site generator that converts 
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Enable GitHub Pages deployment',
         prompt: 'You have built a portfolio site with an index.html in the root of your repository. Write the step-by-step instructions for enabling GitHub Pages so the site is live at yourusername.github.io/portfolio.',
         starterCode: `// Step-by-step: Enable GitHub Pages for a portfolio repo
 
@@ -860,6 +876,8 @@ You do not need to fix a complex bug to contribute. Great first contributions in
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Contribute via a fork',
         prompt: 'Write the complete sequence of terminal commands to: (1) clone your fork of an open-source project, (2) create a fix branch, (3) add the upstream remote, (4) keep your fork in sync with upstream, (5) push your branch.',
         starterCode: `# Fork-based contribution workflow
 # (Assume you have already forked the repo on GitHub)
@@ -987,6 +1005,8 @@ Add a SECURITY.md file to your repository to tell users how to responsibly repor
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Write a security policy',
         prompt: 'Write a simple SECURITY.md file for your portfolio project. Include: the supported version, how to report a vulnerability, and what reporters can expect in terms of response.',
         starterCode: `# Security Policy
 

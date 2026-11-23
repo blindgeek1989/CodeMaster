@@ -21,6 +21,10 @@ const typescriptModule = {
     'Configure a tsconfig.json for a web project',
     'Identify a category of runtime bug that TypeScript would have caught at compile time',
   ],
+  project: {
+    name: 'Profile Page in TypeScript',
+    description: 'Convert and extend the profile page JavaScript using TypeScript\'s type system.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHAT IS TYPESCRIPT?
@@ -125,18 +129,31 @@ Most professional JavaScript projects — React apps, Node.js APIs, Electron app
       ],
       exercise: {
         prompt: 'Write a TypeScript function called "formatName" that takes a firstName (string) and lastName (string) and returns the full name as a string. Add explicit type annotations on the parameters and return type.',
-        starterCode: `// Write a typed function called formatName
+        projectStep: 1,
+        projectStepLabel: 'Add type annotations to a function',
+        starterCode: `// Profile project - step 1
+// Add type annotations to a function
 
-function formatName(/* add parameters with types here */)/* add return type */ {
-  // return the full name as "firstName lastName"
+function formatName(
+  /* add typed params */
+)/* add return type */ {
+  // return "firstName lastName"
 }
 
-console.log(formatName("Ada", "Lovelace")); // should print: Ada Lovelace`,
-        solution: `function formatName(firstName: string, lastName: string): string {
+console.log(
+  formatName("Ada", "Lovelace")
+); // Ada Lovelace`,
+        solution: `// Profile project - step 1
+function formatName(
+  firstName: string,
+  lastName: string
+): string {
   return firstName + " " + lastName;
 }
 
-console.log(formatName("Ada", "Lovelace")); // Ada Lovelace`,
+console.log(
+  formatName("Ada", "Lovelace")
+); // Ada Lovelace`,
       },
     },
 
@@ -254,26 +271,32 @@ You only need to write explicit types when TypeScript cannot infer them (functio
       ],
       exercise: {
         prompt: 'Declare four variables with explicit TypeScript types: a user\'s name (string), their score (number), whether they are logged in (boolean), and an array of their completed lesson IDs (numbers).',
-        starterCode: `// Declare four typed variables
+        projectStep: 2,
+        projectStepLabel: 'Type profile data variables',
+        starterCode: `// Profile project - step 2
+// Type the profile data variables
+
+// 1. User's name (string):
+
+// 2. User's score (number):
+
+// 3. Whether logged in (boolean):
+
+// 4. Completed lesson IDs (number[]):`,
+        solution: `// Profile project - step 2
 
 // 1. User's name:
-
-// 2. User's score:
-
-// 3. Whether they are logged in:
-
-// 4. Array of completed lesson IDs (numbers):`,
-        solution: `// 1. User's name:
 let userName: string = "Ada Lovelace";
 
 // 2. User's score:
 let score: number = 950;
 
-// 3. Whether they are logged in:
+// 3. Whether logged in:
 let isLoggedIn: boolean = true;
 
-// 4. Array of completed lesson IDs:
-let completedLessons: number[] = [1, 2, 3, 5, 8];`,
+// 4. Completed lesson IDs:
+let completedLessons: number[] =
+  [1, 2, 3, 5, 8];`,
       },
     },
 
@@ -386,31 +409,35 @@ In most cases they are interchangeable. The common convention:
         },
       ],
       exercise: {
-        prompt: 'Define an interface called "Lesson" with: an id (number), a title (string), a content (string), a completed status (boolean), and an optional durationMinutes (number). Then create a variable of that type.',
-        starterCode: `// Define the Lesson interface
+        prompt: 'Define a Profile interface with: an id (number), a name (string), a bio (string), a skills array (string[]), and an optional avatarUrl (string). Then create a variable of that type.',
+        projectStep: 3,
+        projectStepLabel: 'Create a Profile interface',
+        starterCode: `// Profile project - step 3
+// Define the Profile interface
 
-interface Lesson {
-  // add properties here
+interface Profile {
+  // add: id, name, bio, skills
+  // optional: avatarUrl
 }
 
-// Create a Lesson object
-const firstLesson: Lesson = {
+const myProfile: Profile = {
   // fill in the values
 };`,
-        solution: `interface Lesson {
+        solution: `// Profile project - step 3
+
+interface Profile {
   id: number;
-  title: string;
-  content: string;
-  completed: boolean;
-  durationMinutes?: number;
+  name: string;
+  bio: string;
+  skills: string[];
+  avatarUrl?: string;
 }
 
-const firstLesson: Lesson = {
+const myProfile: Profile = {
   id: 1,
-  title: "What Is TypeScript?",
-  content: "TypeScript adds types to JavaScript...",
-  completed: true,
-  durationMinutes: 15,
+  name: "Ada Lovelace",
+  bio: "Mathematician and writer",
+  skills: ["math", "logic"],
 };`,
       },
     },
@@ -513,22 +540,35 @@ TypeScript types work identically with arrow functions:
         },
       ],
       exercise: {
-        prompt: 'Write a typed function "calculateDiscount" that takes a price (number) and an optional discountPercent (number, defaulting to 10). It should return the discounted price as a number.',
-        starterCode: `// Write the calculateDiscount function with TypeScript types
+        prompt: 'Write a typed function "calcDiscount" that takes a price (number) and an optional pct (number, defaulting to 10). It should return the discounted price as a number.',
+        projectStep: 4,
+        projectStepLabel: 'Type a utility function',
+        starterCode: `// Profile project - step 4
+// Type a utility function
 
-function calculateDiscount(/* parameters */): /* return type */ {
-  // Calculate the discounted price
-  // discount formula: price - (price * discountPercent / 100)
+function calcDiscount(
+  /* price: type */
+  /* pct defaults to 10 */
+): /* return type */ {
+  // price - (price * pct / 100)
 }
 
-console.log(calculateDiscount(100));      // should return 90
-console.log(calculateDiscount(100, 20));  // should return 80`,
-        solution: `function calculateDiscount(price: number, discountPercent: number = 10): number {
-  return price - (price * discountPercent / 100);
+console.log(calcDiscount(100));
+// should return 90
+console.log(calcDiscount(100, 20));
+// should return 80`,
+        solution: `// Profile project - step 4
+function calcDiscount(
+  price: number,
+  pct: number = 10
+): number {
+  return price - (price * pct / 100);
 }
 
-console.log(calculateDiscount(100));      // 90
-console.log(calculateDiscount(100, 20));  // 80`,
+console.log(calcDiscount(100));
+// 90
+console.log(calcDiscount(100, 20));
+// 80`,
       },
     },
 
@@ -637,31 +677,45 @@ The optional chaining operator (?.) is useful with nullable values:
       ],
       exercise: {
         prompt: 'Write a function "describe" that accepts a value typed as string | number | boolean and returns a string description. Use type narrowing to handle each case differently.',
-        starterCode: `// Write the describe function using type narrowing
+        projectStep: 5,
+        projectStepLabel: 'Add union type narrowing',
+        starterCode: `// Profile project - step 5
+// Add union type narrowing
 
-function describe(value: string | number | boolean): string {
-  // Handle each type with typeof narrowing
+function describe(
+  value: string | number | boolean
+): string {
   // string: return 'Text: ' + value
-  // number: return 'Number: ' + value.toFixed(2)
-  // boolean: return value ? 'Yes' : 'No'
+  // number: 'Number: ' + toFixed(2)
+  // boolean: value ? 'Yes' : 'No'
 }
 
-console.log(describe("hello"));  // Text: hello
-console.log(describe(3.14159));  // Number: 3.14
-console.log(describe(true));     // Yes`,
-        solution: `function describe(value: string | number | boolean): string {
+console.log(describe("hello"));
+// Text: hello
+console.log(describe(3.14159));
+// Number: 3.14
+console.log(describe(true));
+// Yes`,
+        solution: `// Profile project - step 5
+function describe(
+  value: string | number | boolean
+): string {
   if (typeof value === "string") {
     return "Text: " + value;
   }
   if (typeof value === "number") {
-    return "Number: " + value.toFixed(2);
+    return "Number: " +
+      value.toFixed(2);
   }
   return value ? "Yes" : "No";
 }
 
-console.log(describe("hello"));  // Text: hello
-console.log(describe(3.14159));  // Number: 3.14
-console.log(describe(true));     // Yes`,
+console.log(describe("hello"));
+// Text: hello
+console.log(describe(3.14159));
+// Number: 3.14
+console.log(describe(true));
+// Yes`,
       },
     },
 
@@ -779,25 +833,52 @@ TypeScript's standard library uses generics everywhere:
       ],
       exercise: {
         prompt: 'Write a generic function "getProperty" that takes an object of type T and a key of type K (where K extends keyof T) and returns the property value. This is a real TypeScript utility pattern.',
-        starterCode: `// Write a generic getProperty function
+        projectStep: 6,
+        projectStepLabel: 'Write a generic utility',
+        starterCode: `// Profile project - step 6
+// Write a generic utility
 
-function getProperty<T, K extends keyof T>(obj: T, key: K) {
+function getProperty<
+  T,
+  K extends keyof T
+>(obj: T, key: K) {
   // return the value at obj[key]
 }
 
-const user = { id: 1, name: "Ada", email: "ada@test.com" };
+const user = {
+  id: 1,
+  name: "Ada",
+  email: "ada@test.com",
+};
 
-console.log(getProperty(user, "name"));   // Ada
-console.log(getProperty(user, "id"));     // 1
-// getProperty(user, "age");  // should be a TypeScript error — "age" does not exist on user`,
-        solution: `function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+console.log(
+  getProperty(user, "name")
+); // Ada
+console.log(
+  getProperty(user, "id")
+); // 1
+// getProperty(user, "age");
+// Error: "age" not on user`,
+        solution: `// Profile project - step 6
+function getProperty<
+  T,
+  K extends keyof T
+>(obj: T, key: K): T[K] {
   return obj[key];
 }
 
-const user = { id: 1, name: "Ada", email: "ada@test.com" };
+const user = {
+  id: 1,
+  name: "Ada",
+  email: "ada@test.com",
+};
 
-console.log(getProperty(user, "name"));   // Ada
-console.log(getProperty(user, "id"));     // 1`,
+console.log(
+  getProperty(user, "name")
+); // Ada
+console.log(
+  getProperty(user, "id")
+); // 1`,
       },
     },
 
@@ -906,7 +987,10 @@ Watch mode (recompiles on every save):
       ],
       exercise: {
         prompt: 'Write a tsconfig.json for a Node.js API project. It should: compile to ES2020, use CommonJS modules, output to a "dist" folder, read source from "src", and enable strict mode.',
-        starterCode: `// Write a tsconfig.json for a Node.js API project
+        projectStep: 7,
+        projectStepLabel: 'Configure TypeScript for the project',
+        starterCode: `// Profile project - step 7
+// Write tsconfig.json
 {
   "compilerOptions": {
 
@@ -914,7 +998,8 @@ Watch mode (recompiles on every save):
   "include": [],
   "exclude": []
 }`,
-        solution: `{
+        solution: `// Profile project - step 7
+{
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",

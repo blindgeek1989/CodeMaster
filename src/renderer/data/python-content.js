@@ -22,6 +22,10 @@ const pythonModule = {
     'Use a dictionary to store and look up information',
     'Handle an error so the program does not crash',
   ],
+  project: {
+    name: 'Quiz Application',
+    description: 'Build a text-based multiple-choice quiz game in Python.',
+  },
   lessons: [
     {
       id: 'py-1',
@@ -82,6 +86,8 @@ Python is text-based. Every Python program is a plain text file. Screen readers 
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Print the quiz title',
         steps: [
           {
             instruction: 'Step 1: Write a Python comment. Type a line starting with # that says "My first Python program".',
@@ -166,6 +172,8 @@ Python uses indentation (spaces at the start of a line) to define structure. You
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Display quiz output lines',
         steps: [
           {
             instruction: 'Step 1: Print three lines: your favourite colour, your favourite number (as text, e.g. "7"), and your favourite food. Each on its own line using separate print() calls.',
@@ -258,6 +266,8 @@ You can reassign a variable at any time:
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Store a question in a variable',
         steps: [
           {
             instruction: 'Step 1: Create a variable called city and assign it the string value "London". Then print it.',
@@ -346,6 +356,8 @@ Each character in a string has an index starting at 0:
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Format question text with f-strings',
         steps: [
           {
             instruction: 'Step 1: Create a variable called message with the value "  Welcome to Python!  " (with spaces around it). Print it after calling .strip() to remove the surrounding whitespace.',
@@ -356,7 +368,7 @@ Each character in a string has an index starting at 0:
           {
             instruction: 'Step 2: Create variables first_name = "Ada" and last_name = "Lovelace". Use an f-string to print: "Full name: Ada Lovelace".',
             starterCode: 'first_name = "Ada"\nlast_name = "Lovelace"\n# Use an f-string to print the full name\n',
-            solution: 'first_name = "Ada"\nlast_name = "Lovelace"\nprint(f"Full name: {first_name} {last_name}")\n',
+            solution: 'first_name = "Ada"\nlast_name = "Lovelace"\nfull = f"{first_name} {last_name}"\nprint(f"Full name: {full}")\n',
             expectedOutput: 'Full name: Ada Lovelace',
           },
           {
@@ -427,6 +439,8 @@ CHECKING IF AN ITEM IS IN A LIST
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Store multiple questions in a list',
         steps: [
           {
             instruction: 'Step 1: Create a list called languages with three items: "Python", "HTML", "CSS". Print the full list, then print just the first item.',
@@ -442,8 +456,8 @@ CHECKING IF AN ITEM IS IN A LIST
           },
           {
             instruction: 'Step 3: Use a for loop to print each language in the list on its own line.',
-            starterCode: 'languages = ["Python", "HTML", "CSS", "JavaScript"]\n# Loop through and print each language\n',
-            solution: 'languages = ["Python", "HTML", "CSS", "JavaScript"]\nfor language in languages:\n    print(language)\n',
+            starterCode: 'languages = [\n    "Python", "HTML",\n    "CSS", "JavaScript",\n]\n# Loop through and print each language\n',
+            solution: 'languages = [\n    "Python", "HTML",\n    "CSS", "JavaScript",\n]\nfor language in languages:\n    print(language)\n',
             expectedOutput: 'Python\nHTML\nCSS\nJavaScript',
           },
         ],
@@ -532,6 +546,8 @@ SHORT-HAND: TERNARY EXPRESSION
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Check the answer with an if statement',
         steps: [
           {
             instruction: 'Step 1: Write an if/else statement. Given temperature = 35, print "It is hot" if temperature is greater than 30, otherwise print "It is cool".',
@@ -618,6 +634,8 @@ continue — SKIP THIS ITERATION
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Loop through all questions',
         steps: [
           {
             instruction: 'Step 1: Use a for loop with range() to print the numbers 1 through 5, each on its own line.',
@@ -725,6 +743,8 @@ A docstring is a string at the very start of a function body that describes what
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Define a function to ask a question',
         steps: [
           {
             instruction: 'Step 1: Define a function called say_hello that takes one parameter called name and prints "Hello, {name}!". Then call it with the argument "World".',
@@ -818,23 +838,25 @@ LENGTH
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Load questions from a dictionary',
         steps: [
           {
             instruction: 'Step 1: Create a dictionary called book with three keys: "title" = "Python Basics", "author" = "Ada", and "year" = 2026. Print the value of the "title" key.',
             starterCode: '# Create the book dictionary and print the title\n',
-            solution: 'book = {"title": "Python Basics", "author": "Ada", "year": 2026}\nprint(book["title"])\n',
+            solution: 'book = {\n    "title": "Python Basics",\n    "author": "Ada",\n    "year": 2026,\n}\nprint(book["title"])\n',
             expectedOutput: 'Python Basics',
           },
           {
             instruction: 'Step 2: Add a new key "pages" with value 200 to the book dictionary. Then print the length of the dictionary.',
-            starterCode: 'book = {"title": "Python Basics", "author": "Ada", "year": 2026}\n# Add "pages": 200 and print the length\n',
-            solution: 'book = {"title": "Python Basics", "author": "Ada", "year": 2026}\nbook["pages"] = 200\nprint(len(book))\n',
+            starterCode: 'book = {\n    "title": "Python Basics",\n    "author": "Ada",\n    "year": 2026,\n}\n# Add "pages": 200 and print the length\n',
+            solution: 'book = {\n    "title": "Python Basics",\n    "author": "Ada",\n    "year": 2026,\n}\nbook["pages"] = 200\nprint(len(book))\n',
             expectedOutput: '4',
           },
           {
             instruction: 'Step 3: Loop through the book dictionary using .items() and print each key-value pair in the format "key: value".',
-            starterCode: 'book = {"title": "Python Basics", "author": "Ada", "year": 2026, "pages": 200}\n# Loop through items and print each key: value\n',
-            solution: 'book = {"title": "Python Basics", "author": "Ada", "year": 2026, "pages": 200}\nfor key, value in book.items():\n    print(f"{key}: {value}")\n',
+            starterCode: 'book = {\n    "title": "Python Basics",\n    "author": "Ada",\n    "year": 2026,\n    "pages": 200,\n}\n# Loop through items and print each key: value\n',
+            solution: 'book = {\n    "title": "Python Basics",\n    "author": "Ada",\n    "year": 2026,\n    "pages": 200,\n}\nfor key, value in book.items():\n    print(f"{key}: {value}")\n',
             expectedOutput: 'title: Python Basics\nauthor: Ada\nyear: 2026\npages: 200',
           },
         ],
@@ -933,6 +955,8 @@ You can raise exceptions yourself with raise:
         },
       ],
       exercise: {
+        projectStep: 10,
+        projectStepLabel: 'Handle errors in the quiz',
         steps: [
           {
             instruction: 'Step 1: Write a try/except block that tries to convert the string "not_a_number" to an integer using int(). Catch the ValueError and print "Invalid input: not a number."',
@@ -949,7 +973,7 @@ You can raise exceptions yourself with raise:
           {
             instruction: 'Step 3: Define a function called safe_divide(a, b). It should return a / b, but raise a ValueError with the message "Cannot divide by zero." if b is 0. Call it inside a try/except block with a=10, b=0, and print the error message.',
             starterCode: '# Define safe_divide, then call it with 10, 0 inside try/except\n',
-            solution: 'def safe_divide(a, b):\n    if b == 0:\n        raise ValueError("Cannot divide by zero.")\n    return a / b\n\ntry:\n    result = safe_divide(10, 0)\nexcept ValueError as e:\n    print(e)\n',
+            solution: 'def safe_divide(a, b):\n    if b == 0:\n        msg = "Cannot divide by zero."\n        raise ValueError(msg)\n    return a / b\n\ntry:\n    result = safe_divide(10, 0)\nexcept ValueError as e:\n    print(e)\n',
             expectedOutput: 'Cannot divide by zero.',
           },
         ],

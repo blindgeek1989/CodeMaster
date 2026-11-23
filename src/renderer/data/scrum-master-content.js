@@ -17,6 +17,10 @@ const scrumMasterModule = {
     'Explain how a Scrum Master facilitates retrospectives without controlling them',
     'Understand the difference between coaching, mentoring, and advising',
   ],
+  project: {
+    name: 'Sprint Facilitation Playbook',
+    description: 'Build a Scrum Master playbook documenting how to facilitate each Scrum event.',
+  },
   lessons: [
     {
       id: 'scrum-master-1',
@@ -96,7 +100,38 @@ On smaller teams, the Scrum Master role is sometimes taken on part-time by a tea
           answer: 3,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Playbook: SM servant leadership',
+        prompt: 'Write 3 concrete ways a Scrum Master can serve the Developers without micromanaging them. Each should be a specific action or question.',
+        starterCode: `// Playbook Entry 1: Servant Leadership
+// 3 ways to serve Developers
+// without micromanaging.
+
+Way 1:
+
+Way 2:
+
+Way 3:`,
+        solution: `// Playbook Entry 1: Servant Leadership
+Way 1:
+Ask "What would help you move
+forward?" instead of assigning
+a solution. Let the Developer
+own the answer.
+
+Way 2:
+Remove process obstacles (waiting
+on approvals, missing access)
+so Developers can focus on
+building, not admin work.
+
+Way 3:
+In Daily Scrum, ask "Is anything
+blocking your progress?" then
+follow up -- don't just listen
+and do nothing.`,
+      },
     },
     {
       id: 'scrum-master-2',
@@ -172,7 +207,39 @@ Servant leadership is not being a pushover or saying yes to everything. A Scrum 
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Playbook: Sprint Planning',
+        prompt: 'Write a 5-step facilitation checklist for running Sprint Planning. Each step should be a concrete action the Scrum Master takes before or during the event.',
+        starterCode: `// Playbook Entry 2: Sprint Planning
+// 5-step facilitation checklist.
+
+Step 1:
+Step 2:
+Step 3:
+Step 4:
+Step 5:`,
+        solution: `// Playbook Entry 2: Sprint Planning
+Step 1: Before the event, confirm
+the Product Owner has prepared
+enough refined backlog items.
+
+Step 2: Open by asking "Why is
+this Sprint valuable?" -- help
+the team craft a clear Sprint Goal.
+
+Step 3: Ask Developers "How much
+work can you reliably complete?"
+-- do not let PO pressure them.
+
+Step 4: Timebox each topic. If
+discussion runs long, park it
+and move on.
+
+Step 5: Close by confirming the
+Sprint Goal aloud and asking
+"Can we all commit to this?"`,
+      },
     },
     {
       id: 'scrum-master-3',
@@ -273,7 +340,49 @@ If a discussion is valuable but goes long, the right response is to schedule a s
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Playbook: Impediment escalation',
+        prompt: 'Write a template for escalating an impediment that cannot be resolved within the team. Include: description, who must act, impact on the Sprint, and the requested action.',
+        starterCode: `// Playbook Entry 3: Escalation
+// Use when an impediment needs
+// action from outside the team.
+
+IMPEDIMENT ESCALATION
+
+Impediment:
+
+Who needs to act:
+
+Impact on Sprint:
+
+Requested action:
+
+Escalated by:
+Date raised:`,
+        solution: `// Playbook Entry 3: Escalation
+IMPEDIMENT ESCALATION
+
+Impediment:
+Team cannot access the staging
+environment. IT requires VP approval
+and has not responded in 3 days.
+
+Who needs to act:
+IT dept and VP of Engineering.
+
+Impact on Sprint:
+3 of 5 Sprint items cannot be
+tested. Sprint Goal is at risk.
+
+Requested action:
+Grant staging access by [date]
+or provide an alternative test
+environment within 24 hours.
+
+Escalated by: Scrum Master
+Date raised: [today's date]`,
+      },
     },
     {
       id: 'scrum-master-4',
@@ -351,7 +460,34 @@ A great Scrum Master looks for patterns. When the same type of impediment recurs
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Playbook: Sprint Review',
+        prompt: 'Write 3 questions a Scrum Master can ask stakeholders during a Sprint Review to get actionable feedback rather than passive observation.',
+        starterCode: `// Playbook Entry 4: Sprint Review
+// 3 questions for stakeholders.
+
+Question 1:
+
+Question 2:
+
+Question 3:`,
+        solution: `// Playbook Entry 4: Sprint Review
+Question 1:
+"Does this Increment solve the
+problem you originally described?
+If not, what is still missing?"
+
+Question 2:
+"Given what you have seen today,
+would you change the order of
+anything on the Product Backlog?"
+
+Question 3:
+"What would need to be true for
+you to consider this feature
+ready for real users?"`,
+      },
     },
     {
       id: 'scrum-master-5',
@@ -442,7 +578,56 @@ A Scrum Master is effective when:
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Playbook: Retrospective format',
+        prompt: 'Write a 4-step retrospective format: gather data, generate insights, decide on actions, then close. For each step, describe what the Scrum Master does and one question to ask.',
+        starterCode: `// Playbook Entry 5: Retrospective
+// 4-step format.
+
+Step 1 -- Gather data:
+  What SM does:
+  Question to ask:
+
+Step 2 -- Generate insights:
+  What SM does:
+  Question to ask:
+
+Step 3 -- Decide on actions:
+  What SM does:
+  Question to ask:
+
+Step 4 -- Close:
+  What SM does:
+  Question to ask:`,
+        solution: `// Playbook Entry 5: Retrospective
+Step 1 -- Gather data:
+  What SM does: Invite everyone
+  to write one thing that went
+  well and one that did not.
+  Question: "What happened this
+  Sprint that we should discuss?"
+
+Step 2 -- Generate insights:
+  What SM does: Group themes and
+  ask team to vote on the most
+  important one.
+  Question: "Why do we think
+  this keeps happening?"
+
+Step 3 -- Decide on actions:
+  What SM does: Focus on 1-2
+  improvements the team commits to.
+  Question: "What one thing will
+  we do differently next Sprint?"
+
+Step 4 -- Close:
+  What SM does: Read agreed
+  actions aloud and confirm
+  owners and due dates.
+  Question: "Does everyone feel
+  heard and clear on next steps?"`,
+      },
     },
   ],
 };

@@ -26,34 +26,37 @@ const MODULES = {
   'scrum-exam':         window.scrumExamPrepModule,
 };
 
-// ===== Module metadata (icon, label, optional prereqs) =====
+// ===== Module metadata (icon, label, optional prereqs, category) =====
 const MODULE_DEFS = [
-  { id: 'think',                icon: '🧠', label: 'Think Like a Programmer', note: 'Start here' },
-  { id: 'html',                 icon: '📄', label: 'HTML' },
-  { id: 'css',                  icon: '🎨', label: 'CSS',                    prereqs: ['html'] },
-  { id: 'javascript',           icon: '⚡', label: 'JavaScript',             prereqs: ['html', 'css'] },
-  { id: 'python',               icon: '🐍', label: 'Python' },
-  { id: 'sql',                  icon: '🗄️', label: 'SQL' },
-  { id: 'powershell',           icon: '💻', label: 'PowerShell' },
-  { id: 'aria',                 icon: '♿', label: 'ARIA',                   prereqs: ['html'] },
-  { id: 'git',                  icon: '🌿', label: 'Git & Version Control' },
-  { id: 'github',               icon: '🐙', label: 'GitHub',                prereqs: ['git'] },
-  { id: 'typescript',           icon: '🔷', label: 'TypeScript',            prereqs: ['javascript'] },
-  { id: 'async-js',             icon: '⏳', label: 'Async JavaScript',      prereqs: ['javascript'] },
-  { id: 'react',                icon: '⚛️', label: 'React',                prereqs: ['javascript', 'async-js'] },
-  { id: 'nextjs',               icon: '▲',  label: 'Next.js',               prereqs: ['react'] },
-  { id: 'nodejs',               icon: '🟢', label: 'Node.js & Express',     prereqs: ['javascript'] },
-  { id: 'jest',                 icon: '🧪', label: 'Testing with Jest',     prereqs: ['javascript'] },
-  { id: 'regex',                icon: '🔍', label: 'Regular Expressions',   prereqs: ['javascript'] },
-  { id: 'prompt-engineering',   icon: '✨', label: 'Prompt Engineering' },
-  { id: 'scrum-intro',          icon: '🔄', label: 'Intro to Scrum' },
-  { id: 'scrum-master',         icon: '🏉', label: 'Scrum Master',          prereqs: ['scrum-intro'] },
-  { id: 'scrum-ai',             icon: '🤖', label: 'Scrum Master with AI',  prereqs: ['scrum-master'] },
-  { id: 'scrum-exam',           icon: '📝', label: 'Scrum Exam Prep',       prereqs: ['scrum-master'] },
+  { id: 'think',                icon: '🧠', label: 'Think Like a Programmer', note: 'Start here',  category: 'beginner' },
+  { id: 'html',                 icon: '📄', label: 'HTML',                                          category: 'beginner' },
+  { id: 'css',                  icon: '🎨', label: 'CSS',                    prereqs: ['html'],      category: 'beginner' },
+  { id: 'javascript',           icon: '⚡', label: 'JavaScript',             prereqs: ['html', 'css'], category: 'intermediate' },
+  { id: 'python',               icon: '🐍', label: 'Python',                                        category: 'beginner' },
+  { id: 'sql',                  icon: '🗄️', label: 'SQL',                                           category: 'beginner' },
+  { id: 'powershell',           icon: '💻', label: 'PowerShell',                                    category: 'beginner' },
+  { id: 'aria',                 icon: '♿', label: 'ARIA',                   prereqs: ['html'],      category: 'intermediate' },
+  { id: 'git',                  icon: '🌿', label: 'Git & Version Control',                         category: 'beginner' },
+  { id: 'github',               icon: '🐙', label: 'GitHub',                prereqs: ['git'],       category: 'intermediate' },
+  { id: 'typescript',           icon: '🔷', label: 'TypeScript',            prereqs: ['javascript'], category: 'advanced' },
+  { id: 'async-js',             icon: '⏳', label: 'Async JavaScript',      prereqs: ['javascript'], category: 'intermediate' },
+  { id: 'react',                icon: '⚛️', label: 'React',                prereqs: ['javascript', 'async-js'], category: 'advanced' },
+  { id: 'nextjs',               icon: '▲',  label: 'Next.js',               prereqs: ['react'],     category: 'advanced' },
+  { id: 'nodejs',               icon: '🟢', label: 'Node.js & Express',     prereqs: ['javascript'], category: 'intermediate' },
+  { id: 'jest',                 icon: '🧪', label: 'Testing with Jest',     prereqs: ['javascript'], category: 'intermediate' },
+  { id: 'regex',                icon: '🔍', label: 'Regular Expressions',   prereqs: ['javascript'], category: 'intermediate' },
+  { id: 'prompt-engineering',   icon: '✨', label: 'Prompt Engineering',                            category: 'beginner' },
+  { id: 'scrum-intro',          icon: '🔄', label: 'Intro to Scrum',                               category: 'beginner' },
+  { id: 'scrum-master',         icon: '🏉', label: 'Scrum Master',          prereqs: ['scrum-intro'], category: 'intermediate' },
+  { id: 'scrum-ai',             icon: '🤖', label: 'Scrum Master with AI',  prereqs: ['scrum-master'], category: 'advanced' },
+  { id: 'scrum-exam',           icon: '📝', label: 'Scrum Exam Prep',       prereqs: ['scrum-master'], category: 'advanced' },
 ];
 
 // ===== Languages that support real code execution =====
 const EXECUTABLE_LANGUAGES = new Set(['python', 'sql', 'powershell']);
+
+// ===== Active category filter for welcome screen =====
+let activeCategory = 'all';
 
 // ===== State =====
 let state = {
@@ -885,11 +888,62 @@ function renderLessonContent(lesson, container) {
         parseAndRenderText(block.value, container);
       } else if (block.type === 'table') {
         container.appendChild(buildContentTable(block));
+      } else if (block.type === 'code') {
+        container.appendChild(buildCodeBlock(block));
       }
     });
   } else {
     parseAndRenderText(lesson.content, container);
   }
+}
+
+function buildCodeBlock(block) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'code-block-wrapper';
+  wrapper.setAttribute('role', 'region');
+  const langName = block.lang || 'code';
+  wrapper.setAttribute('aria-label', `Code example: ${langName}`);
+
+  const header = document.createElement('div');
+  header.className = 'code-block-header';
+
+  const langLabel = document.createElement('span');
+  langLabel.className = 'code-lang-label';
+  langLabel.setAttribute('aria-hidden', 'true');
+  langLabel.textContent = langName;
+  header.appendChild(langLabel);
+
+  if (block.caption) {
+    const caption = document.createElement('span');
+    caption.className = 'code-block-caption';
+    caption.textContent = block.caption;
+    header.appendChild(caption);
+  }
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'code-copy-btn';
+  copyBtn.textContent = 'Copy';
+  copyBtn.setAttribute('aria-label', 'Copy code to clipboard');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(block.value).then(() => {
+      copyBtn.textContent = 'Copied';
+      announce('Code copied to clipboard.');
+      setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+    });
+  });
+  header.appendChild(copyBtn);
+
+  const pre = document.createElement('pre');
+  pre.className = 'code-block';
+  if (block.lang) pre.setAttribute('lang', block.lang);
+
+  const code = document.createElement('code');
+  code.textContent = block.value;
+  pre.appendChild(code);
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(pre);
+  return wrapper;
 }
 
 // ===== Show a single lesson =====
@@ -1531,6 +1585,30 @@ function buildExercise(exercise, lessonTitle, moduleId) {
   h2.textContent = 'Coding Exercise';
   section.appendChild(h2);
 
+  // Project context banner
+  const mod = MODULES[moduleId];
+  if (mod && mod.project && exercise.projectStep) {
+    const projectBanner = document.createElement('div');
+    projectBanner.className = 'project-context';
+    projectBanner.setAttribute('role', 'note');
+    projectBanner.setAttribute('aria-label',
+      `Project: ${mod.project.name}, step ${exercise.projectStep}`);
+
+    const projectLbl = document.createElement('span');
+    projectLbl.className = 'project-label';
+    projectLbl.textContent = `Project: ${mod.project.name}`;
+
+    const stepLbl = document.createElement('span');
+    stepLbl.className = 'project-step-label';
+    stepLbl.textContent = exercise.projectStepLabel
+      ? `Step ${exercise.projectStep} — ${exercise.projectStepLabel}`
+      : `Step ${exercise.projectStep}`;
+
+    projectBanner.appendChild(projectLbl);
+    projectBanner.appendChild(stepLbl);
+    section.appendChild(projectBanner);
+  }
+
   // Step counter header
   const stepHeader = document.createElement('div');
   stepHeader.className = 'step-header';
@@ -1561,8 +1639,8 @@ function buildExercise(exercise, lessonTitle, moduleId) {
       e.preventDefault();
       const s = editor.selectionStart;
       const end = editor.selectionEnd;
-      editor.value = editor.value.substring(0, s) + '    ' + editor.value.substring(end);
-      editor.selectionStart = editor.selectionEnd = s + 4;
+      editor.value = editor.value.substring(0, s) + '  ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = s + 2;
     }
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -1729,6 +1807,71 @@ function buildExercise(exercise, lessonTitle, moduleId) {
 }
 
 // ===== Welcome screen =====
+function buildModuleCards(welcome) {
+  const filtered = activeCategory === 'all'
+    ? MODULE_DEFS
+    : MODULE_DEFS.filter(d => d.category === activeCategory);
+
+  const statusMsg = activeCategory === 'all'
+    ? `Showing all ${filtered.length} modules`
+    : `Showing ${filtered.length} ${activeCategory} module${filtered.length !== 1 ? 's' : ''}`;
+
+  const status = document.createElement('p');
+  status.className = 'filter-status sr-only';
+  status.setAttribute('aria-live', 'polite');
+  status.setAttribute('aria-atomic', 'true');
+  status.textContent = statusMsg;
+
+  const cards = document.createElement('ul');
+  cards.className = 'module-cards';
+
+  filtered.forEach(({ id, icon, label, note, category }) => {
+    const mod = MODULES[id];
+    if (!mod) return;
+    const count = mod.lessons.length;
+    const done  = state.completedLessons[id] ? state.completedLessons[id].size : 0;
+    const progressText = done > 0 ? ` — ${done}/${count} complete` : '';
+    const desc = note ? `${count} lessons — ${note}${progressText}` : `${count} lessons${progressText}`;
+    const catLabel = category.charAt(0).toUpperCase() + category.slice(1);
+
+    const li = document.createElement('li');
+
+    const card = document.createElement('button');
+    card.className = 'module-start-card';
+    card.setAttribute('aria-label', `${label} — ${desc} — ${catLabel}`);
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'card-icon';
+    iconSpan.setAttribute('aria-hidden', 'true');
+    iconSpan.textContent = icon;
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'card-label';
+    labelSpan.setAttribute('aria-hidden', 'true');
+    labelSpan.textContent = label;
+
+    const descSpan = document.createElement('span');
+    descSpan.className = 'card-desc';
+    descSpan.setAttribute('aria-hidden', 'true');
+    descSpan.textContent = desc;
+
+    const badge = document.createElement('span');
+    badge.className = `card-category-badge card-category-badge--${category}`;
+    badge.setAttribute('aria-hidden', 'true');
+    badge.textContent = catLabel;
+
+    card.appendChild(iconSpan);
+    card.appendChild(labelSpan);
+    card.appendChild(descSpan);
+    card.appendChild(badge);
+    card.addEventListener('click', () => loadModule(id));
+    li.appendChild(card);
+    cards.appendChild(li);
+  });
+
+  return { cards, status, statusMsg };
+}
+
 function showWelcome() {
   mainContent.innerHTML = '';
 
@@ -1746,53 +1889,48 @@ function showWelcome() {
   const p2 = document.createElement('p');
   p2.textContent = 'Choose a module below to get started.';
 
-  const cards = document.createElement('ul');
-  cards.className = 'module-cards';
+  // ---- Category filter bar ----
+  const filterGroup = document.createElement('div');
+  filterGroup.className = 'category-filters';
+  filterGroup.setAttribute('role', 'group');
+  filterGroup.setAttribute('aria-label', 'Filter modules by difficulty');
 
-  const defs = MODULE_DEFS;
-
-  defs.forEach(({ id, icon, label, note }) => {
-    const mod = MODULES[id];
-    if (!mod) return;
-    const count = mod.lessons.length;
-    const done  = state.completedLessons[id] ? state.completedLessons[id].size : 0;
-    const progressText = done > 0 ? ` — ${done}/${count} complete` : '';
-    const desc = note ? `${count} lessons — ${note}${progressText}` : `${count} lessons${progressText}`;
-
-    const li = document.createElement('li');
-
-    const card = document.createElement('button');
-    card.className = 'module-start-card';
-    card.setAttribute('aria-label', `${label} — ${desc}`);
-
-    const iconSpan = document.createElement('span');
-    iconSpan.className = 'card-icon';
-    iconSpan.setAttribute('aria-hidden', 'true');
-    iconSpan.textContent = icon;
-
-    const labelSpan = document.createElement('span');
-    labelSpan.className = 'card-label';
-    labelSpan.setAttribute('aria-hidden', 'true');
-    labelSpan.textContent = label;
-
-    const descSpan = document.createElement('span');
-    descSpan.className = 'card-desc';
-    descSpan.setAttribute('aria-hidden', 'true');
-    descSpan.textContent = desc;
-
-    card.appendChild(iconSpan);
-    card.appendChild(labelSpan);
-    card.appendChild(descSpan);
-    card.addEventListener('click', () => {
-      loadModule(id);
+  [
+    { value: 'all',          label: 'All' },
+    { value: 'beginner',     label: 'Beginner' },
+    { value: 'intermediate', label: 'Intermediate' },
+    { value: 'advanced',     label: 'Advanced' },
+  ].forEach(({ value, label }) => {
+    const btn = document.createElement('button');
+    btn.className = 'category-filter-btn';
+    btn.dataset.category = value;
+    btn.textContent = label;
+    btn.setAttribute('aria-pressed', value === activeCategory ? 'true' : 'false');
+    btn.addEventListener('click', () => {
+      activeCategory = value;
+      filterGroup.querySelectorAll('.category-filter-btn').forEach(b => {
+        b.setAttribute('aria-pressed', b.dataset.category === value ? 'true' : 'false');
+      });
+      const old = welcome.querySelector('.module-cards');
+      const oldStatus = welcome.querySelector('.filter-status');
+      if (old) old.remove();
+      if (oldStatus) oldStatus.remove();
+      const { cards, status, statusMsg } = buildModuleCards(welcome);
+      welcome.appendChild(status);
+      welcome.appendChild(cards);
+      announce(statusMsg);
     });
-    li.appendChild(card);
-    cards.appendChild(li);
+    filterGroup.appendChild(btn);
   });
+
+  // ---- Initial cards ----
+  const { cards, status } = buildModuleCards(welcome);
 
   welcome.appendChild(h1);
   welcome.appendChild(p1);
   welcome.appendChild(p2);
+  welcome.appendChild(filterGroup);
+  welcome.appendChild(status);
   welcome.appendChild(cards);
   mainContent.appendChild(welcome);
   h1.setAttribute('tabindex', '-1');
@@ -1919,6 +2057,113 @@ function initUpdater() {
   });
 }
 
+// ===== Feedback & Help panels =====
+function initFeedbackHelp() {
+  const feedbackBtn     = document.getElementById('feedback-btn');
+  const feedbackModal   = document.getElementById('feedback-modal');
+  const feedbackForm    = document.getElementById('feedback-form');
+  const feedbackType    = document.getElementById('feedback-type');
+  const feedbackTitle   = document.getElementById('feedback-title');
+  const feedbackBody    = document.getElementById('feedback-body');
+  const feedbackTitleError = document.getElementById('feedback-title-error');
+  const btnCloseFeedback = document.getElementById('btn-close-feedback');
+
+  const helpBtn     = document.getElementById('help-btn');
+  const helpModal   = document.getElementById('help-modal');
+  const helpEmail   = document.getElementById('help-email-link');
+  const helpGithub  = document.getElementById('help-github-link');
+  const btnCloseHelp = document.getElementById('btn-close-help');
+
+  const REPO = 'https://github.com/blindgeek1989/CodeMaster';
+  const HELP_EMAIL = 'blindgeek1989@gmail.com';
+
+  function openModal(modal, firstFocusable, triggerEl) {
+    modal.hidden = false;
+    modal._trigger = triggerEl;
+    firstFocusable.focus();
+    const handler = (e) => {
+      if (e.key === 'Escape') { closeModal(modal); return; }
+      if (e.key !== 'Tab') return;
+      const els = [...modal.querySelectorAll(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex="0"]'
+      )];
+      const first = els[0];
+      const last  = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    };
+    modal.addEventListener('keydown', handler);
+    modal._trapHandler = handler;
+    modal._outsideHandler = (e) => { if (e.target === modal) closeModal(modal); };
+    modal.addEventListener('click', modal._outsideHandler);
+  }
+
+  function closeModal(modal) {
+    modal.hidden = true;
+    if (modal._trapHandler) { modal.removeEventListener('keydown', modal._trapHandler); modal._trapHandler = null; }
+    if (modal._outsideHandler) { modal.removeEventListener('click', modal._outsideHandler); modal._outsideHandler = null; }
+    if (modal._trigger) { modal._trigger.focus(); modal._trigger = null; }
+  }
+
+  function openExternal(url) {
+    if (window.electronAPI && window.electronAPI.openExternal) {
+      window.electronAPI.openExternal(url);
+    } else {
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  // ---- Feedback ----
+  const labelMap = { bug: 'bug', feature: 'enhancement', general: 'feedback' };
+
+  feedbackBtn.addEventListener('click', () => openModal(feedbackModal, feedbackTitle, feedbackBtn));
+
+  btnCloseFeedback.addEventListener('click', () => closeModal(feedbackModal));
+
+  feedbackForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = feedbackTitle.value.trim();
+    if (!title) {
+      feedbackTitle.setAttribute('aria-invalid', 'true');
+      feedbackTitleError.textContent = 'Please enter a title.';
+      feedbackTitleError.hidden = false;
+      feedbackTitle.focus();
+      return;
+    }
+    feedbackTitle.removeAttribute('aria-invalid');
+    feedbackTitleError.hidden = true;
+
+    const type   = feedbackType.value;
+    const label  = labelMap[type] || 'feedback';
+    const body   = feedbackBody.value.trim();
+    const url    = `${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=${encodeURIComponent(label)}`;
+    openExternal(url);
+    closeModal(feedbackModal);
+    announce('Opening GitHub to create your issue. Thank you for the feedback!');
+  });
+
+  feedbackTitle.addEventListener('input', () => {
+    if (feedbackTitle.value.trim()) {
+      feedbackTitle.removeAttribute('aria-invalid');
+      feedbackTitleError.hidden = true;
+    }
+  });
+
+  // ---- Help ----
+  helpEmail.href  = `mailto:${HELP_EMAIL}?subject=CodeMaster%20Help`;
+  helpGithub.href = REPO;
+
+  helpEmail.addEventListener('click', (e) => { e.preventDefault(); openExternal(helpEmail.href); });
+  helpGithub.addEventListener('click', (e) => { e.preventDefault(); openExternal(helpGithub.href); });
+
+  helpBtn.addEventListener('click', () => openModal(helpModal, btnCloseHelp, helpBtn));
+
+  btnCloseHelp.addEventListener('click', () => closeModal(helpModal));
+}
+
 // ===== Init =====
 function init() {
   loadProgress();
@@ -1926,6 +2171,7 @@ function init() {
   initFontSize();
   checkAndShowResumeDialog();
   initUpdater();
+  initFeedbackHelp();
 
   homeBtn.addEventListener('click', () => {
     showWelcome();

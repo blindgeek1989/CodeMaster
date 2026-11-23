@@ -22,6 +22,10 @@ const jestModule = {
     'Write an async test that awaits a mocked fetch call',
     'Generate a coverage report and identify untested branches',
   ],
+  project: {
+    name: 'Profile Page Test Suite',
+    description: 'Write automated tests for the profile page backend API and utilities.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — WHY TEST?
@@ -138,6 +142,8 @@ Other testing frameworks exist (Vitest, Mocha, Jasmine) but Jest is the most com
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Identify test types for a real feature',
         prompt: 'No code to write yet — this is a conceptual lesson. In the text area, write a short description of one real feature from an app you use or could imagine building, and identify: (1) one unit test for it, (2) one integration test, and (3) one e2e test.',
         starterCode: `// Example feature: a shopping cart "apply discount code" function
 // Unit test:        ...
@@ -327,6 +333,8 @@ Use .only and .skip sparingly — never commit a .only as it silences all other 
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Write your first Jest test suite',
         prompt: 'Write a multiply(a, b) function and a test file for it. The tests should cover: two positive numbers, multiplying by zero, and multiplying two negative numbers (which should produce a positive result).',
         starterCode: `// multiply.js
 function multiply(a, b) {
@@ -512,12 +520,24 @@ CHOOSING THE RIGHT MATCHER
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Practice matchers on a user lookup',
         prompt: 'Write tests for a getUser() function that returns a user object. Use at least four different matchers: toEqual, toHaveProperty, toMatchObject, and toThrow.',
         starterCode: `// userService.js
 function getUser(id) {
   const users = {
-    1: { id: 1, name: 'Alex', email: 'alex@example.com', role: 'admin' },
-    2: { id: 2, name: 'Jordan', email: 'jordan@example.com', role: 'user' },
+    1: {
+      id: 1,
+      name: 'Alex',
+      email: 'alex@example.com',
+      role: 'admin',
+    },
+    2: {
+      id: 2,
+      name: 'Jordan',
+      email: 'jordan@example.com',
+      role: 'user',
+    },
   };
   if (!users[id]) throw new Error('User not found');
   return users[id];
@@ -528,13 +548,24 @@ module.exports = { getUser };
 const { getUser } = require('./userService');
 
 describe('getUser()', () => {
-  // Write tests using toEqual, toHaveProperty, toMatchObject, and toThrow
+  // Write tests using toEqual, toHaveProperty,
+  // toMatchObject, and toThrow
 });`,
         solution: `// userService.js
 function getUser(id) {
   const users = {
-    1: { id: 1, name: 'Alex', email: 'alex@example.com', role: 'admin' },
-    2: { id: 2, name: 'Jordan', email: 'jordan@example.com', role: 'user' },
+    1: {
+      id: 1,
+      name: 'Alex',
+      email: 'alex@example.com',
+      role: 'admin',
+    },
+    2: {
+      id: 2,
+      name: 'Jordan',
+      email: 'jordan@example.com',
+      role: 'user',
+    },
   };
   if (!users[id]) throw new Error('User not found');
   return users[id];
@@ -728,6 +759,8 @@ If removing or reordering a test causes others to fail, your tests are not isola
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Test a stateful Stack class',
         prompt: 'Write a Stack class (push, pop, peek, isEmpty, size) and a full test suite for it. Use beforeEach to create a fresh Stack before each test.',
         starterCode: `// stack.js
 class Stack {
@@ -955,6 +988,8 @@ The difference between:
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Mock a module dependency',
         prompt: 'Write tests for a notifyUser() function that calls sendSMS() internally. Mock the sendSMS module so no real messages are sent. Assert it was called with the right arguments.',
         starterCode: `// smsService.js
 function sendSMS(phone, message) {
@@ -1162,6 +1197,8 @@ Always either: (1) use async/await, or (2) return the promise.`,
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Test async fetch with mocked responses',
         prompt: 'Write an async function getPostTitle(id) that fetches a post from /api/posts/{id} and returns the title string. Then write tests for: the happy path (post found), and the error path (fetch returns ok:false).',
         starterCode: `// posts.js
 async function getPostTitle(id) {
@@ -1214,7 +1251,10 @@ afterEach(() => {
 it('returns the post title when the fetch succeeds', async () => {
   fetch.mockResolvedValueOnce({
     ok: true,
-    json: () => Promise.resolve({ id: 1, title: 'Hello World' }),
+    json: () => Promise.resolve({
+      id: 1,
+      title: 'Hello World',
+    }),
   });
   const title = await getPostTitle(1);
   expect(title).toBe('Hello World');
@@ -1382,6 +1422,8 @@ This prevents new code from being merged without adequate tests.`,
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Build a validator using TDD',
         prompt: 'Use TDD to build an isValidEmail(email) function. Start with a failing test for each rule, then implement the minimum code to pass it. Rules: must contain @, must have at least one character before @, must have at least one character after @, must have a dot after @.',
         starterCode: `// email.js
 function isValidEmail(email) {

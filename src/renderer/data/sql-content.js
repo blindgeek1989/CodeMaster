@@ -19,6 +19,10 @@ const sqlModule = {
     'Count and group rows with COUNT and GROUP BY',
     'Join two tables and retrieve columns from both',
   ],
+  project: {
+    name: 'Employee Records Database',
+    description: 'Build and query a relational database of company employee records.',
+  },
   lessons: [
     {
       id: 'sql-1',
@@ -75,6 +79,8 @@ SQL is pure text. Every query is a plain text command. There are no graphical el
       ],
       exercise: {
         schema: '',
+        projectStep: 1,
+        projectStepLabel: 'Learn the SQL building blocks',
         steps: [
           {
             instruction: 'Step 1: SQL has no code to run for this conceptual lesson. Type the four main SQL command types as SQL comments (each starting with --), one per line: SELECT, INSERT, UPDATE, DELETE.',
@@ -165,6 +171,8 @@ INSERT INTO employees VALUES
   (6, 'Frank Reyes',    'Marketing',   58000, '2023-02-14'),
   (7, 'Grace Obi',      'Sales',       75000, '2021-08-08'),
   (8, 'Henry Liu',      'Engineering', 91000, '2020-12-01');`,
+        projectStep: 2,
+        projectStepLabel: 'Retrieve all employee records',
         steps: [
           {
             instruction: 'Step 1: Write a SELECT query that retrieves ALL columns and ALL rows from the employees table.',
@@ -179,7 +187,7 @@ INSERT INTO employees VALUES
           {
             instruction: 'Step 3: Write a SELECT query that retrieves name and salary, aliasing salary as annual_pay.',
             starterCode: '-- Select name and salary (alias salary as annual_pay)\n',
-            solution: 'SELECT name, salary AS annual_pay FROM employees;',
+            solution: 'SELECT name, salary AS annual_pay\nFROM employees;',
           },
         ],
       },
@@ -248,21 +256,23 @@ Never use = to check for NULL — it always returns false. Use IS NULL or IS NOT
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01'),(3,'Carol Singh','Engineering',88000,'2022-01-10'),(4,'David Marsh','Sales',71000,'2019-11-22'),(5,'Eva Torres','Engineering',102000,'2018-05-30'),(6,'Frank Reyes','Marketing',58000,'2023-02-14'),(7,'Grace Obi','Sales',75000,'2021-08-08'),(8,'Henry Liu','Engineering',91000,'2020-12-01');`,
+        projectStep: 3,
+        projectStepLabel: 'Filter employees by criteria',
         steps: [
           {
             instruction: 'Step 1: Write a query that returns all columns for employees in the Engineering department only.',
             starterCode: "-- Return all Engineering employees\n",
-            solution: "SELECT * FROM employees WHERE department = 'Engineering';",
+            solution: "SELECT * FROM employees\nWHERE department = 'Engineering';",
           },
           {
             instruction: 'Step 2: Write a query that returns name and salary for employees earning more than 80000.',
             starterCode: '-- Return name and salary for high earners\n',
-            solution: 'SELECT name, salary FROM employees WHERE salary > 80000;',
+            solution: 'SELECT name, salary\nFROM employees\nWHERE salary > 80000;',
           },
           {
             instruction: "Step 3: Write a query that returns all columns for employees in Engineering OR Marketing (two conditions joined with OR).",
             starterCode: '-- Return employees from Engineering OR Marketing\n',
-            solution: "SELECT * FROM employees WHERE department = 'Engineering' OR department = 'Marketing';",
+            solution: "SELECT * FROM employees\nWHERE department = 'Engineering'\n   OR department = 'Marketing';",
           },
         ],
       },
@@ -333,21 +343,23 @@ Always write clauses in this order — SQL requires it.`,
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01'),(3,'Carol Singh','Engineering',88000,'2022-01-10'),(4,'David Marsh','Sales',71000,'2019-11-22'),(5,'Eva Torres','Engineering',102000,'2018-05-30'),(6,'Frank Reyes','Marketing',58000,'2023-02-14'),(7,'Grace Obi','Sales',75000,'2021-08-08'),(8,'Henry Liu','Engineering',91000,'2020-12-01');`,
+        projectStep: 4,
+        projectStepLabel: 'Sort and limit query results',
         steps: [
           {
             instruction: 'Step 1: Write a query that returns all employees sorted by name in alphabetical (ascending) order.',
             starterCode: '-- Sort employees by name A-Z\n',
-            solution: 'SELECT * FROM employees ORDER BY name ASC;',
+            solution: 'SELECT * FROM employees\nORDER BY name ASC;',
           },
           {
             instruction: 'Step 2: Write a query that returns only the name and salary of the top 3 highest-paid employees.',
             starterCode: '-- Top 3 earners by salary (highest first)\n',
-            solution: 'SELECT name, salary FROM employees ORDER BY salary DESC LIMIT 3;',
+            solution: 'SELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;',
           },
           {
             instruction: 'Step 3: Write a query that returns all Engineering employees sorted by salary from highest to lowest.',
             starterCode: "-- Engineering employees, highest salary first\n",
-            solution: "SELECT * FROM employees WHERE department = 'Engineering' ORDER BY salary DESC;",
+            solution: "SELECT * FROM employees\nWHERE department = 'Engineering'\nORDER BY salary DESC;",
           },
         ],
       },
@@ -411,21 +423,23 @@ Always specify the column names in INSERT statements. If the table structure cha
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01');`,
+        projectStep: 5,
+        projectStepLabel: 'Add new employees to the database',
         steps: [
           {
             instruction: "Step 1: Insert a new employee into the employees table: name = 'Sam Lee', department = 'Sales', salary = 72000, hire_date = '2024-06-01'. Then SELECT all rows to verify.",
             starterCode: '-- Insert Sam Lee, then select all rows\n',
-            solution: "INSERT INTO employees (name, department, salary, hire_date)\nVALUES ('Sam Lee', 'Sales', 72000, '2024-06-01');\nSELECT * FROM employees;",
+            solution: "INSERT INTO employees (\n  name, department,\n  salary, hire_date\n)\nVALUES (\n  'Sam Lee', 'Sales',\n  72000, '2024-06-01'\n);\nSELECT * FROM employees;",
           },
           {
             instruction: "Step 2: Insert two employees in a single INSERT statement: ('Mia Hall', 'Engineering', 89000, '2024-07-01') and ('Noah Park', 'Marketing', 61000, '2024-07-15'). Then SELECT all rows.",
             starterCode: '-- Insert two employees in one statement, then select all\n',
-            solution: "INSERT INTO employees (name, department, salary, hire_date) VALUES\n  ('Mia Hall', 'Engineering', 89000, '2024-07-01'),\n  ('Noah Park', 'Marketing', 61000, '2024-07-15');\nSELECT * FROM employees;",
+            solution: "INSERT INTO employees (\n  name, department,\n  salary, hire_date\n)\nVALUES\n  ('Mia Hall', 'Engineering',\n   89000, '2024-07-01'),\n  ('Noah Park', 'Marketing',\n   61000, '2024-07-15');\nSELECT * FROM employees;",
           },
           {
             instruction: "Step 3: Insert one more employee ('Olivia Tan', 'Engineering', 97000, '2024-08-01'), then SELECT only name and salary for Engineering employees.",
             starterCode: '-- Insert Olivia Tan, then select Engineering employees\n',
-            solution: "INSERT INTO employees (name, department, salary, hire_date)\nVALUES ('Olivia Tan', 'Engineering', 97000, '2024-08-01');\nSELECT name, salary FROM employees WHERE department = 'Engineering';",
+            solution: "INSERT INTO employees (\n  name, department,\n  salary, hire_date\n)\nVALUES (\n  'Olivia Tan', 'Engineering',\n  97000, '2024-08-01'\n);\nSELECT name, salary\nFROM employees\nWHERE department = 'Engineering';",
           },
         ],
       },
@@ -500,21 +514,23 @@ Using id in WHERE is the safest approach — it uniquely identifies exactly one 
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01'),(3,'Carol Singh','Engineering',88000,'2022-01-10'),(4,'David Marsh','Sales',71000,'2019-11-22'),(5,'Eva Torres','Engineering',102000,'2018-05-30');`,
+        projectStep: 6,
+        projectStepLabel: 'Update employee information',
         steps: [
           {
             instruction: "Step 1: Update Alice Chen's salary to 98000 (use id = 1 in the WHERE clause). Then SELECT all rows to verify.",
             starterCode: "-- Update Alice's salary, then select all\n",
-            solution: 'UPDATE employees SET salary = 98000 WHERE id = 1;\nSELECT * FROM employees;',
+            solution: 'UPDATE employees\n  SET salary = 98000\n  WHERE id = 1;\nSELECT * FROM employees;',
           },
           {
             instruction: "Step 2: Give all Engineering employees a 10% raise by multiplying salary by 1.10. Then SELECT name and salary for Engineering employees.",
             starterCode: "-- 10% raise for Engineering, then select their names and salaries\n",
-            solution: "UPDATE employees SET salary = salary * 1.10 WHERE department = 'Engineering';\nSELECT name, salary FROM employees WHERE department = 'Engineering';",
+            solution: "UPDATE employees\n  SET salary = salary * 1.10\n  WHERE department = 'Engineering';\nSELECT name, salary\nFROM employees\nWHERE department = 'Engineering';",
           },
           {
             instruction: "Step 3: Move Bob Okafor (id = 2) to the Sales department AND give him a new salary of 68000. Then SELECT all rows to verify both changes.",
             starterCode: "-- Update Bob's department and salary in one statement\n",
-            solution: "UPDATE employees SET department = 'Sales', salary = 68000 WHERE id = 2;\nSELECT * FROM employees;",
+            solution: "UPDATE employees\n  SET department = 'Sales',\n      salary = 68000\n  WHERE id = 2;\nSELECT * FROM employees;",
           },
         ],
       },
@@ -590,11 +606,13 @@ DELETE vs TRUNCATE vs DROP
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01'),(3,'Carol Singh','Engineering',88000,'2022-01-10'),(4,'David Marsh','Sales',71000,'2019-11-22'),(5,'Eva Torres','Engineering',102000,'2018-05-30'),(6,'Frank Reyes','Marketing',58000,'2023-02-14');`,
+        projectStep: 7,
+        projectStepLabel: 'Remove employee records safely',
         steps: [
           {
             instruction: 'Step 1: First preview who will be deleted: SELECT all employees where salary < 60000. This is the "check before you delete" step.',
             starterCode: '-- Preview: which employees earn less than 60000?\n',
-            solution: 'SELECT * FROM employees WHERE salary < 60000;',
+            solution: 'SELECT * FROM employees\nWHERE salary < 60000;',
           },
           {
             instruction: 'Step 2: Now delete Frank Reyes (id = 6). Then SELECT all rows to confirm he is gone.',
@@ -604,7 +622,7 @@ INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(
           {
             instruction: "Step 3: Delete all Marketing employees. Then SELECT all remaining rows.",
             starterCode: "-- Delete all Marketing employees, then select all remaining\n",
-            solution: "DELETE FROM employees WHERE department = 'Marketing';\nSELECT * FROM employees;",
+            solution: "DELETE FROM employees\nWHERE department = 'Marketing';\nSELECT * FROM employees;",
           },
         ],
       },
@@ -681,6 +699,8 @@ THE FULL QUERY ORDER
       exercise: {
         schema: `CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT, salary REAL, hire_date TEXT);
 INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(2,'Bob Okafor','Marketing',62000,'2020-07-01'),(3,'Carol Singh','Engineering',88000,'2022-01-10'),(4,'David Marsh','Sales',71000,'2019-11-22'),(5,'Eva Torres','Engineering',102000,'2018-05-30'),(6,'Frank Reyes','Marketing',58000,'2023-02-14'),(7,'Grace Obi','Sales',75000,'2021-08-08'),(8,'Henry Liu','Engineering',91000,'2020-12-01');`,
+        projectStep: 8,
+        projectStepLabel: 'Count and group employees',
         steps: [
           {
             instruction: 'Step 1: Write a query that returns the total number of employees using COUNT(*), aliased as total_employees.',
@@ -690,12 +710,12 @@ INSERT INTO employees VALUES (1,'Alice Chen','Engineering',95000,'2021-03-15'),(
           {
             instruction: 'Step 2: Write a query that returns each department name, the number of employees in that department (as headcount), and the average salary (as avg_salary). Use GROUP BY.',
             starterCode: '-- Count and average salary per department\n',
-            solution: 'SELECT department, COUNT(*) AS headcount, AVG(salary) AS avg_salary FROM employees GROUP BY department;',
+            solution: 'SELECT\n  department,\n  COUNT(*) AS headcount,\n  AVG(salary) AS avg_salary\nFROM employees\nGROUP BY department;',
           },
           {
             instruction: 'Step 3: Write a query that returns the department with the highest total salary budget (SUM of salaries), aliased as total_budget, sorted highest to lowest.',
             starterCode: '-- Total salary budget per department, highest first\n',
-            solution: 'SELECT department, SUM(salary) AS total_budget FROM employees GROUP BY department ORDER BY total_budget DESC;',
+            solution: 'SELECT\n  department,\n  SUM(salary) AS total_budget\nFROM employees\nGROUP BY department\nORDER BY total_budget DESC;',
           },
         ],
       },
@@ -773,21 +793,23 @@ Add a WHERE clause after the JOIN to filter the combined result:
 CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, dept_id INTEGER, salary REAL);
 INSERT INTO departments VALUES (1,'Engineering','London',500000),(2,'Marketing','Manchester',200000),(3,'Sales','Birmingham',300000);
 INSERT INTO employees VALUES (1,'Alice Chen',1,95000),(2,'Bob Okafor',2,62000),(3,'Carol Singh',1,88000),(4,'David Marsh',3,71000),(5,'Eva Torres',1,102000),(6,'Frank Reyes',2,58000),(7,'Grace Obi',3,75000),(8,'Henry Liu',1,91000);`,
+        projectStep: 9,
+        projectStepLabel: 'Link employees to departments',
         steps: [
           {
             instruction: 'Step 1: Write an INNER JOIN query that returns each employee\'s name and their department\'s name (alias it as dept_name). Join employees to departments on employees.dept_id = departments.id.',
             starterCode: '-- Join employees to departments, show name and dept_name\n',
-            solution: 'SELECT e.name, d.name AS dept_name\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.id;',
+            solution: 'SELECT e.name, d.name AS dept_name\nFROM employees e\nINNER JOIN departments d\n  ON e.dept_id = d.id;',
           },
           {
             instruction: "Step 2: Extend your join to also show the location and salary. Filter to only show employees in the 'London' location.",
             starterCode: "-- Join employees to departments, show name, dept_name, location, salary — London only\n",
-            solution: "SELECT e.name, d.name AS dept_name, d.location, e.salary\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.id\nWHERE d.location = 'London';",
+            solution: "SELECT\n  e.name,\n  d.name AS dept_name,\n  d.location,\n  e.salary\nFROM employees e\nINNER JOIN departments d\n  ON e.dept_id = d.id\nWHERE d.location = 'London';",
           },
           {
             instruction: 'Step 3: Write a query that shows each department\'s name and the total salary of employees in it (as dept_total). Use INNER JOIN, GROUP BY, and ORDER BY dept_total descending.',
             starterCode: '-- Total salary per department, highest first\n',
-            solution: 'SELECT d.name, SUM(e.salary) AS dept_total\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.id\nGROUP BY d.name\nORDER BY dept_total DESC;',
+            solution: 'SELECT\n  d.name,\n  SUM(e.salary) AS dept_total\nFROM employees e\nINNER JOIN departments d\n  ON e.dept_id = d.id\nGROUP BY d.name\nORDER BY dept_total DESC;',
           },
         ],
       },
@@ -862,21 +884,23 @@ CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT, dept_id INTEGER, budge
 INSERT INTO departments VALUES (1,'Engineering','London'),(2,'Marketing','Manchester'),(3,'Sales','Birmingham');
 INSERT INTO employees VALUES (1,'Alice Chen',1,95000,'2021-03-15'),(2,'Bob Okafor',2,62000,'2020-07-01'),(3,'Carol Singh',1,88000,'2022-01-10'),(4,'David Marsh',3,71000,'2019-11-22'),(5,'Eva Torres',1,102000,'2018-05-30'),(6,'Frank Reyes',2,58000,'2023-02-14'),(7,'Grace Obi',3,75000,'2021-08-08'),(8,'Henry Liu',1,91000,'2020-12-01');
 INSERT INTO projects VALUES (1,'Platform Rebuild',1,250000),(2,'Brand Campaign',2,80000),(3,'Sales Automation',3,120000),(4,'API Gateway',1,150000);`,
+        projectStep: 10,
+        projectStepLabel: 'Build the full employee report',
         steps: [
           {
             instruction: 'Step 1: Find all employees earning above the company average salary. Use a subquery: WHERE salary > (SELECT AVG(salary) FROM employees). Show name and salary.',
             starterCode: '-- Employees above average salary (use a subquery)\n',
-            solution: 'SELECT name, salary FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);',
+            solution: 'SELECT name, salary\nFROM employees\nWHERE salary > (\n  SELECT AVG(salary)\n  FROM employees\n);',
           },
           {
             instruction: 'Step 2: Write a multi-join query: join employees to departments and then departments to projects (on dept_id). Show employee name, department name, and project name. Only show Engineering employees.',
             starterCode: "-- Three-table join: employees → departments → projects (Engineering only)\n",
-            solution: "SELECT e.name, d.name AS department, p.name AS project\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.id\nINNER JOIN projects p ON d.id = p.dept_id\nWHERE d.name = 'Engineering';",
+            solution: "SELECT\n  e.name,\n  d.name AS department,\n  p.name AS project\nFROM employees e\nINNER JOIN departments d\n  ON e.dept_id = d.id\nINNER JOIN projects p\n  ON d.id = p.dept_id\nWHERE d.name = 'Engineering';",
           },
           {
             instruction: 'Step 3: Write a complete business report: for each department, show the department name, number of employees (as headcount), average salary (as avg_salary), and total project budget (as project_budget). Join all three tables. Group by department name. Sort by headcount descending.',
             starterCode: '-- Full department report: headcount, avg salary, project budget\n',
-            solution: 'SELECT d.name AS department, COUNT(DISTINCT e.id) AS headcount, AVG(e.salary) AS avg_salary, SUM(p.budget) AS project_budget\nFROM departments d\nINNER JOIN employees e ON e.dept_id = d.id\nINNER JOIN projects p ON p.dept_id = d.id\nGROUP BY d.name\nORDER BY headcount DESC;',
+            solution: 'SELECT\n  d.name AS department,\n  COUNT(DISTINCT e.id) AS headcount,\n  AVG(e.salary) AS avg_salary,\n  SUM(p.budget) AS project_budget\nFROM departments d\nINNER JOIN employees e\n  ON e.dept_id = d.id\nINNER JOIN projects p\n  ON p.dept_id = d.id\nGROUP BY d.name\nORDER BY headcount DESC;',
           },
         ],
       },

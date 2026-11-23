@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
@@ -200,4 +200,10 @@ ipcMain.handle('install-update', () => {
 
 ipcMain.handle('get-version', () => {
   return app.getVersion();
+});
+
+ipcMain.handle('open-external', (_event, url) => {
+  if (/^(https?:|mailto:)/.test(url)) {
+    shell.openExternal(url);
+  }
 });

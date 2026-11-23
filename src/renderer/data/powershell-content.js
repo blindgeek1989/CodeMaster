@@ -20,6 +20,10 @@ const powershellModule = {
     'Assign a value to a variable and use it in an output command',
     'Run a development tool from the terminal',
   ],
+  project: {
+    name: 'System Automation Toolkit',
+    description: 'Build a set of PowerShell scripts to automate common system tasks.',
+  },
   lessons: [
     {
       id: 'ps-1',
@@ -75,6 +79,8 @@ Everything after > is where you type your command.`,
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Print a system greeting',
         steps: [
           {
             instruction: 'Step 1: Run Write-Output to print the text "Hello, terminal!" to the screen.',
@@ -164,6 +170,8 @@ Press Tab while typing a path — PowerShell completes the folder or file name f
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'List files in a directory',
         steps: [
           {
             instruction: 'Step 1: Run Get-Location to print your current directory path.',
@@ -245,17 +253,19 @@ Deleted files do not go to the Recycle Bin when removed via PowerShell. They are
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Read and write files',
         steps: [
           {
             instruction: 'Step 1: Use Write-Output and > to write the text "PowerShell is great" to a new file called demo.txt. Then read it back with Get-Content.',
             starterCode: '# Write text to demo.txt, then read it back\n',
-            solution: 'Write-Output "PowerShell is great" > demo.txt\nGet-Content demo.txt',
+            solution: '"PowerShell is great" > demo.txt\nGet-Content demo.txt',
             expectedOutput: 'PowerShell is great',
           },
           {
             instruction: 'Step 2: Append a second line "I am learning the terminal" to demo.txt using >>. Then read the whole file with Get-Content.',
             starterCode: 'Write-Output "PowerShell is great" > demo.txt\n# Append the second line, then read the file\n',
-            solution: 'Write-Output "PowerShell is great" > demo.txt\nWrite-Output "I am learning the terminal" >> demo.txt\nGet-Content demo.txt',
+            solution: '"PowerShell is great" > demo.txt\n"I am learning the terminal" >> demo.txt\nGet-Content demo.txt',
             expectedOutput: 'PowerShell is great\nI am learning the terminal',
           },
           {
@@ -334,11 +344,13 @@ COMBINING
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Filter command output',
         steps: [
           {
             instruction: 'Step 1: Create a file called log.txt with three lines using >> (append each line): "INFO: App started", "ERROR: Connection failed", "INFO: Retrying". Then use Select-String to search for "ERROR" in log.txt.',
             starterCode: '# Create log.txt with 3 lines, then search for ERROR\n',
-            solution: '"INFO: App started" > log.txt\n"ERROR: Connection failed" >> log.txt\n"INFO: Retrying" >> log.txt\nSelect-String -Pattern "ERROR" -Path log.txt',
+            solution: '"INFO: App started" > log.txt\n"ERROR: Connection failed" >> log.txt\n"INFO: Retrying" >> log.txt\nSelect-String "ERROR" log.txt',
           },
           {
             instruction: 'Step 2: Use Get-ChildItem piped to Where-Object to list only files (not folders) in the current directory. Check $_.PSIsContainer -eq $false.',
@@ -348,7 +360,7 @@ COMBINING
           {
             instruction: 'Step 3: Use Get-ChildItem piped to Select-Object to show only the Name and LastWriteTime properties of items in the current directory.',
             starterCode: '# Show only Name and LastWriteTime properties\n',
-            solution: 'Get-ChildItem | Select-Object Name, LastWriteTime',
+            solution: 'ls | Select-Object Name, LastWriteTime',
           },
         ],
       },
@@ -419,6 +431,8 @@ STORING PIPELINE RESULTS
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Store username in a variable',
         steps: [
           {
             instruction: 'Step 1: Create a variable $greeting with the value "Good morning". Then use Write-Output to print "Good morning, PowerShell!" using string interpolation.',
@@ -514,23 +528,25 @@ Create an array with @():
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Make decisions with if/else',
         steps: [
           {
             instruction: 'Step 1: Write a PowerShell if/else: given $score = 85, print "Pass" if $score -ge 60, otherwise print "Fail".',
             starterCode: '$score = 85\n# Print Pass or Fail based on score\n',
-            solution: '$score = 85\nif ($score -ge 60) {\n    Write-Output "Pass"\n} else {\n    Write-Output "Fail"\n}',
+            solution: '$score = 85\nif ($score -ge 60) {\n  Write-Output "Pass"\n} else {\n  Write-Output "Fail"\n}',
             expectedOutput: 'Pass',
           },
           {
             instruction: 'Step 2: Create an array $fruits = @("apple", "banana", "cherry"). Use foreach to print each fruit with Write-Output.',
             starterCode: '$fruits = @("apple", "banana", "cherry")\n# Loop through and print each fruit\n',
-            solution: '$fruits = @("apple", "banana", "cherry")\nforeach ($fruit in $fruits) {\n    Write-Output $fruit\n}',
+            solution: '$fruits = @("apple", "banana", "cherry")\nforeach ($fruit in $fruits) {\n  Write-Output $fruit\n}',
             expectedOutput: 'apple\nbanana\ncherry',
           },
           {
             instruction: 'Step 3: Use a for loop to print the numbers 1 through 5, one per line.',
             starterCode: '# Use a for loop to print 1, 2, 3, 4, 5\n',
-            solution: 'for ($i = 1; $i -le 5; $i++) {\n    Write-Output $i\n}',
+            solution: 'for ($i = 1; $i -le 5; $i++) {\n  Write-Output $i\n}',
             expectedOutput: '1\n2\n3\n4\n5',
           },
         ],
@@ -616,23 +632,25 @@ Once you understand the terminal, you can run any tool:
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Define a toolkit function',
         steps: [
           {
             instruction: 'Step 1: Define a function called Say-Hello that writes "Hello from PowerShell!" to output. Then call it.',
             starterCode: '# Define Say-Hello, then call it\n',
-            solution: 'function Say-Hello {\n    Write-Output "Hello from PowerShell!"\n}\nSay-Hello',
+            solution: 'function Say-Hello {\n  Write-Output "Hello from PowerShell!"\n}\nSay-Hello',
             expectedOutput: 'Hello from PowerShell!',
           },
           {
             instruction: 'Step 2: Define a function called Get-Square that takes a parameter $Number and returns $Number * $Number. Call it with 7 and print the result.',
             starterCode: '# Define Get-Square, call it with 7, print result\n',
-            solution: 'function Get-Square {\n    param ($Number)\n    return $Number * $Number\n}\n$result = Get-Square -Number 7\nWrite-Output $result',
+            solution: 'function Get-Square {\n  param ($Number)\n  return $Number * $Number\n}\n$result = Get-Square -Number 7\nWrite-Output $result',
             expectedOutput: '49',
           },
           {
             instruction: 'Step 3: Define a function called Greet-User with a $Name parameter defaulting to "World". Call it once with no argument, and once with Name = "Alice".',
             starterCode: '# Define Greet-User with default param, call it twice\n',
-            solution: 'function Greet-User {\n    param ($Name = "World")\n    Write-Output "Hello, $Name!"\n}\nGreet-User\nGreet-User -Name "Alice"',
+            solution: 'function Greet-User {\n  param ($Name = "World")\n  Write-Output "Hello, $Name!"\n}\nGreet-User\nGreet-User -Name "Alice"',
             expectedOutput: 'Hello, World!\nHello, Alice!',
           },
         ],
@@ -703,6 +721,8 @@ KEYBOARD SHORTCUTS IN THE TERMINAL
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Print dev tool commands',
         steps: [
           {
             instruction: 'Step 1: Check what version of Python is installed by running: python --version. The output will vary by machine.',
@@ -718,8 +738,8 @@ KEYBOARD SHORTCUTS IN THE TERMINAL
           {
             instruction: 'Step 3: Define a PowerShell function called Show-DevTools that prints three lines: "Git: version control", "Node: JavaScript runtime", "Python: scripting and data". Call it.',
             starterCode: '# Define Show-DevTools and call it\n',
-            solution: 'function Show-DevTools {\n    Write-Output "Git: version control"\n    Write-Output "Node: JavaScript runtime"\n    Write-Output "Python: scripting and data"\n}\nShow-DevTools',
-            expectedOutput: 'Git: version control\nNode: JavaScript runtime\nPython: scripting and data',
+            solution: 'function Show-DevTools {\n  Write-Output "Git: version control"\n  Write-Output "Node: JavaScript runtime"\n  Write-Output "Python: scripting, data"\n}\nShow-DevTools',
+            expectedOutput: 'Git: version control\nNode: JavaScript runtime\nPython: scripting, data',
           },
         ],
       },
@@ -853,36 +873,45 @@ WRITE-ERROR vs THROW vs $PSCmdlet.WriteError
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Handle errors with try/catch',
         prompt: 'Write a PowerShell function "Read-ConfigFile" that takes a file path, reads it with Get-Content, and handles the case where the file does not exist by outputting a useful error message and returning $null.',
         starterCode: `# Write Read-ConfigFile with error handling
 
 function Read-ConfigFile {
-    param([string]$Path)
+  param([string]$Path)
 
-    # Use try/catch to handle file not found
-    # On success: return the file contents
-    # On failure: write an error message and return $null
+  # Use try/catch: on success return contents
+  # On failure: write an error, return $null
 }
 
 # Test calls:
-$config = Read-ConfigFile -Path "C:\config.json"
-$missing = Read-ConfigFile -Path "C:\does-not-exist.json"`,
+$config = Read-ConfigFile \`
+  -Path "C:\config.json"
+$missing = Read-ConfigFile \`
+  -Path "C:\does-not-exist.json"`,
         solution: `function Read-ConfigFile {
-    param([string]$Path)
+  param([string]$Path)
 
-    try {
-        $content = Get-Content -Path $Path -Raw -ErrorAction Stop
-        Write-Output "Config loaded from: $Path"
-        return $content
-    }
-    catch {
-        Write-Error "Could not read config file '$Path': $($_.Exception.Message)"
-        return $null
-    }
+  try {
+    $content = Get-Content \`
+      -Path $Path \`
+      -Raw \`
+      -ErrorAction Stop
+    Write-Output "Loaded: $Path"
+    return $content
+  }
+  catch {
+    $msg = $_.Exception.Message
+    Write-Error "Failed '$Path': $msg"
+    return $null
+  }
 }
 
-$config = Read-ConfigFile -Path "C:\config.json"
-$missing = Read-ConfigFile -Path "C:\does-not-exist.json"`,
+$config = Read-ConfigFile \`
+  -Path "C:\config.json"
+$missing = Read-ConfigFile \`
+  -Path "C:\does-not-exist.json"`,
       },
     },
     {
@@ -1016,6 +1045,8 @@ SAVING RESULTS TO A FILE
         },
       ],
       exercise: {
+        projectStep: 10,
+        projectStepLabel: 'Call an external API',
         prompt: 'Write a PowerShell script that: (1) calls a GET endpoint at "https://jsonplaceholder.typicode.com/posts/1", (2) outputs the title and body from the response, and (3) handles any errors with try/catch.',
         starterCode: `# Call the JSONPlaceholder API and display a post
 
@@ -1026,14 +1057,19 @@ SAVING RESULTS TO A FILE
 # 3. Output the post's body:`,
         solution: `# Call the JSONPlaceholder API and display a post
 
-try {
-    $post = Invoke-RestMethod -Uri "https://jsonplaceholder.typicode.com/posts/1" -ErrorAction Stop
+$url = "https://jsonplaceholder" +
+  ".typicode.com/posts/1"
 
-    Write-Output "Title: $($post.title)"
-    Write-Output "Body: $($post.body)"
+try {
+  $post = Invoke-RestMethod \`
+    -Uri $url \`
+    -ErrorAction Stop
+  Write-Output "Title: $($post.title)"
+  Write-Output "Body: $($post.body)"
 }
 catch {
-    Write-Error "Failed to load post: $($_.Exception.Message)"
+  $msg = $_.Exception.Message
+  Write-Error "Failed to load: $msg"
 }`,
       },
     },

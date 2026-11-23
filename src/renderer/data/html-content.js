@@ -16,6 +16,10 @@ const htmlModule = {
     'Create a working form with accessible labels',
     'Understand what makes HTML accessible to screen reader users',
   ],
+  project: {
+    name: 'Personal Profile Page',
+    description: 'Build a complete, accessible personal profile page from scratch.',
+  },
   lessons: [
     {
       id: 'html-1',
@@ -138,6 +142,8 @@ The ul (list) element contains two li (list item) elements. Always close the inn
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Create basic HTML elements',
         prompt: 'Write three HTML elements: (1) A paragraph that says "I am learning HTML." (2) A link that displays the text "Visit my site" and points to https://example.com. (3) A self-closing image tag with src="logo.png" and alt="CodeMaster logo".',
         starterCode: `<!-- 1. A paragraph -->
 
@@ -217,6 +223,8 @@ Comments are useful for leaving yourself reminders in your code.`,
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Build the document shell',
         prompt: 'Build a complete HTML document from scratch. It should have: a DOCTYPE declaration, an html element with lang="en", a head section with charset meta tag and a title of "My First Page", and a body section with a paragraph that says "Hello, world! This is my first HTML page."',
         starterCode: `<!-- Build your complete HTML document here -->
 `,
@@ -294,6 +302,8 @@ Screen readers announce "list, 3 items" before reading a list, and "list end" wh
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Add page headings and intro paragraph',
         prompt: 'Build the structure of a page about your favorite hobby. Include: (1) An h1 with the hobby name. (2) An h2 that says "Why I enjoy it" followed by a paragraph. (3) An h2 that says "What you need to get started" followed by an unordered list of at least three items. (4) An h2 that says "Steps to get started" followed by an ordered list of at least three steps.',
         starterCode: `<!DOCTYPE html>
 <html lang="en">
@@ -406,6 +416,8 @@ Never do: alt="image" or alt="photo" — these are meaningless.`,
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Add navigation links and a profile image',
         prompt: 'Write the HTML for: (1) A link to https://bbc.com that says "BBC News — World Headlines". (2) An image of a mountain sunrise with a meaningful alt description. (3) A decorative divider image (no information) with the correct alt attribute. (4) A link to a "privacy.html" page in the same website.',
         starterCode: `<!-- 1. Link to BBC News -->
 
@@ -503,6 +515,8 @@ Always use a <button> for buttons — never a <div> or <span>. Only a real butto
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Add landmark structure to the page',
         prompt: 'Build a complete, accessible "Contact Us" page. It should include: (1) A proper HTML document structure with a descriptive title. (2) Semantic landmarks: header, main, footer. (3) Inside main: an h1, a short intro paragraph, and a form with labeled fields for name, email address, a message textarea, and a submit button.',
         starterCode: `<!DOCTYPE html>
 <html lang="en">
@@ -643,6 +657,8 @@ Screen readers announce the caption before reading the table, so users know what
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Add a skills table to the profile',
         prompt: 'Build an accessible table showing three students and their grades. It should have: a caption describing the table, a thead with column headers (Name, Subject, Grade) using th and scope="col", and a tbody with three rows of student data.',
         starterCode: `<table>
   <!-- Add caption -->
@@ -753,6 +769,8 @@ For videos that contain important visual information not described in the dialog
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Add an accessible video player',
         prompt: 'Write the HTML for an accessible video player. It should: use a <video> element with controls, provide an mp4 source, include an English captions track set as default, and below the video add a paragraph with a link to "transcript.html" that says "Read the full transcript".',
         starterCode: `<!-- Accessible video player -->
 
@@ -852,6 +870,8 @@ role="alert" makes screen readers announce the content immediately as an alert.`
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Fix ARIA issues on the page',
         prompt: 'Fix the four accessibility issues in the HTML below using ARIA attributes. (1) The icon button needs a meaningful label. (2) The search results section needs to be labeled by its heading. (3) The star rating needs to be hidden from screen readers (add a visible replacement). (4) The status div needs to announce updates politely.',
         starterCode: `<!-- 1. Icon button with no label -->
 <button>🔍</button>
@@ -977,6 +997,8 @@ Use this every time you build a page:
         },
       ],
       exercise: {
+        projectStep: 9,
+        projectStepLabel: 'Complete the page accessibility checklist',
         prompt: 'Build a complete, accessible HTML page for a personal blog post. It must include: DOCTYPE, html with lang, charset meta, viewport meta, a descriptive title, a skip link, a header with a site name and nav, a main section with an h1, at least two h2 sections with paragraphs, an unordered list, an image with good alt text, and a footer. Use the checklist from the lesson.',
         starterCode: `<!DOCTYPE html>
 <!-- Build your complete accessible blog post page here -->
@@ -1157,6 +1179,8 @@ Web Components with Shadow DOM require careful ARIA implementation — ARIA attr
         },
       ],
       exercise: {
+        projectStep: 10,
+        projectStepLabel: 'Add a confirmation dialog',
         prompt: 'Write the HTML and minimal JavaScript for an accessible confirmation dialog using the native <dialog> element. The dialog should: have a heading, be opened by a button, close on Cancel, and return focus to the trigger.',
         starterCode: `<!-- Accessible confirmation dialog using <dialog> -->
 
@@ -1416,6 +1440,8 @@ FORM SUBMISSION ACCESSIBILITY CHECKLIST
       ],
 
       exercise: {
+        projectStep: 11,
+        projectStepLabel: 'Build the contact form with validation',
         prompt: 'Build an accessible registration form with three fields: Full name (required, min 2 chars), Email (required, type email), and Password (required, minlength 8). Use fieldset/legend, proper labels, novalidate, and show linked error messages with aria-invalid and aria-describedby when the form is submitted with invalid data.',
         starterCode: `<!-- Accessible registration form -->
 <form id="register" novalidate>

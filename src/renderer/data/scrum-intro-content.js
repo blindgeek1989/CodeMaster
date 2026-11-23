@@ -17,6 +17,10 @@
     'Describe the Product Backlog, Sprint Backlog, and Increment',
     'Understand the difference between Agile and Scrum',
   ],
+  project: {
+    name: 'Sprint Zero Setup',
+    description: 'Document a Sprint Zero for a fictional team setting up Scrum for the first time.',
+  },
   lessons: [
     {
       id: 'scrum-intro-1',
@@ -138,7 +142,37 @@ Other Agile frameworks include Kanban, SAFe, LeSS, and XP (Extreme Programming).
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Explain Agile to stakeholders',
+        prompt: 'Write 3 bullet points explaining Agile to a non-technical manager. Each bullet should be one sentence and avoid technical jargon.',
+        starterCode: `// Sprint Zero: Explain Agile
+// Write 3 bullet points for
+// a non-technical manager.
+
+Bullet 1:
+
+Bullet 2:
+
+Bullet 3:`,
+        solution: `// Sprint Zero: Explain Agile
+// Bullet 1:
+Agile delivers working results in short
+cycles rather than waiting years for
+a plan to be completed.
+
+// Bullet 2:
+Agile welcomes feedback and change --
+even late in the project -- because
+real needs often differ from initial
+assumptions.
+
+// Bullet 3:
+Agile teams work in short bursts
+(called Sprints), so you see real
+progress every 1-4 weeks, not just
+at the end.`,
+      },
     },
     {
       id: 'scrum-intro-2',
@@ -204,7 +238,34 @@ Scrum is not a rigid methodology with step-by-step instructions for every situat
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Define the Scrum Team',
+        prompt: 'List the 3 Scrum roles and write one sentence for each explaining their accountability. Use your own words.',
+        starterCode: `// Sprint Zero: Scrum Team Setup
+// List 3 roles, one sentence each.
+
+Role 1 -- Product Owner:
+
+Role 2 -- Developers:
+
+Role 3 -- Scrum Master:`,
+        solution: `// Sprint Zero: Scrum Team Setup
+Role 1 -- Product Owner:
+Accountable for maximising product
+value by managing and ordering the
+Product Backlog.
+
+Role 2 -- Developers:
+Responsible for creating a usable
+Increment each Sprint by doing
+the actual build work.
+
+Role 3 -- Scrum Master:
+Accountable for the team's
+effectiveness by coaching, removing
+obstacles, and upholding Scrum.`,
+      },
     },
     {
       id: 'scrum-intro-3',
@@ -276,7 +337,58 @@ If the work requires more people, multiple Scrum teams work on the same product 
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Map the Sprint calendar',
+        prompt: 'Create a reference table for the 5 Scrum events. For each event, write its name, its time-box for a 1-month Sprint, and its primary purpose in one sentence.',
+        starterCode: `// Sprint Zero: Sprint Calendar
+// Fill in each event's details.
+
+Event: Sprint
+  Time-box:
+  Purpose:
+
+Event: Sprint Planning
+  Time-box:
+  Purpose:
+
+Event: Daily Scrum
+  Time-box:
+  Purpose:
+
+Event: Sprint Review
+  Time-box:
+  Purpose:
+
+Event: Sprint Retrospective
+  Time-box:
+  Purpose:`,
+        solution: `// Sprint Zero: Sprint Calendar
+Event: Sprint
+  Time-box: 1-4 weeks
+  Purpose: Container for all work
+    and other Scrum events.
+
+Event: Sprint Planning
+  Time-box: 8 hours max
+  Purpose: Create the Sprint Goal
+    and select backlog items.
+
+Event: Daily Scrum
+  Time-box: 15 minutes
+  Purpose: Inspect progress and
+    adapt the daily plan.
+
+Event: Sprint Review
+  Time-box: 4 hours max
+  Purpose: Inspect the Increment
+    with stakeholders.
+
+Event: Sprint Retrospective
+  Time-box: 3 hours max
+  Purpose: Inspect and improve
+    the team's process.`,
+      },
     },
     {
       id: 'scrum-intro-4',
@@ -357,7 +469,44 @@ This cycle creates a steady heartbeat. Problems surface quickly. Improvements ha
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Define artifacts and commitments',
+        prompt: 'For each of the 3 Scrum artifacts, write its name, its commitment, and who is accountable for it.',
+        starterCode: `// Sprint Zero: Artifacts
+// For each artifact:
+// name, commitment, accountable person.
+
+Artifact 1:
+  Name:
+  Commitment:
+  Accountable:
+
+Artifact 2:
+  Name:
+  Commitment:
+  Accountable:
+
+Artifact 3:
+  Name:
+  Commitment:
+  Accountable:`,
+        solution: `// Sprint Zero: Artifacts
+Artifact 1:
+  Name: Product Backlog
+  Commitment: Product Goal
+  Accountable: Product Owner
+
+Artifact 2:
+  Name: Sprint Backlog
+  Commitment: Sprint Goal
+  Accountable: Developers
+
+Artifact 3:
+  Name: Increment
+  Commitment: Definition of Done
+  Accountable: Developers`,
+      },
     },
     {
       id: 'scrum-intro-5',
@@ -433,7 +582,33 @@ Without visible, transparent artifacts, Scrum cannot function. The Product Backl
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Write Sprint Zero plan',
+        prompt: 'Write a Sprint Zero plan for a fictional team. Include: a team name, a 1-week Sprint length, and a Sprint Goal focused on setting up the development environment.',
+        starterCode: `// Sprint Zero: Our Sprint Plan
+
+Team name:
+Sprint length:
+Sprint Goal:
+
+Sprint Zero plan (3-5 sentences):`,
+        solution: `// Sprint Zero: Our Sprint Plan
+Team name: Accessible Web Team
+Sprint length: 1 week
+Sprint Goal: Set up the development
+environment so every team member
+can build and test locally.
+
+Sprint Zero plan:
+The Accessible Web Team will spend
+1 week setting up shared tools:
+code editor, version control, local
+server, and test runner. By the end
+of Sprint Zero, every team member
+will be able to run the app locally
+and pass the first automated test.`,
+      },
     },
   ],
 };

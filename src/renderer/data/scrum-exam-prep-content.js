@@ -20,6 +20,10 @@ const scrumExamPrepModule = {
     'Identify whether a described behaviour violates the Scrum Guide',
     'Explain what Nexus adds to Scrum for multiple teams',
   ],
+  project: {
+    name: 'CSM Exam Study Plan',
+    description: 'Build a personalised study plan tracking your readiness for the CSM or PSM I exam.',
+  },
   lessons: [
     // ─────────────────────────────────────────────────────────────────
     // LESSON 1 — SCRUM VALUES
@@ -148,6 +152,8 @@ If the values are absent, empiricism breaks down. If empiricism breaks down, Scr
         },
       ],
       exercise: {
+        projectStep: 1,
+        projectStepLabel: 'Study plan: Scrum Values',
         prompt: 'For each Scrum Value, write a one-sentence description of what violating it looks like in a real team. Use the format: "Violating [Value] looks like..."',
         starterCode: `// Five Scrum Values — write what each violation looks like
 // Example: "Violating Commitment looks like a team ignoring the Sprint Goal to work on personal projects."
@@ -278,6 +284,8 @@ Sprint Retrospective:  Transparency of team dynamics -> Inspection of process ->
         },
       ],
       exercise: {
+        projectStep: 2,
+        projectStepLabel: 'Study plan: Empiricism',
         prompt: 'Describe how each of the three pillars of empiricism is present in the Sprint Retrospective. Write one sentence per pillar.',
         starterCode: `// How does the Sprint Retrospective demonstrate each pillar?
 
@@ -439,6 +447,8 @@ TRAP: "The Scrum Master is accountable for the Definition of Done." — FALSE. T
         },
       ],
       exercise: {
+        projectStep: 3,
+        projectStepLabel: 'Study plan: Rules and traps',
         prompt: 'List all five Scrum events with their time-boxes for a one-month Sprint. Then write one sentence explaining what each event is NOT (a common exam trap).',
         starterCode: `// Event | Time-box | What it is NOT
 
@@ -574,6 +584,8 @@ Sprint Backlog:
         },
       ],
       exercise: {
+        projectStep: 4,
+        projectStepLabel: 'Study plan: Product Backlog',
         prompt: 'List three key differences between the Product Backlog and the Sprint Backlog. Focus on ownership, content, and how each can be changed.',
         starterCode: `// Product Backlog vs Sprint Backlog — three key differences
 
@@ -695,6 +707,8 @@ TRAP: "The Increment is only what was delivered in the current Sprint." — FALS
         },
       ],
       exercise: {
+        projectStep: 5,
+        projectStepLabel: 'Study plan: Definition of Done',
         prompt: 'Write a sample Definition of Done for a web development team building an accessible web application. Include at least 6 criteria that would need to be true before any item is considered "done."',
         starterCode: `// Definition of Done — Accessible Web Application Team
 // List at least 6 criteria that must ALL be true for an item to be "done"
@@ -806,6 +820,8 @@ For the PSM I exam, Nexus knowledge is most important. Awareness of LeSS and tha
         },
       ],
       exercise: {
+        projectStep: 6,
+        projectStepLabel: 'Study plan: Scaling with Nexus',
         prompt: 'In your own words, explain why a single shared Definition of Done is especially important when multiple Scrum Teams work on the same product.',
         starterCode: `// Why is a shared Definition of Done critical in a scaled environment?
 // Write 3-5 sentences explaining the risks of multiple teams having different DoDs.`,
@@ -1245,6 +1261,8 @@ Use the Timed Exam Mode (available from the module menu) to simulate real exam c
         },
       ],
       exercise: {
+        projectStep: 7,
+        projectStepLabel: 'Study plan: Mock Exam 1',
         prompt: 'Review your mock exam answers and identify the two questions you found hardest. Write a short explanation of the correct answer in your own words for each.',
         starterCode: `// Hard question 1 — write the question topic and your explanation:
 
@@ -1686,6 +1704,8 @@ Use the Timed Exam Mode (available from the module menu) to simulate real exam c
         },
       ],
       exercise: {
+        projectStep: 8,
+        projectStepLabel: 'Study plan: Mock Exam 2',
         prompt: 'Compare your scores from Mock Exam 1 and Mock Exam 2. Write which topic areas you missed the most questions in, and identify the specific lessons in this module to review before your real exam.',
         starterCode: `// Post-exam review
 

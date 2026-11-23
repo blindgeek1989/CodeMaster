@@ -17,6 +17,10 @@ const scrumMasterAIModule = {
     'Explain why human judgment cannot be replaced by AI in Scrum coaching',
     'Apply a checklist for responsible AI use in your Scrum practice',
   ],
+  project: {
+    name: 'AI-Assisted Sprint Tools',
+    description: 'Build a collection of AI prompts that assist Scrum Master activities.',
+  },
   lessons: [
     {
       id: 'scrum-master-ai-1',
@@ -87,7 +91,35 @@ Think of AI as a very fast, very knowledgeable assistant who never gets tired. T
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 1,
+        projectStepLabel: 'AI Sprint summary prompt',
+        prompt: 'Write an AI prompt that takes a list of completed and remaining Sprint items and produces a clear stakeholder summary. Test it mentally on a Sprint where the goal was partially achieved.',
+        starterCode: `// AI Tool Prompt #1: Sprint Summary
+// Write a prompt that takes Sprint
+// data and produces a stakeholder
+// summary.
+
+Prompt:`,
+        solution: `// AI Tool Prompt #1: Sprint Summary
+Prompt:
+Write a concise Sprint summary for
+non-technical stakeholders. Keep it
+under 150 words. No jargon.
+
+Format:
+- Sprint Goal: [one sentence]
+- Outcome: achieved / partial / missed
+- Completed: [bullet list]
+- Not completed: [bullet list + reason]
+- Next Sprint focus: [one sentence]
+
+Sprint data:
+Completed: [paste items here]
+Not completed: [paste items here]
+Reason not completed: [paste]
+Sprint Goal: [paste]`,
+      },
     },
     {
       id: 'scrum-master-ai-2',
@@ -177,7 +209,38 @@ Always treat AI output as a first draft requiring human review and judgment — 
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 2,
+        projectStepLabel: 'AI backlog refinement prompt',
+        prompt: 'Write an AI prompt that takes a vague user story and rewrites it in INVEST format, splitting into smaller stories with acceptance criteria if needed.',
+        starterCode: `// AI Tool Prompt #2: Backlog Refinement
+// Write a prompt to improve a
+// vague user story.
+
+Prompt:
+
+// Test it on this vague story:
+// "As a user, I want a better
+//  checkout experience."`,
+        solution: `// AI Tool Prompt #2: Backlog Refinement
+Prompt:
+Rewrite the following user story to
+meet the INVEST criteria
+(Independent, Negotiable, Valuable,
+Estimable, Small, Testable).
+
+If the story is too large to fit in
+one Sprint, split it into 2-4
+smaller stories. For each story:
+1. Write it as: "As a [user],
+   I want [goal] so that [reason]."
+2. Add 2-3 acceptance criteria.
+3. Flag any missing information
+   the team needs to clarify.
+
+User story to improve:
+[paste user story here]`,
+      },
     },
     {
       id: 'scrum-master-ai-3',
@@ -265,7 +328,50 @@ Get the team's informed consent before introducing AI into retrospective process
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 3,
+        projectStepLabel: 'AI retrospective analysis prompt',
+        prompt: 'Write an AI prompt that analyses 5 anonymised retrospective comments, groups them by theme, identifies the top theme, and suggests one actionable improvement.',
+        starterCode: `// AI Tool Prompt #3: Retro Analysis
+// Write a prompt to find themes in
+// retrospective comments.
+
+Prompt:
+
+// Test comments (anonymised):
+// 1. "Requirements keep changing
+//    after we start building."
+// 2. "Stories aren't ready
+//    before Sprint Planning."
+// 3. "We spend half of planning
+//    clarifying acceptance criteria."
+// 4. "Hard to commit without
+//    knowing what 'done' means."
+// 5. "PO is often unavailable
+//    during refinement."`,
+        solution: `// AI Tool Prompt #3: Retro Analysis
+Prompt:
+Analyse the following retrospective
+comments from a Scrum team. Do not
+identify or name any individuals.
+
+Tasks:
+1. Group comments by theme.
+2. Identify the top theme that
+   appears most often or has the
+   biggest impact.
+3. Write a 1-2 sentence summary
+   of the top theme.
+4. Suggest one actionable improvement
+   the team could try next Sprint.
+
+Retrospective comments:
+1. [paste comment]
+2. [paste comment]
+3. [paste comment]
+4. [paste comment]
+5. [paste comment]`,
+      },
     },
     {
       id: 'scrum-master-ai-4',
@@ -344,7 +450,44 @@ CAUTION: Always inform participants that recording and AI transcription is happe
           answer: 2,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 4,
+        projectStepLabel: 'AI impediment report prompt',
+        prompt: 'Write an AI prompt that converts rough bullet notes about a blocked issue into a structured impediment report suitable for escalation to leadership.',
+        starterCode: `// AI Tool Prompt #4: Impediment Report
+// Write a prompt to turn bullet notes
+// into a clear escalation report.
+
+Prompt:
+
+// Test it on these rough notes:
+// - no access to test db
+// - blocked 2 days now
+// - tried IT helpdesk - no response
+// - 2 stories blocked
+// - could cause Sprint Goal miss`,
+        solution: `// AI Tool Prompt #4: Impediment Report
+Prompt:
+Convert the following rough notes into
+a clear, structured impediment report
+for escalation. Use this format:
+
+IMPEDIMENT REPORT
+Impediment: [one clear sentence]
+Duration blocked: [X days]
+Items affected: [list]
+Impact: [Sprint Goal risk + details]
+Steps already taken: [list]
+Action required: [specific ask]
+Deadline for action: [date if known]
+
+Keep the report factual and brief.
+Do not add information not in the
+notes.
+
+Rough notes:
+[paste bullet notes here]`,
+      },
     },
     {
       id: 'scrum-master-ai-5',
@@ -439,7 +582,40 @@ AI tools will continue to evolve rapidly. New capabilities will emerge that are 
           answer: 1,
         },
       ],
-      exercise: null,
+      exercise: {
+        projectStep: 5,
+        projectStepLabel: 'AI stakeholder email prompt',
+        prompt: 'Write an AI prompt that converts Sprint Review notes into a professional stakeholder email. The email should acknowledge whether the Sprint Goal was met and summarise what comes next.',
+        starterCode: `// AI Tool Prompt #5: Stakeholder Email
+// Write a prompt to convert Sprint
+// Review notes into an email.
+
+Prompt:`,
+        solution: `// AI Tool Prompt #5: Stakeholder Email
+Prompt:
+Write a professional email to
+non-technical stakeholders summarising
+this Sprint Review.
+
+The email should:
+1. Open with a 1-sentence summary
+   of whether the Sprint Goal was
+   achieved.
+2. List 2-4 highlights from the
+   Increment (what was built).
+3. Note any significant feedback
+   from the Review session.
+4. Close with the next Sprint focus
+   in one sentence.
+
+Tone: positive but honest. If the
+Sprint Goal was missed, acknowledge
+it and explain why briefly.
+Keep the email under 200 words.
+
+Sprint Review notes:
+[paste notes here]`,
+      },
     },
   ],
 };

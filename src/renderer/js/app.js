@@ -1566,6 +1566,73 @@ function buildQuiz(lesson, progressFill, total, moduleId, lessonIndex) {
   return section;
 }
 
+// ===== Exercise guidance helpers =====
+function extractSignificantTokens(code) {
+  const tokens = new Set();
+  for (const m of code.matchAll(/<\/?(\w[\w-]*)/g))
+    tokens.add(`tag:${m[1].toLowerCase()}`);
+  for (const m of code.matchAll(/\b([\w-][\w-]*)=/g))
+    tokens.add(`attr:${m[1].toLowerCase()}`);
+  for (const m of code.matchAll(/\b([\w-]+)\s*:\s*\S/g)) {
+    const prop = m[1].toLowerCase();
+    if (prop.length > 2 && !prop.startsWith('http'))
+      tokens.add(`prop:${prop}`);
+  }
+  for (const m of code.matchAll(/\.([\w$]+)\s*\(/g))
+    tokens.add(`method:${m[1]}`);
+  return tokens;
+}
+
+function findMissingElements(userCode, solution, starterCode) {
+  const solutionTokens = extractSignificantTokens(solution);
+  const userTokens = extractSignificantTokens(userCode);
+  const starterTokens = extractSignificantTokens(starterCode || '');
+  return [...solutionTokens]
+    .filter(t => !starterTokens.has(t) && !userTokens.has(t))
+    .map(t => t.replace(/^(?:tag|attr|prop|method):/, ''));
+}
+
+function buildMistakeGuidance(missing, attemptCount) {
+  const items = missing.slice(0, 3).join(', ');
+  if (attemptCount === 1)
+    return `Not quite. Make sure your code includes: ${items}. Review the instructions and try again.`;
+  if (attemptCount === 2)
+    return `Still missing some elements. Check for: ${items}. Use "Show solution" if you need a hint.`;
+  return 'Keep trying! Use "Show solution" to study the approach, then reset and try again on your own.';
+}
+
+function buildOutputHint(actual, expected, attemptCount) {
+  if (attemptCount === 1) {
+    const aLines = actual.trim().split('\n');
+    const eLines = expected.trim().split('\n');
+    if (aLines.length !== eLines.length)
+      return `Your output has ${aLines.length} line(s) but ${eLines.length} are expected. Check for extra or missing output.`;
+    for (let i = 0; i < eLines.length; i++) {
+      if ((aLines[i] || '').trim() !== eLines[i].trim())
+        return `Line ${i + 1} doesn't match. Check the value or format of that line.`;
+    }
+    return "The output doesn't match. Double-check your logic and try again.";
+  }
+  if (attemptCount === 2)
+    return 'Still not matching. Re-read the instructions carefully. Use "Show solution" if you are stuck.';
+  return 'Use "Show solution" to study the approach, then reset and try it yourself.';
+}
+
+function buildErrorGuidance(errorText, attemptCount) {
+  if (attemptCount === 1) {
+    if (/SyntaxError/i.test(errorText))
+      return 'You have a syntax error. Check for missing brackets, quotes, or semicolons near the line mentioned.';
+    if (/TypeError/i.test(errorText))
+      return 'You have a type error. Check that you are using the right data type or that variables are defined before use.';
+    if (/NameError|ReferenceError/i.test(errorText))
+      return 'A variable or function is not defined. Check the spelling and make sure it is declared before use.';
+    return 'Read the error message carefully — the line number tells you where to look.';
+  }
+  if (attemptCount === 2)
+    return 'Still an error. Try simplifying your code — comment out parts until it runs, then add them back.';
+  return 'Use "Show solution" to compare your code, then reset and try again.';
+}
+
 // ===== Exercise builder =====
 function buildExercise(exercise, lessonTitle, moduleId) {
   // Normalise: old format {prompt, starterCode, solution} → stepped format
@@ -1686,11 +1753,13 @@ function buildExercise(exercise, lessonTitle, moduleId) {
   let currentStep = 0;
   let stepPassed = false;
   let solShown = false;
+  let attemptCount = 0;
 
   function renderStep(idx) {
     const step = steps[idx];
     stepPassed = false;
     solShown = false;
+    attemptCount = 0;
     nextBtn.setAttribute('hidden', '');
     output.textContent = '';
     output.classList.remove('show', 'success', 'error');
@@ -1735,18 +1804,26 @@ function buildExercise(exercise, lessonTitle, moduleId) {
           const out = result.output || '(No output)';
           if (step.expectedOutput !== undefined) {
             const passed = result.output.trim() === step.expectedOutput.trim();
-            const msg = passed
-              ? `Output:\n${result.output}\n\n✓ Correct!`
-              : `Output:\n${result.output}\n\nExpected:\n${step.expectedOutput}\n\nNot quite — check your code and try again.`;
-            markStepPassed(msg, passed);
+            if (passed) {
+              markStepPassed(`Output:\n${result.output}\n\n✓ Correct!`, true);
+            } else {
+              attemptCount++;
+              const hint = buildOutputHint(result.output, step.expectedOutput, attemptCount);
+              output.textContent = `Output:\n${result.output}\n\nExpected:\n${step.expectedOutput}\n\n${hint}`;
+              output.classList.add('show', 'error');
+              output.classList.remove('success');
+              announce(hint);
+            }
           } else {
             markStepPassed(`Output:\n${out}\n\nLooks good! Check the output matches what you expected.`, true);
           }
         } else {
-          output.textContent = `Error:\n${result.output}`;
+          attemptCount++;
+          const errHint = buildErrorGuidance(result.output, attemptCount);
+          output.textContent = `Error:\n${result.output}\n\n${errHint}`;
           output.classList.add('show', 'error');
           output.classList.remove('success');
-          announce('Your code has an error. Read the error message below the editor.');
+          announce(errHint);
         }
       } catch (err) {
         runBtn.disabled = false;
@@ -1755,7 +1832,25 @@ function buildExercise(exercise, lessonTitle, moduleId) {
         output.classList.add('show', 'error');
       }
     } else {
-      markStepPassed('Code submitted! Compare your work with the solution to check your understanding.', true);
+      const step = steps[currentStep];
+      if (step.solution) {
+        attemptCount++;
+        const missing = findMissingElements(code, step.solution, step.starterCode || '');
+        if (missing.length === 0 || attemptCount >= 3) {
+          const msg = missing.length === 0
+            ? 'Your code includes all the key elements. Well done!'
+            : 'Code submitted. Use "Show solution" to compare your approach.';
+          markStepPassed(msg, missing.length === 0);
+        } else {
+          const hint = buildMistakeGuidance(missing, attemptCount);
+          output.textContent = hint;
+          output.classList.add('show', 'error');
+          output.classList.remove('success');
+          announce(hint);
+        }
+      } else {
+        markStepPassed('Code submitted! Compare your work with the solution to check your understanding.', true);
+      }
     }
   });
 

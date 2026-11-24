@@ -2035,88 +2035,72 @@ function showWelcome() {
 
 // ===== Auto-updater UI =====
 function initUpdater() {
-  const banner          = document.getElementById('update-banner');
-  const versionLabel    = document.getElementById('update-version-label');
-  const btnWhatsNew     = document.getElementById('btn-whats-new');
-  const errorMsg        = document.getElementById('update-error-msg');
-  const btnDownload     = document.getElementById('btn-download-update');
-  const btnDismiss      = document.getElementById('btn-dismiss-update');
-  const progressSection = document.getElementById('update-progress-section');
-  const progressBar     = document.getElementById('update-progress-bar');
-  const progressLabel   = document.getElementById('update-progress-label');
-  const restartSection  = document.getElementById('update-restart-section');
-  const btnInstall      = document.getElementById('btn-install-update');
-  const modal           = document.getElementById('whats-new-modal');
-  const modalNotes      = document.getElementById('modal-release-notes');
-  const btnCloseModal   = document.getElementById('btn-close-whats-new');
+  const modal           = document.getElementById('update-modal');
+  const modalHeading    = document.getElementById('update-modal-heading');
+  const modalNotes      = document.getElementById('update-modal-notes');
+  const progressSection = document.getElementById('update-modal-progress');
+  const progressBar     = document.getElementById('update-modal-bar');
+  const progressLabel   = document.getElementById('update-modal-progress-label');
+  const modalStatus     = document.getElementById('update-modal-status');
+  const btnInstall      = document.getElementById('btn-update-install');
+  const btnLater        = document.getElementById('btn-update-later');
 
   if (!window.electronAPI) return;
 
-  // ---- Modal open/close with focus trap ----
+  // ---- Focus trap ----
   let _trapFocus = null;
 
-  function openWhatsNewModal() {
+  function openUpdateModal() {
     modal.hidden = false;
-    btnCloseModal.focus();
-
+    btnLater.focus();
     _trapFocus = (e) => {
-      if (e.key === 'Escape') { closeWhatsNewModal(); return; }
       if (e.key !== 'Tab') return;
-      const focusable = [...modal.querySelectorAll('button, [href], [tabindex="0"]')];
+      const focusable = [...modal.querySelectorAll('button:not([hidden])')];
+      if (focusable.length === 0) return;
       const first = focusable[0];
       const last  = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
+        e.preventDefault(); last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
+        e.preventDefault(); first.focus();
       }
     };
     modal.addEventListener('keydown', _trapFocus);
   }
 
-  function closeWhatsNewModal() {
+  function closeUpdateModal() {
     modal.hidden = true;
     if (_trapFocus) modal.removeEventListener('keydown', _trapFocus);
     _trapFocus = null;
-    btnWhatsNew.focus();
   }
 
-  btnWhatsNew.addEventListener('click', openWhatsNewModal);
-  btnCloseModal.addEventListener('click', closeWhatsNewModal);
+  btnLater.addEventListener('click', closeUpdateModal);
 
-  // Close when clicking the overlay backdrop (outside the dialog)
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeWhatsNewModal();
-  });
-
-  // ---- Updater events ----
+  // ---- Version display ----
   window.electronAPI.getVersion().then(v => {
     const el = document.getElementById('app-version-display');
     if (el) el.textContent = `v${v}`;
   });
 
+  // ---- Updater events ----
   window.electronAPI.onUpdateAvailable((info) => {
-    updateReady = true;
-    versionLabel.textContent = `Version ${info.version}`;
     const notes = info.releaseNotes
       ? info.releaseNotes.replace(/<[^>]+>/g, '').trim()
-      : 'No release notes provided.';
+      : 'Improvements and bug fixes.';
+    modalHeading.textContent = `What's New in CodeMaster v${info.version}`;
     modalNotes.textContent = notes;
-    btnWhatsNew.hidden = false;
-    errorMsg.hidden = true;
-    btnDownload.disabled = false;
-    btnDownload.textContent = 'Download Update';
-    banner.hidden = false;
-    announce(`Update available: Version ${info.version}. Use the update bar to download.`);
-    btnDownload.focus();
+    modalStatus.textContent = 'Downloading update…';
+    progressBar.style.setProperty('--progress', '0%');
+    progressBar.setAttribute('aria-valuenow', 0);
+    progressLabel.textContent = '0%';
+    progressSection.hidden = false;
+    btnInstall.hidden = true;
+    openUpdateModal();
+    announce(`Update available: Version ${info.version}. Downloading now.`);
+    window.electronAPI.downloadUpdate();
   });
 
   window.electronAPI.onDownloadProgress((progress) => {
-    progressSection.hidden = false;
-    btnDownload.disabled = true;
-    btnDownload.textContent = 'Downloading...';
     progressBar.style.setProperty('--progress', `${progress.percent}%`);
     progressBar.setAttribute('aria-valuenow', progress.percent);
     progressLabel.textContent = `${progress.percent}%`;
@@ -2124,40 +2108,17 @@ function initUpdater() {
 
   window.electronAPI.onUpdateDownloaded((info) => {
     progressSection.hidden = true;
-    restartSection.hidden = false;
-    announce(`Update downloaded. Version ${info.version} is ready. Press Restart and Install to apply.`);
+    modalStatus.textContent = 'Update ready. Restart CodeMaster to apply it.';
+    btnInstall.hidden = false;
     btnInstall.focus();
+    announce(`Version ${info.version} is downloaded and ready to install.`);
   });
-
-  let updateReady = false;
 
   window.electronAPI.onUpdateError(() => {
-    const friendly = 'Unable to check for updates. Please check your internet connection, or visit github.com/blindgeek1989/CodeMaster to download the latest version.';
-    errorMsg.textContent = friendly;
-    errorMsg.hidden = false;
-    banner.hidden = false;
-    announce(friendly);
-    btnDownload.disabled = false;
-    btnDownload.textContent = 'Check Again';
-    progressSection.hidden = true;
-    updateReady = false;
-  });
-
-  btnDownload.addEventListener('click', () => {
-    errorMsg.hidden = true;
-    if (updateReady) {
-      window.electronAPI.downloadUpdate();
-      announce('Downloading update. Please wait.');
-    } else {
-      btnDownload.disabled = true;
-      btnDownload.textContent = 'Checking…';
-      window.electronAPI.checkForUpdates();
+    if (!modal.hidden) {
+      progressSection.hidden = true;
+      modalStatus.textContent = 'Download failed. Please check your connection and try again later.';
     }
-  });
-
-  btnDismiss.addEventListener('click', () => {
-    banner.hidden = true;
-    announce('Update notification dismissed.');
   });
 
   btnInstall.addEventListener('click', () => {

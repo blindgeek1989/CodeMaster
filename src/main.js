@@ -35,7 +35,7 @@ let mainWindow = null;
 let silentUpdateCheck = true;
 
 autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 function createWindow() {
   mainWindow = new BrowserWindow({

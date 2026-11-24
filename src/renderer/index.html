@@ -44,63 +44,38 @@
     role="status"
   ></div>
 
-  <!-- ===== Update notification banner ===== -->
-  <section
-    id="update-banner"
-    class="update-banner"
-    role="region"
-    aria-label="Application update available"
-    aria-live="polite"
-    hidden
-  >
-    <div class="update-banner-top">
-      <div class="update-info">
-        <strong class="update-headline">
-          <span id="update-version-label"></span> is available
-        </strong>
-        <button id="btn-whats-new" class="btn-whats-new" hidden>What's new</button>
-      </div>
-      <div class="update-actions" role="group" aria-label="Update actions">
-        <button id="btn-download-update" class="btn-update-download">Download Update</button>
-        <button id="btn-dismiss-update" class="btn-update-dismiss">Dismiss</button>
-      </div>
-    </div>
-    <p id="update-error-msg" class="update-error-msg" hidden></p>
-
-    <!-- Download progress (hidden until download starts) -->
-    <div id="update-progress-section" class="update-progress-section" hidden>
-      <div
-        id="update-progress-bar"
-        class="update-progress-bar"
-        role="progressbar"
-        aria-valuenow="0"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-label="Update download progress"
-      ></div>
-      <span id="update-progress-label" class="update-progress-label" aria-live="polite"></span>
-    </div>
-
-    <!-- Restart prompt (hidden until download completes) -->
-    <div id="update-restart-section" class="update-restart-section" hidden>
-      <span class="update-ready-msg">Update downloaded and ready to install.</span>
-      <button id="btn-install-update" class="btn-update-install">Restart &amp; Install</button>
-    </div>
-  </section>
-
-  <!-- ===== What's new modal ===== -->
+  <!-- ===== Update modal ===== -->
   <div
-    id="whats-new-modal"
+    id="update-modal"
     class="modal-overlay"
     role="dialog"
     aria-modal="true"
-    aria-labelledby="modal-whats-new-heading"
+    aria-labelledby="update-modal-heading"
     hidden
   >
     <div class="modal-dialog">
-      <h2 id="modal-whats-new-heading">What's new in this update</h2>
-      <div id="modal-release-notes" class="modal-release-notes"></div>
-      <button id="btn-close-whats-new" class="btn-primary">Close</button>
+      <h2 id="update-modal-heading"></h2>
+      <div id="update-modal-notes" class="modal-release-notes"></div>
+
+      <div id="update-modal-progress" class="update-progress-section" hidden>
+        <div
+          id="update-modal-bar"
+          class="update-progress-bar"
+          role="progressbar"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Download progress"
+        ></div>
+        <span id="update-modal-progress-label" class="update-progress-label" aria-live="polite"></span>
+      </div>
+
+      <p id="update-modal-status" class="update-modal-status" aria-live="polite"></p>
+
+      <div class="modal-actions">
+        <button id="btn-update-install" class="btn-update-install" hidden>Restart &amp; Install</button>
+        <button id="btn-update-later">Later</button>
+      </div>
     </div>
   </div>
 

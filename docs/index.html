@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A guided coding curriculum for the modern web developer. Learn HTML, CSS, JavaScript, Python, React, and more with interactive lessons, quizzes, and exercises." />
+  <title>CodeMaster — A Guided Coding Curriculum for the Modern Web Developer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0f172a;
+      --bg-card:     #1e293b;
+      --border:      #334155;
+      --accent:      #6366f1;
+      --accent-hover:#818cf8;
+      --text:        #f1f5f9;
+      --text-muted:  #94a3b8;
+      --success:     #4ade80;
+      --radius:      0.5rem;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent-hover); }
+    a:hover { color: var(--text); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0 0 var(--radius) 0;
+      font-weight: 700;
+      z-index: 100;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== Header ===== */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand span { color: var(--accent-hover); }
+
+    nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.9rem; color: var(--text-muted); text-decoration: none; }
+    nav a:hover, nav a:focus-visible { color: var(--text); }
+
+    /* ===== Hero ===== */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 span { color: var(--accent-hover); }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); color: #fff; }
+
+    .btn-secondary {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .btn-secondary:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .version-note {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== Sections ===== */
+    section { padding: 4rem 2rem; }
+    section:nth-child(even) { background: var(--bg-card); }
+
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-heading {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+    }
+
+    /* ===== Features grid ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .feature-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===== Modules ===== */
+    .level-group { margin-bottom: 2.5rem; }
+
+    .level-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-hover);
+      margin-bottom: 0.75rem;
+    }
+
+    .modules-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .module-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    footer nav { gap: 1.25rem; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 3rem 1.25rem 2.5rem; }
+      section { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header>
+    <div class="brand">Code<span>Master</span></div>
+    <nav aria-label="Site navigation">
+      <a href="https://github.com/blindgeek1989/CodeMaster/releases">Download</a>
+      <a href="https://github.com/blindgeek1989/CodeMaster/wiki">Docs</a>
+      <a href="https://github.com/blindgeek1989/CodeMaster">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <h1 id="hero-heading">A guided coding curriculum for the <span>modern web developer</span></h1>
+      <p>Learn HTML, CSS, JavaScript, Python, React, and more with interactive lessons, quizzes, and hands-on exercises — all in a free desktop app built for everyone.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/blindgeek1989/CodeMaster/releases/latest" class="btn-primary">Download for Windows</a>
+        <a href="https://github.com/blindgeek1989/CodeMaster" class="btn-secondary">View on GitHub</a>
+      </div>
+      <p class="version-note">Free &amp; open source · Windows · v1.9.2</p>
+    </section>
+
+    <!-- Features -->
+    <section aria-labelledby="features-heading">
+      <div class="section-inner">
+        <h2 class="section-heading" id="features-heading">Everything you need to learn to code</h2>
+        <p class="section-sub">Structured curriculum, interactive practice, and tools that keep you moving forward.</p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>22+ Modules</h3>
+            <p>Beginner to advanced topics organized into a clear learning path with prerequisites.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Interactive Exercises</h3>
+            <p>Write real code with starter templates, hints, and solutions. Run Python, SQL, and PowerShell directly in the app.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Quizzes</h3>
+            <p>Multiple-choice questions after every lesson to reinforce what you've learned.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Full-Text Search</h3>
+            <p>Find any lesson instantly across all modules with live search results.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Bookmarks</h3>
+            <p>Save lessons to revisit later. Your bookmarks and progress are stored locally.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Glossary</h3>
+            <p>A built-in reference of coding terms available from anywhere in the app.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Auto-Updates</h3>
+            <p>New content and improvements are delivered automatically so you're always up to date.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Fully Accessible</h3>
+            <p>Built keyboard-first with complete screen reader support, adjustable text size, and high-contrast compatibility.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modules -->
+    <section aria-labelledby="modules-heading">
+      <div class="section-inner">
+        <h2 class="section-heading" id="modules-heading">What you'll learn</h2>
+        <p class="section-sub">22 modules across three difficulty levels, each building on the last.</p>
+
+        <div class="level-group">
+          <div class="level-label">Beginner</div>
+          <div class="modules-grid">
+            <span class="module-chip">Think Like a Programmer</span>
+            <span class="module-chip">HTML</span>
+            <span class="module-chip">CSS</span>
+            <span class="module-chip">Python</span>
+            <span class="module-chip">SQL</span>
+            <span class="module-chip">PowerShell</span>
+            <span class="module-chip">Git &amp; Version Control</span>
+            <span class="module-chip">Prompt Engineering</span>
+            <span class="module-chip">Intro to Scrum</span>
+          </div>
+        </div>
+
+        <div class="level-group">
+          <div class="level-label">Intermediate</div>
+          <div class="modules-grid">
+            <span class="module-chip">JavaScript</span>
+            <span class="module-chip">ARIA</span>
+            <span class="module-chip">GitHub</span>
+            <span class="module-chip">Async JavaScript</span>
+            <span class="module-chip">Node.js &amp; Express</span>
+            <span class="module-chip">Testing with Jest</span>
+            <span class="module-chip">Regular Expressions</span>
+            <span class="module-chip">Scrum Master</span>
+          </div>
+        </div>
+
+        <div class="level-group">
+          <div class="level-label">Advanced</div>
+          <div class="modules-grid">
+            <span class="module-chip">TypeScript</span>
+            <span class="module-chip">React</span>
+            <span class="module-chip">Next.js</span>
+            <span class="module-chip">Scrum Master with AI</span>
+            <span class="module-chip">Scrum Exam Prep</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <nav aria-label="Footer navigation">
+      <a href="https://github.com/blindgeek1989/CodeMaster/releases/latest">Download</a>
+      <a href="https://github.com/blindgeek1989/CodeMaster/wiki">Documentation</a>
+      <a href="https://github.com/blindgeek1989/CodeMaster/issues">Report an Issue</a>
+      <a href="https://github.com/blindgeek1989/CodeMaster">GitHub</a>
+    </nav>
+    <p>© 2026 blindgeek1989 · MIT License</p>
+  </footer>
+
+</body>
+</html>

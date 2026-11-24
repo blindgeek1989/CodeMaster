@@ -2098,6 +2098,7 @@ function initUpdater() {
   });
 
   window.electronAPI.onUpdateAvailable((info) => {
+    updateReady = true;
     versionLabel.textContent = `Version ${info.version}`;
     const notes = info.releaseNotes
       ? info.releaseNotes.replace(/<[^>]+>/g, '').trim()
@@ -2105,6 +2106,8 @@ function initUpdater() {
     modalNotes.textContent = notes;
     btnWhatsNew.hidden = false;
     errorMsg.hidden = true;
+    btnDownload.disabled = false;
+    btnDownload.textContent = 'Download Update';
     banner.hidden = false;
     announce(`Update available: Version ${info.version}. Use the update bar to download.`);
     btnDownload.focus();
@@ -2126,6 +2129,8 @@ function initUpdater() {
     btnInstall.focus();
   });
 
+  let updateReady = false;
+
   window.electronAPI.onUpdateError(() => {
     const friendly = 'Unable to check for updates. Please check your internet connection, or visit github.com/blindgeek1989/CodeMaster to download the latest version.';
     errorMsg.textContent = friendly;
@@ -2133,14 +2138,21 @@ function initUpdater() {
     banner.hidden = false;
     announce(friendly);
     btnDownload.disabled = false;
-    btnDownload.textContent = 'Retry';
+    btnDownload.textContent = 'Check Again';
     progressSection.hidden = true;
+    updateReady = false;
   });
 
   btnDownload.addEventListener('click', () => {
     errorMsg.hidden = true;
-    window.electronAPI.downloadUpdate();
-    announce('Downloading update. Please wait.');
+    if (updateReady) {
+      window.electronAPI.downloadUpdate();
+      announce('Downloading update. Please wait.');
+    } else {
+      btnDownload.disabled = true;
+      btnDownload.textContent = 'Checking…';
+      window.electronAPI.checkForUpdates();
+    }
   });
 
   btnDismiss.addEventListener('click', () => {

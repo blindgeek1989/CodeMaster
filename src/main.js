@@ -32,6 +32,7 @@ function formatSqlResults(results) {
 }
 
 let mainWindow = null;
+let silentUpdateCheck = true;
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = false;
@@ -47,7 +48,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    title: 'CodeMaster — Accessible Coding Learning Platform',
+    title: 'CodeMaster — A Guided Coding Curriculum for the Modern Web Developer',
     backgroundColor: '#0f172a',
   });
 
@@ -59,8 +60,10 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  // Check for updates only in packaged app (not during npm start)
+  // Silent background check on launch — errors are suppressed so the user
+  // never sees a banner just because there are no releases yet
   if (app.isPackaged) {
+    silentUpdateCheck = true;
     autoUpdater.checkForUpdates().catch(() => {});
   }
 
@@ -105,7 +108,7 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('error', (err) => {
-  if (!mainWindow) return;
+  if (!mainWindow || silentUpdateCheck) return;
   mainWindow.webContents.send('update-error', err.message);
 });
 
@@ -188,6 +191,11 @@ ipcMain.handle('run-code', async (_event, { code, language, schema }) => {
   }
 
   return { success: true, output: '' };
+});
+
+ipcMain.handle('check-for-updates', () => {
+  silentUpdateCheck = false;
+  autoUpdater.checkForUpdates().catch(() => {});
 });
 
 ipcMain.handle('download-update', () => {

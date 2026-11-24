@@ -1,7 +1,7 @@
 {
   "name": "codemaster",
   "version": "1.9.2",
-  "description": "Accessible coding learning platform for screen reader and keyboard users",
+  "description": "A guided coding curriculum for the modern web developer.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",

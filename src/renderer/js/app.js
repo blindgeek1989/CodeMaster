@@ -1980,7 +1980,7 @@ function showWelcome() {
   h1.textContent = 'CodeMaster';
 
   const p1 = document.createElement('p');
-  p1.textContent = 'A fully accessible coding learning platform built for keyboard and screen reader users. No experience needed — start from the very beginning.';
+  p1.textContent = 'A guided coding curriculum for the modern web developer.';
 
   const p2 = document.createElement('p');
   p2.textContent = 'Choose a module below to get started.';

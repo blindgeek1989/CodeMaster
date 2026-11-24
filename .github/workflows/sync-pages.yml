@@ -1,0 +1,35 @@
+name: Sync App to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/renderer/**'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync renderer to docs/app
+        run: |
+          mkdir -p docs/app/js docs/app/styles docs/app/data
+          cp src/renderer/index.html docs/app/index.html
+          cp src/renderer/js/app.js docs/app/js/app.js
+          cp src/renderer/js/web-api-shim.js docs/app/js/web-api-shim.js
+          cp src/renderer/styles/main.css docs/app/styles/main.css
+          cp src/renderer/data/*.js docs/app/data/
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/app/
+          git diff --staged --quiet || git commit -m "sync: update docs/app from renderer [skip ci]"
+          git push

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeMaster — A Guided Coding Curriculum for the Modern Web Developer</title>
+  <link rel="stylesheet" href="styles/main.css" />
+
+  <!-- Module data -->
+  <script src="data/git-content.js"></script>
+  <script src="data/github-content.js"></script>
+  <script src="data/typescript-content.js"></script>
+  <script src="data/async-js-content.js"></script>
+  <script src="data/react-content.js"></script>
+  <script src="data/nextjs-content.js"></script>
+  <script src="data/nodejs-content.js"></script>
+  <script src="data/jest-content.js"></script>
+  <script src="data/regex-content.js"></script>
+  <script src="data/prompt-engineering-content.js"></script>
+  <script src="data/think-programmer-content.js"></script>
+  <script src="data/html-content.js"></script>
+  <script src="data/css-content.js"></script>
+  <script src="data/js-content.js"></script>
+  <script src="data/python-content.js"></script>
+  <script src="data/sql-content.js"></script>
+  <script src="data/powershell-content.js"></script>
+  <script src="data/aria-content.js"></script>
+  <script src="data/scrum-intro-content.js"></script>
+  <script src="data/scrum-master-content.js"></script>
+  <script src="data/scrum-master-ai-content.js"></script>
+  <script src="data/scrum-exam-prep-content.js"></script>
+  <script src="data/glossary-content.js"></script>
+</head>
+<body>
+  <!-- Skip to main content -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Screen reader announcer (aria-live region) -->
+  <div
+    id="sr-announcer"
+    class="sr-announcer"
+    aria-live="assertive"
+    aria-atomic="true"
+    role="status"
+  ></div>
+
+  <!-- ===== Update modal ===== -->
+  <div
+    id="update-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="update-modal-heading"
+    hidden
+  >
+    <div class="modal-dialog">
+      <h2 id="update-modal-heading"></h2>
+      <div id="update-modal-notes" class="modal-release-notes"></div>
+
+      <div id="update-modal-progress" class="update-progress-section" hidden>
+        <div
+          id="update-modal-bar"
+          class="update-progress-bar"
+          role="progressbar"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Download progress"
+        ></div>
+        <span id="update-modal-progress-label" class="update-progress-label" aria-live="polite"></span>
+      </div>
+
+      <p id="update-modal-status" class="update-modal-status" aria-live="polite"></p>
+
+      <div class="modal-actions">
+        <button id="btn-update-install" class="btn-update-install" hidden>Restart &amp; Install</button>
+        <button id="btn-update-later">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- ===== Header ===== -->
+    <header class="app-header" role="banner">
+      <div class="header-brand">
+        <span class="app-logo" aria-label="CodeMaster">Code<span>Master</span></span>
+        <span class="app-tagline" aria-label="A guided coding curriculum for the modern web developer">Guided Coding Curriculum</span>
+        <span id="app-version-display" class="app-version" aria-label="Application version"></span>
+      </div>
+
+      <div class="header-toolbar">
+        <button id="home-btn" class="toolbar-btn" aria-label="Go to home screen">Home</button>
+
+        <div class="header-search" role="search">
+          <label for="lesson-search" class="sr-only">Search lessons</label>
+          <input
+            type="search"
+            id="lesson-search"
+            class="lesson-search-input"
+            placeholder="Search lessons…"
+            autocomplete="off"
+            aria-controls="search-results"
+            aria-autocomplete="list"
+          />
+          <ul
+            id="search-results"
+            class="search-results"
+            role="listbox"
+            aria-label="Search results"
+            hidden
+          ></ul>
+          <p id="search-status" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+        </div>
+
+        <button
+          id="bookmarks-toggle-btn"
+          class="toolbar-btn"
+          aria-expanded="false"
+          aria-controls="bookmarks-panel"
+        >Bookmarks</button>
+
+        <div class="font-size-controls" role="group" aria-label="Text size">
+          <button id="font-decrease" class="font-size-btn" aria-label="Decrease text size">A-</button>
+          <span id="font-size-display" class="font-size-display" aria-live="polite" aria-atomic="true"></span>
+          <button id="font-increase" class="font-size-btn" aria-label="Increase text size">A+</button>
+        </div>
+
+        <button id="glossary-btn" class="toolbar-btn">Glossary</button>
+        <button id="feedback-btn" class="toolbar-btn" aria-label="Send feedback or report a bug">Feedback</button>
+        <button id="help-btn" class="toolbar-btn" aria-label="Help and support">Help</button>
+      </div>
+    </header>
+
+    <!-- Bookmarks panel (drops down from header) -->
+    <div
+      id="bookmarks-panel"
+      class="bookmarks-panel"
+      hidden
+      role="region"
+      aria-label="Bookmarks"
+    >
+      <ul id="bookmarks-list" class="bookmarks-list" role="list"></ul>
+    </div>
+
+    <!-- ===== Main ===== -->
+    <main class="main-content" id="main-content" tabindex="-1">
+      <!-- Content is loaded dynamically by app.js -->
+    </main>
+
+  </div>
+
+  <!-- ===== Feedback modal ===== -->
+  <div
+    id="feedback-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feedback-modal-heading"
+    hidden
+  >
+    <div class="modal-dialog">
+      <h2 id="feedback-modal-heading">Send Feedback</h2>
+      <p>Submit a bug report or feature request on GitHub. Your browser will open with the form pre-filled.</p>
+
+      <form id="feedback-form" novalidate>
+        <div class="form-field">
+          <label for="feedback-type">Feedback type</label>
+          <select id="feedback-type">
+            <option value="bug">Bug report</option>
+            <option value="feature">Feature request</option>
+            <option value="general">General feedback</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="feedback-title">Title (required)</label>
+          <input
+            id="feedback-title"
+            type="text"
+            required
+            aria-describedby="feedback-title-hint"
+            placeholder="Brief description of the issue or idea"
+          />
+          <p id="feedback-title-hint" class="field-hint">Keep it short and specific.</p>
+          <p id="feedback-title-error" role="alert" class="field-error" hidden></p>
+        </div>
+
+        <div class="form-field">
+          <label for="feedback-body">Details (optional)</label>
+          <textarea
+            id="feedback-body"
+            rows="5"
+            placeholder="Steps to reproduce, expected behaviour, what you would like to see..."
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Open on GitHub</button>
+          <button type="button" id="btn-close-feedback">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Help modal ===== -->
+  <div
+    id="help-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="help-modal-heading"
+    hidden
+  >
+    <div class="modal-dialog">
+      <h2 id="help-modal-heading">Help &amp; Support</h2>
+      <p>Need help with CodeMaster? Reach out directly — your message goes straight to the developer's inbox.</p>
+
+      <ul class="help-links">
+        <li>
+          <strong>Email support:</strong>
+          <a id="help-email-link" href="#">blindgeek1989@gmail.com</a>
+        </li>
+        <li>
+          <strong>GitHub:</strong>
+          <a id="help-github-link" href="#">View repository, report issues, and read the wiki</a>
+        </li>
+      </ul>
+
+      <p class="field-hint">When emailing, include the module name, lesson title, and a description of the problem.</p>
+
+      <button id="btn-close-help" class="btn-primary">Close</button>
+    </div>
+  </div>
+
+  <script src="js/web-api-shim.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
